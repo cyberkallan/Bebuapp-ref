@@ -1,0 +1,71 @@
+/**
+ * Stable, client-facing error codes. Clients branch on `code`, never on the
+ * human-readable message. Codes are grouped by domain prefix.
+ */
+export const ErrorCode = {
+  // Generic
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  RATE_LIMITED: 'RATE_LIMITED',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  IDEMPOTENCY_KEY_REUSED: 'IDEMPOTENCY_KEY_REUSED',
+
+  // Auth / tenant
+  AUTH_REQUIRED: 'AUTH_REQUIRED',
+  AUTH_TOKEN_INVALID: 'AUTH_TOKEN_INVALID',
+  AUTH_TOKEN_EXPIRED: 'AUTH_TOKEN_EXPIRED',
+  FORBIDDEN: 'FORBIDDEN',
+  TENANT_HEADER_MISSING: 'TENANT_HEADER_MISSING',
+  TENANT_NOT_FOUND: 'TENANT_NOT_FOUND',
+  TENANT_SUSPENDED: 'TENANT_SUSPENDED',
+  TENANT_MISMATCH: 'TENANT_MISMATCH',
+  ACCOUNT_BLOCKED: 'ACCOUNT_BLOCKED',
+
+  // Wallet / payments
+  WALLET_INSUFFICIENT_BALANCE: 'WALLET_INSUFFICIENT_BALANCE',
+  WALLET_NOT_FOUND: 'WALLET_NOT_FOUND',
+  WALLET_INVALID_AMOUNT: 'WALLET_INVALID_AMOUNT',
+  PAYMENT_PROVIDER_UNAVAILABLE: 'PAYMENT_PROVIDER_UNAVAILABLE',
+  PAYMENT_VERIFICATION_FAILED: 'PAYMENT_VERIFICATION_FAILED',
+  PAYMENT_ORDER_NOT_FOUND: 'PAYMENT_ORDER_NOT_FOUND',
+  PAYMENT_ALREADY_PROCESSED: 'PAYMENT_ALREADY_PROCESSED',
+  COIN_PACKAGE_UNAVAILABLE: 'COIN_PACKAGE_UNAVAILABLE',
+
+  // Calls
+  CALL_NOT_FOUND: 'CALL_NOT_FOUND',
+  CALL_INVALID_TRANSITION: 'CALL_INVALID_TRANSITION',
+  CALL_CALLER_UNAVAILABLE: 'CALL_CALLER_UNAVAILABLE',
+  CALL_ALREADY_ACTIVE: 'CALL_ALREADY_ACTIVE',
+  CALL_FEATURE_DISABLED: 'CALL_FEATURE_DISABLED',
+  CALL_SELF_NOT_ALLOWED: 'CALL_SELF_NOT_ALLOWED',
+
+  // Callers
+  CALLER_NOT_FOUND: 'CALLER_NOT_FOUND',
+  CALLER_NOT_APPROVED: 'CALLER_NOT_APPROVED',
+  CALLER_APPLICATION_EXISTS: 'CALLER_APPLICATION_EXISTS',
+
+  // Moderation
+  REPORT_NOT_FOUND: 'REPORT_NOT_FOUND',
+} as const;
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+/**
+ * Every non-2xx response from the API has exactly this shape. `details` is
+ * only populated for validation errors and never contains stack traces,
+ * SQL, or internal identifiers.
+ */
+export interface ApiErrorBody {
+  statusCode: number;
+  code: ErrorCode;
+  message: string;
+  requestId: string;
+  details?: readonly ApiErrorDetail[];
+}
+
+export interface ApiErrorDetail {
+  /** JSON pointer-ish path, e.g. "body.amount" or "query.page". */
+  path: string;
+  message: string;
+}

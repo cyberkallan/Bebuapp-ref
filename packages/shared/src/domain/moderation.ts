@@ -1,0 +1,57 @@
+export const ReportReason = {
+  HARASSMENT: 'HARASSMENT',
+  SEXUAL_CONTENT: 'SEXUAL_CONTENT',
+  SCAM_OR_FRAUD: 'SCAM_OR_FRAUD',
+  UNDERAGE: 'UNDERAGE',
+  HATE_SPEECH: 'HATE_SPEECH',
+  SPAM: 'SPAM',
+  IMPERSONATION: 'IMPERSONATION',
+  OTHER: 'OTHER',
+} as const;
+export type ReportReason = (typeof ReportReason)[keyof typeof ReportReason];
+
+export const ReportStatus = {
+  OPEN: 'OPEN',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  ACTION_TAKEN: 'ACTION_TAKEN',
+  DISMISSED: 'DISMISSED',
+} as const;
+export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus];
+
+export const ModerationAction = {
+  WARN: 'WARN',
+  TEMPORARY_BLOCK: 'TEMPORARY_BLOCK',
+  PERMANENT_BLOCK: 'PERMANENT_BLOCK',
+  CALLER_SUSPEND: 'CALLER_SUSPEND',
+  CONTENT_REMOVED: 'CONTENT_REMOVED',
+  NO_ACTION: 'NO_ACTION',
+} as const;
+export type ModerationAction = (typeof ModerationAction)[keyof typeof ModerationAction];
+
+/**
+ * Categories of audited admin/system actions. Every entry in the audit log
+ * carries one of these plus the acting principal, target and diff.
+ */
+export const AuditAction = {
+  TENANT_CREATED: 'TENANT_CREATED',
+  TENANT_UPDATED: 'TENANT_UPDATED',
+  TENANT_SUSPENDED: 'TENANT_SUSPENDED',
+  ADMIN_ROLE_GRANTED: 'ADMIN_ROLE_GRANTED',
+  ADMIN_ROLE_REVOKED: 'ADMIN_ROLE_REVOKED',
+  USER_BLOCKED: 'USER_BLOCKED',
+  USER_UNBLOCKED: 'USER_UNBLOCKED',
+  CALLER_APPROVED: 'CALLER_APPROVED',
+  CALLER_REJECTED: 'CALLER_REJECTED',
+  CALLER_SUSPENDED: 'CALLER_SUSPENDED',
+  CALLER_RATES_CHANGED: 'CALLER_RATES_CHANGED',
+  WALLET_ADJUSTED: 'WALLET_ADJUSTED',
+  PAYMENT_REFUNDED: 'PAYMENT_REFUNDED',
+  PAYOUT_APPROVED: 'PAYOUT_APPROVED',
+  PAYOUT_REJECTED: 'PAYOUT_REJECTED',
+  COIN_PACKAGE_CHANGED: 'COIN_PACKAGE_CHANGED',
+  PRICING_CHANGED: 'PRICING_CHANGED',
+  MODERATION_ACTION: 'MODERATION_ACTION',
+  NOTIFICATION_BROADCAST: 'NOTIFICATION_BROADCAST',
+  SETTINGS_CHANGED: 'SETTINGS_CHANGED',
+} as const;
+export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];

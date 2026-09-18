@@ -1,0 +1,27 @@
+packages:
+  - 'apps/api'
+  - 'apps/admin'
+  - 'packages/*'
+
+# Fail fast on unmet peer dependencies instead of silently hoisting.
+strictPeerDependencies: false
+autoInstallPeers: true
+
+# Only these packages are allowed to run install-time scripts.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
+  - esbuild
+  - '@swc/core'
+  - sharp
+  - unrs-resolver
+  - protobufjs
+  - '@tailwindcss/oxide'
+  - msgpackr-extract
+  - '@nestjs/core'
+  - farmhash-modern
+  - bufferutil
+  - utf-8-validate
+minimumReleaseAgeExclude:
+  - prettier@3.9.8

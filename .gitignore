@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+apps/api/src/generated/
+
+# Environment - never commit real credentials
+.env
+.env.*
+!.env.example
+!apps/**/.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test / coverage
+coverage/
+.vitest/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Local infra state
+infra/docker/.data/
+
+# Cloud agent terminal scratch
+terminals/
+
+# Flutter / Dart (apps/mobile)
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/.packages
+apps/mobile/build/
+apps/mobile/ios/Pods/
+apps/mobile/ios/.symlinks/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/android/key.properties
+apps/mobile/**/google-services.json
+apps/mobile/**/GoogleService-Info.plist
+apps/mobile/**/*.jks
+apps/mobile/**/*.keystore

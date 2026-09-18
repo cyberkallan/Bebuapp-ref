@@ -1,0 +1,11 @@
+{
+  "extends": "@bebu/config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "noEmit": false,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}

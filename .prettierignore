@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.next
+out
+coverage
+pnpm-lock.yaml
+apps/api/src/generated
+apps/api/prisma/migrations
+apps/mobile
+*.md
