@@ -1,0 +1,6 @@
+# Staging: dev sign-in is enabled on the console, so the whole /admin surface
+# sits behind HTTP basic auth at the edge as a second factor.
+# Hash: docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'
+basic_auth {
+	{$ADMIN_BASIC_AUTH_USER} {$ADMIN_BASIC_AUTH_HASH}
+}

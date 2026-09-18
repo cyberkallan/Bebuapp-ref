@@ -99,8 +99,9 @@ services:
       API_PORT: 4180
       API_HOST: 0.0.0.0
       API_PUBLIC_URL: https://${DOMAIN:?set DOMAIN in infra/deploy/.env}
-      # Caddy terminates TLS one hop in front of the API.
-      TRUST_PROXY_HOPS: 1
+      # Proxy hops in front of the API: 1 (bebu caddy) or 2 in edge mode
+      # (shared reverse proxy -> bebu caddy).
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
       LOG_PRETTY: 'false'
       DATABASE_URL: postgresql://${POSTGRES_USER:-bebu}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bebu}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
@@ -155,10 +156,13 @@ services:
       DOMAIN: ${DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in infra/deploy/.env}
       ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+      ADMIN_GUARD: ${ADMIN_GUARD:-none}
       ADMIN_BASIC_AUTH_USER: ${ADMIN_BASIC_AUTH_USER:-}
       ADMIN_BASIC_AUTH_HASH: ${ADMIN_BASIC_AUTH_HASH:-}
     volumes:
-      - ./${CADDYFILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
+      - ./caddy/${CADDYFILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
+      - ./caddy/routes.caddy:/etc/caddy/routes.caddy:ro
+      - ./caddy/guards:/etc/caddy/guards:ro
       - landing-dist:/srv/landing:ro
       - caddy-data:/data
       - caddy-config:/config

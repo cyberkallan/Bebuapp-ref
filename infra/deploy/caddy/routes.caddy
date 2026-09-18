@@ -1,12 +1,10 @@
-# bebu edge (STAGING variant): automatic HTTPS (Let's Encrypt), static landing site, API and
-# operator console on one domain. Environment variables come from compose.
-{
-	email {$ACME_EMAIL}
-	servers {
-		trusted_proxies static private_ranges
-	}
-}
-
+# Shared bebu routing snippets, imported by Caddyfile (public TLS edge) and
+# Caddyfile.edge (internal HTTP edge behind a shared reverse proxy).
+#
+#   /            static landing site + APK downloads (volume /srv/landing)
+#   /api/*       API (NestJS)            /health*   API readiness/liveness
+#   /admin/*     operator console        /metrics   blocked at the edge
+#
 (security_headers) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -18,16 +16,13 @@
 	}
 }
 
+# Selected with ADMIN_GUARD=none|basic-auth (see guards/).
 (admin_guard) {
-	# Staging: dev sign-in is enabled on the console, so the whole /admin
-	# surface sits behind HTTP basic auth at the edge as a second factor.
-	# Generate the hash with: docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'
-	basic_auth {
-		{$ADMIN_BASIC_AUTH_USER} {$ADMIN_BASIC_AUTH_HASH}
-	}
+	import /etc/caddy/guards/{$ADMIN_GUARD}.caddy
 }
 
-{$DOMAIN} {
+# Everything below the site address is shared with Caddyfile.edge.
+(bebu_routes) {
 	encode zstd gzip
 	import security_headers
 
@@ -86,9 +81,4 @@
 		output stdout
 		format json
 	}
-}
-
-# Redirect the bare www host to the apex.
-www.{$DOMAIN} {
-	redir https://{$DOMAIN}{uri} permanent
 }

@@ -13,6 +13,10 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 ENV_FILE="$HERE/.env"
 COMPOSE=(docker compose -f "$HERE/docker-compose.yml" --env-file "$ENV_FILE")
+# Edge mode (shared reverse proxy on the host) adds the override file.
+if [[ -f "$ENV_FILE" ]] && grep -qE '^EDGE_NETWORK=.+' "$ENV_FILE"; then
+  COMPOSE+=(-f "$HERE/docker-compose.edge.yml")
+fi
 
 log() { printf '\033[1;35m[bebu]\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31m[bebu]\033[0m %s\n' "$*" >&2; exit 1; }
@@ -42,7 +46,7 @@ ensure_env() {
       log "Generated ${key}"
     fi
   done
-  if grep -qE '^ADMIN_BASIC_AUTH_HASH=\s*$' "$ENV_FILE" && grep -qE '^CADDYFILE=Caddyfile.staging' "$ENV_FILE"; then
+  if grep -qE '^ADMIN_BASIC_AUTH_HASH=\s*$' "$ENV_FILE" && grep -qE '^ADMIN_GUARD=basic-auth' "$ENV_FILE"; then
     local pw hash
     pw="$(random_secret 20)"
     # bcrypt hashes contain `$`; compose .env files need it doubled.
@@ -66,6 +70,9 @@ cmd_up() {
   log "Landing:  https://${DOMAIN}"
   log "API:      https://${DOMAIN}/health"
   log "Console:  https://${DOMAIN}${ADMIN_BASE_PATH:-/admin}"
+  if grep -qE '^EDGE_NETWORK=.+' "$ENV_FILE"; then
+    log "Edge mode: point the host reverse proxy for ${DOMAIN} at http://bebu-edge:80"
+  fi
 }
 
 cmd_seed() {

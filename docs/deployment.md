@@ -59,6 +59,23 @@ infra/deploy/deploy.sh seed       # creates the default tenant + super admin
 Useful commands: `deploy.sh status`, `deploy.sh logs [service]`, `deploy.sh update` (pull + rebuild + restart),
 `deploy.sh down` (volumes are preserved).
 
+### Sharing a server with other apps (edge mode)
+
+If the host already runs a reverse proxy that owns ports 80/443 (another Caddy, nginx, Traefik), set in
+`infra/deploy/.env`:
+
+```
+CADDYFILE=Caddyfile.edge      # bebu's Caddy listens on plain :80, publishes no ports
+EDGE_NETWORK=<docker network the host proxy is on>
+TRUST_PROXY_HOPS=2            # host proxy -> bebu edge -> API
+```
+
+`deploy.sh` then starts bebu's Caddy as the container `bebu-edge` on that network. Add a site block to the host
+proxy that terminates TLS for `DOMAIN` and forwards to `http://bebu-edge:80` with `X-Forwarded-For` and
+`X-Forwarded-Proto`. Everything else (routing, `/admin` guard, landing, APKs) stays inside bebu's own edge.
+
+The `/admin` guard is chosen with `ADMIN_GUARD=basic-auth` (staging) or `ADMIN_GUARD=none` (production).
+
 ### Staging vs production (`APP_ENV`)
 
 `NODE_ENV` is always `production` in the containers (optimised builds, JSON logs). `APP_ENV` describes the deployment
@@ -67,14 +84,14 @@ and drives the security rules:
 | Setting          | `APP_ENV=staging`                                                                    | `APP_ENV=production`                     |
 | ---------------- | ------------------------------------------------------------------------------------ | ---------------------------------------- |
 | Sign-in          | Dev identity form, tokens HMAC-signed with `DEV_AUTH_SECRET` (shared by API + admin) | Firebase only (`AUTH_MODE=firebase`)     |
-| `/admin` at edge | Additionally behind HTTP basic auth (`Caddyfile.staging`)                            | No extra layer                           |
+| `/admin` at edge | Additionally behind HTTP basic auth (`ADMIN_GUARD=basic-auth`)                       | No extra layer (`ADMIN_GUARD=none`)      |
 | Agora            | Optional (call features disabled until configured)                                   | `AGORA_APP_ID` + certificate required    |
 | Purpose          | Test on the real domain before identity provider is wired                            | Live traffic                             |
 
 Unsigned dev tokens are rejected by a staging API, so knowing an admin uid is not enough to call it; the secret is
 never sent to a browser (the console signs tokens server-side).
 
-Switching to production: set `APP_ENV=production`, `CADDYFILE=Caddyfile`, `AUTH_MODE=firebase`,
+Switching to production: set `APP_ENV=production`, `ADMIN_GUARD=none`, `AUTH_MODE=firebase`,
 `ADMIN_AUTH_MODE=firebase`, the Firebase service-account variables and the Agora credentials, then
 `deploy.sh update`. The API refuses to boot if any of these are missing.
 

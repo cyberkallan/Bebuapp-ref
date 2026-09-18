@@ -1,0 +1,16 @@
+# bebu internal edge: plain HTTP on :80, no published ports, reachable only
+# from a shared reverse proxy on the same Docker network (EDGE_NETWORK) that
+# terminates TLS for DOMAIN and forwards X-Forwarded-For / X-Forwarded-Proto.
+# Select with CADDYFILE=Caddyfile.edge in infra/deploy/.env.
+{
+	auto_https off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+import /etc/caddy/routes.caddy
+
+:80 {
+	import bebu_routes
+}
