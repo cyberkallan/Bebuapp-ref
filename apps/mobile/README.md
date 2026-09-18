@@ -5,9 +5,10 @@ branded application; the tenant is chosen at build time and everything visual
 (name, colours, logo, feature flags, legal links) is fetched from the API at
 launch via `GET /api/v1/tenant/config`.
 
-> Status: foundation only. The Flutter SDK was not available in the environment
-> that produced this code, so `flutter analyze` / `flutter test` have not been
-> run here. Run them first when you open the project.
+> Status: foundation stage. Builds and passes `flutter analyze` / `flutter test`
+> on Flutter 3.47 (stable). The app boots, loads the tenant's branding and
+> feature flags from the API and themes itself; calling, wallet and sign-in
+> screens arrive in later stages.
 
 ## Layout
 
@@ -20,12 +21,14 @@ lib/
     theme.dart                  Material 3 theme from tenant branding
   core/
     config/app_flavor.dart      TENANT_KEY / API_BASE_URL / AUTH_MODE
+    config/server_settings.dart runtime API URL override (persisted on device)
     network/api_client.dart     Dio client: X-Tenant-Key, bearer, X-Request-Id
     network/api_error.dart      ApiException mirroring the API error envelope
   features/
     tenant/                     public tenant config model + provider
     startup/                    loading / error bootstrap screen
     home/                       placeholder home proving the pipeline
+    settings/                   "Change server address" sheet for testers
 test/                           unit tests (pure Dart, no device required)
 ```
 
@@ -50,6 +53,41 @@ LAN IP and add it to `CORS_ORIGINS` only if you also serve a web build.
 
 `AUTH_MODE=dev` is rejected in release builds (`StateError` at startup), the
 same way the API rejects dev tokens in production.
+
+## Testing a build on a phone
+
+The APK ships with the emulator address (`http://10.0.2.2:4180`) compiled in.
+On a real device, tap **Change server address** (on the connection error screen,
+or the server icon in the app bar) and enter the address of a machine running
+the API that the phone can reach, e.g. `http://192.168.1.10:4180`. The value is
+stored on the device and survives restarts; "Reset to default" clears it.
+
+Requirements for a LAN test: phone and computer on the same network, the API
+started with `API_HOST=0.0.0.0` (the default), and port 4180 open on the
+computer's firewall. Plain HTTP is allowed by the debug network security
+config for exactly this purpose; store builds should be HTTPS only.
+
+## Release signing
+
+`android/app/build.gradle.kts` reads `android/key.properties` (git-ignored):
+
+```
+storeFile=bebu-release.jks
+storePassword=...
+keyAlias=bebu
+keyPassword=...
+```
+
+Generate a key with `keytool -genkeypair -keystore bebu-release.jks -alias
+bebu -keyalg RSA -keysize 2048 -validity 3650`. Keep the keystore out of git
+and in a password manager; with Play App Signing it is only the upload key.
+Without `key.properties`, release builds are signed with the debug key so
+local `flutter run --release` works, but such builds must not be distributed.
+
+```bash
+flutter build apk --release --dart-define=TENANT_KEY=bebu
+# -> build/app/outputs/flutter-apk/app-release.apk
+```
 
 ## Building another brand
 

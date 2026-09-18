@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_error.dart';
+import '../settings/server_settings_sheet.dart';
 
 /// Neutral bootstrap screen shown before tenant branding is available.
 class StartupScreen extends StatelessWidget {
@@ -62,6 +63,12 @@ class StartupScreen extends StatelessWidget {
                       FilledButton(
                         onPressed: onRetry,
                         child: const Text('Try again'),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: () => showServerSettingsSheet(context),
+                        icon: const Icon(Icons.dns_outlined),
+                        label: const Text('Change server address'),
                       ),
                     ],
                   ),

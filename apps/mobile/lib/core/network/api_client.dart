@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../config/app_flavor.dart';
+import '../config/server_settings.dart';
 import 'api_error.dart';
 
 /// Supplies the current bearer token, if the user is signed in.
@@ -14,8 +15,13 @@ final tokenProviderProvider = Provider<TokenProvider>((_) => () async => null);
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final flavor = ref.watch(appFlavorProvider);
+  final baseUrl = ref.watch(effectiveApiBaseUrlProvider);
   final tokenProvider = ref.watch(tokenProviderProvider);
-  return ApiClient(flavor: flavor, tokenProvider: tokenProvider);
+  return ApiClient(
+    baseUrl: baseUrl,
+    tenantKey: flavor.tenantKey,
+    tokenProvider: tokenProvider,
+  );
 });
 
 /// Thin wrapper over Dio that enforces the platform's HTTP contract:
@@ -24,16 +30,19 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 ///  - a fresh `X-Request-Id` per request (echoed by the API; include it in bug reports)
 ///  - API error envelopes surfaced as [ApiException] with a stable `code`
 class ApiClient {
-  ApiClient({required AppFlavor flavor, required TokenProvider tokenProvider})
-      : _tokenProvider = tokenProvider,
+  ApiClient({
+    required String baseUrl,
+    required String tenantKey,
+    required TokenProvider tokenProvider,
+  })  : _tokenProvider = tokenProvider,
         _dio = Dio(
           BaseOptions(
-            baseUrl: flavor.apiBaseUrl,
+            baseUrl: baseUrl,
             connectTimeout: const Duration(seconds: 8),
             receiveTimeout: const Duration(seconds: 15),
             headers: {
               'Accept': 'application/json',
-              'X-Tenant-Key': flavor.tenantKey,
+              'X-Tenant-Key': tenantKey,
             },
           ),
         ) {

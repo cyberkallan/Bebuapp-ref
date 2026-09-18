@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config/app_flavor.dart';
+import '../../core/config/server_settings.dart';
+import '../settings/server_settings_sheet.dart';
 import '../tenant/tenant_config.dart';
 import '../tenant/tenant_config_provider.dart';
 
@@ -15,13 +17,23 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tenant = ref.watch(tenantConfigProvider).requireValue;
     final flavor = ref.watch(appFlavorProvider);
+    final apiBaseUrl = ref.watch(effectiveApiBaseUrlProvider);
     final scheme = Theme.of(context).colorScheme;
 
     final enabled = TenantFeature.values.where(tenant.isEnabled).toList();
     final disabled = TenantFeature.values.where((f) => !tenant.isEnabled(f)).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text(tenant.branding.displayName)),
+      appBar: AppBar(
+        title: Text(tenant.branding.displayName),
+        actions: [
+          IconButton(
+            tooltip: 'Server address',
+            icon: const Icon(Icons.dns_outlined),
+            onPressed: () => showServerSettingsSheet(context),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -33,7 +45,7 @@ class HomeScreen extends ConsumerWidget {
                 child: Text(tenant.branding.displayName.substring(0, 1).toUpperCase()),
               ),
               title: Text(tenant.branding.displayName),
-              subtitle: Text('tenant ${tenant.key} · ${tenant.currency} · ${flavor.apiBaseUrl}'),
+              subtitle: Text('tenant ${tenant.key} · ${tenant.currency} · $apiBaseUrl'),
             ),
           ),
           const SizedBox(height: 16),

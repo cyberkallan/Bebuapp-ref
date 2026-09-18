@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Production traffic is HTTPS only. Plain HTTP is allowed solely so testers can
+  point the app at a development API on their LAN (see "Change server address"
+  in the app). Tighten to cleartextTrafficPermitted="false" for store builds.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
