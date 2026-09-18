@@ -1,0 +1,55 @@
+# bebu landing — Apache / LiteSpeed configuration for shared hosting.
+# Copied verbatim into the build output by Vite (public/ folder).
+
+Options -Indexes
+DirectoryIndex index.html
+
+# Force HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Serve the operator console status page at /admin (trailing-slash safe)
+RewriteRule ^admin$ /admin/ [R=301,L]
+
+# Android packages must be served with the correct MIME type so browsers
+# download them instead of displaying garbage.
+AddType application/vnd.android.package-archive .apk
+AddType application/json .json
+AddType image/svg+xml .svg
+
+<FilesMatch "\.apk$">
+  Header set Content-Disposition "attachment"
+  Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+# Caching: hashed Vite assets are immutable, everything else revalidates.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType application/vnd.android.package-archive "access plus 1 hour"
+  ExpiresByType image/svg+xml "access plus 7 days"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "^assets/.*\.(js|css|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+ErrorDocument 404 /404.html

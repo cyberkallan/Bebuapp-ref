@@ -1,6 +1,7 @@
 packages:
   - 'apps/api'
   - 'apps/admin'
+  - 'apps/landing'
   - 'packages/*'
 
 # Fail fast on unmet peer dependencies instead of silently hoisting.
