@@ -7,21 +7,27 @@ packages:
 strictPeerDependencies: false
 autoInstallPeers: true
 
-# Only these packages are allowed to run install-time scripts.
-onlyBuiltDependencies:
-  - '@prisma/client'
-  - '@prisma/engines'
-  - prisma
-  - esbuild
-  - '@swc/core'
-  - sharp
-  - unrs-resolver
-  - protobufjs
-  - '@tailwindcss/oxide'
-  - msgpackr-extract
-  - '@nestjs/core'
-  - farmhash-modern
-  - bufferutil
-  - utf-8-validate
+# Install-time scripts are blocked unless explicitly allowed here. Every entry
+# below has a known reason (native binaries, engine download, protobuf codegen).
+allowBuilds:
+  prisma: true
+  '@prisma/engines': true
+  '@prisma/client': true
+  esbuild: true
+  '@swc/core': true
+  sharp: true
+  unrs-resolver: true
+  protobufjs: true
+  '@tailwindcss/oxide': true
+  msgpackr-extract: true
+  '@firebase/util': true
+  farmhash-modern: true
+  bufferutil: true
+  utf-8-validate: true
+
+# Supply-chain guard: refuse versions published less than a day ago unless
+# listed below. pnpm appends to the exclude list when a pinned version is newer.
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - prettier@3.9.8
+  - bullmq@6.3.7

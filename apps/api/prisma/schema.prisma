@@ -1,0 +1,793 @@
+// bebu platform - PostgreSQL source of truth.
+//
+// Conventions
+// - Every tenant-owned table carries `tenantId` and indexes on it.
+// - All coin and fiat values are integers (BIGINT for balances/ledger, INT for
+//   rates/prices). Never Float/Decimal.
+// - Financial tables are append-only where possible; corrections are new rows.
+// - Enum string values match `@bebu/shared` exactly.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "nodejs"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Tenants & administration
+// ---------------------------------------------------------------------------
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+model Tenant {
+  id                 String       @id @default(uuid(7)) @db.Uuid
+  /// Public slug sent by clients in X-Tenant-Key.
+  key                String       @unique @db.VarChar(64)
+  name               String       @db.VarChar(80)
+  status             TenantStatus @default(ACTIVE)
+  androidPackageName String?      @db.VarChar(160)
+  iosBundleId        String?      @db.VarChar(160)
+  /// ISO-3166 alpha-2 codes. Empty = worldwide.
+  supportedCountries String[]     @default([])
+  /// TenantBranding (validated by tenantBrandingSchema).
+  branding           Json         @default("{}")
+  /// TenantLegalUrls.
+  legal              Json         @default("{}")
+  /// Partial<Record<TenantFeatureFlag, boolean>>; merged with defaults at read time.
+  featureFlags       Json         @default("{}")
+  /// Tenant pricing (currency, commission bps, default rates, minimums).
+  pricing            Json         @default("{}")
+  /// Push/notification provider settings and template overrides. Secrets are
+  /// referenced by name, never stored here.
+  notificationConfig Json         @default("{}")
+  createdAt          DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime     @updatedAt @db.Timestamptz(3)
+
+  users              User[]
+  adminAccounts      AdminAccount[]
+  callerProfiles     CallerProfile[]
+  callerVisibility   CallerTenantVisibility[]
+  wallets            Wallet[]
+  walletTransactions WalletTransaction[]
+  coinPackages       CoinPackage[]
+  paymentOrders      PaymentOrder[]
+  paymentEvents      PaymentEvent[]
+  payoutRequests     PayoutRequest[]
+  calls              Call[]
+  reports            Report[]
+  auditLogs          AuditLog[]
+  notificationLogs   NotificationLog[]
+  ratings            Rating[]
+  devices            Device[]
+
+  @@index([status])
+  @@map("tenants")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  TENANT_ADMIN
+  TENANT_STAFF
+}
+
+enum AccountStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+/// Staff/operator accounts. Separate from end users: different lifecycle,
+/// no wallet, may span tenants (SUPER_ADMIN has tenantId = null).
+model AdminAccount {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  firebaseUid String        @unique @db.VarChar(128)
+  email       String        @db.VarChar(320)
+  displayName String        @db.VarChar(120)
+  role        AdminRole
+  /// Null only for SUPER_ADMIN.
+  tenantId    String?       @db.Uuid
+  status      AccountStatus @default(ACTIVE)
+  lastLoginAt DateTime?     @db.Timestamptz(3)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime      @updatedAt @db.Timestamptz(3)
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, role])
+  @@map("admin_accounts")
+}
+
+// ---------------------------------------------------------------------------
+// Users, devices, callers
+// ---------------------------------------------------------------------------
+
+enum Gender {
+  FEMALE
+  MALE
+  NON_BINARY
+  UNDISCLOSED
+}
+
+model User {
+  id                      String        @id @default(uuid(7)) @db.Uuid
+  tenantId                String        @db.Uuid
+  /// Firebase Authentication uid. Unique per tenant (Firebase projects may be shared).
+  firebaseUid             String        @db.VarChar(128)
+  authProvider            String?       @db.VarChar(40)
+  email                   String?       @db.VarChar(320)
+  phoneNumber             String?       @db.VarChar(32)
+  displayName             String        @default("") @db.VarChar(80)
+  avatarUrl               String?       @db.VarChar(1024)
+  gender                  Gender        @default(UNDISCLOSED)
+  birthDate               DateTime?     @db.Date
+  country                 String?       @db.VarChar(2)
+  language                String?       @db.VarChar(16)
+  status                  AccountStatus @default(ACTIVE)
+  blockedReason           String?       @db.VarChar(500)
+  /// NotificationPreferences (see @bebu/shared). Merged with defaults at read time.
+  notificationPreferences Json          @default("{}")
+  lastActiveAt            DateTime?     @db.Timestamptz(3)
+  deletedAt               DateTime?     @db.Timestamptz(3)
+  createdAt               DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime      @updatedAt @db.Timestamptz(3)
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  callerProfile   CallerProfile?
+  wallets         Wallet[]
+  devices         Device[]
+  paymentOrders   PaymentOrder[]
+  callsAsUser     Call[]           @relation("CallUser")
+  reportsFiled    Report[]         @relation("ReportReporter")
+  reportsReceived Report[]         @relation("ReportReported")
+  ratings         Rating[]
+  notifications   NotificationLog[]
+
+  @@unique([tenantId, firebaseUid])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt(sort: Desc)])
+  @@index([tenantId, lastActiveAt])
+  @@map("users")
+}
+
+enum ClientPlatform {
+  ANDROID
+  IOS
+  WEB
+}
+
+/// Push-capable installations. One user may have several devices.
+model Device {
+  id          String         @id @default(uuid(7)) @db.Uuid
+  tenantId    String         @db.Uuid
+  userId      String         @db.Uuid
+  platform    ClientPlatform
+  fcmToken    String         @unique @db.VarChar(512)
+  appVersion  String?        @db.VarChar(32)
+  locale      String?        @db.VarChar(16)
+  timezone    String?        @db.VarChar(64)
+  lastSeenAt  DateTime       @default(now()) @db.Timestamptz(3)
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("devices")
+}
+
+enum CallerStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+/// A user who offers paid calls. Rates are integer coins per billing interval.
+model CallerProfile {
+  id                    String       @id @default(uuid(7)) @db.Uuid
+  /// Home tenant that onboarded the caller.
+  tenantId              String       @db.Uuid
+  userId                String       @unique @db.Uuid
+  status                CallerStatus @default(PENDING_REVIEW)
+  displayName           String       @db.VarChar(80)
+  bio                   String       @default("") @db.VarChar(2000)
+  languages             String[]     @default([])
+  topics                String[]     @default([])
+  privateAudioPerMinute Int          @default(0)
+  privateVideoPerMinute Int          @default(0)
+  randomAudioPerMinute  Int          @default(0)
+  randomVideoPerMinute  Int          @default(0)
+  /// Integer rating aggregate: average = ratingSum / ratingCount.
+  ratingSum             Int          @default(0)
+  ratingCount           Int          @default(0)
+  totalCalls            Int          @default(0)
+  totalBilledSeconds    BigInt       @default(0)
+  /// When true the caller may be exposed to other tenants that allow it
+  /// (see CallerTenantVisibility for the explicit allow-list).
+  sharedAcrossTenants   Boolean      @default(false)
+  /// Identity documents are stored in object storage; only references here.
+  verificationDocuments Json         @default("[]")
+  rejectionReason       String?      @db.VarChar(500)
+  reviewedAt            DateTime?    @db.Timestamptz(3)
+  reviewedByAdminId     String?      @db.Uuid
+  lastOnlineAt          DateTime?    @db.Timestamptz(3)
+  createdAt             DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime     @updatedAt @db.Timestamptz(3)
+
+  tenant         Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user           User                     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  visibility     CallerTenantVisibility[]
+  callsAsCaller  Call[]                   @relation("CallCaller")
+  payoutRequests PayoutRequest[]
+  ratings        Rating[]
+
+  @@index([tenantId, status])
+  @@index([status, sharedAcrossTenants])
+  @@map("caller_profiles")
+}
+
+/// Explicit allow-list of tenants in which a caller is discoverable.
+model CallerTenantVisibility {
+  callerProfileId String   @db.Uuid
+  tenantId        String   @db.Uuid
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  callerProfile CallerProfile @relation(fields: [callerProfileId], references: [id], onDelete: Cascade)
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([callerProfileId, tenantId])
+  @@index([tenantId, enabled])
+  @@map("caller_tenant_visibility")
+}
+
+// ---------------------------------------------------------------------------
+// Wallets & immutable ledger
+// ---------------------------------------------------------------------------
+
+enum WalletKind {
+  USER
+  CALLER_EARNINGS
+  PLATFORM_REVENUE
+}
+
+/// Materialised balance. Always updated in the same transaction as the ledger
+/// row that changes it, under a row lock. `version` supports optimistic checks.
+model Wallet {
+  id          String     @id @default(uuid(7)) @db.Uuid
+  tenantId    String     @db.Uuid
+  kind        WalletKind
+  /// Null only for PLATFORM_REVENUE wallets.
+  userId      String?    @db.Uuid
+  balance     BigInt     @default(0)
+  /// Coins reserved by active call holds; available = balance - heldBalance.
+  heldBalance BigInt     @default(0)
+  version     Int        @default(0)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(3)
+
+  tenant       Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user         User?               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  transactions WalletTransaction[]
+
+  @@unique([tenantId, kind, userId])
+  @@map("wallets")
+}
+
+enum WalletTransactionType {
+  PURCHASE
+  BONUS
+  CALL_CHARGE
+  CALL_EARNING
+  PLATFORM_COMMISSION
+  REFUND
+  HOLD
+  HOLD_RELEASE
+  PAYOUT
+  PAYOUT_REVERSAL
+  ADMIN_ADJUSTMENT
+  CHARGEBACK
+}
+
+enum LedgerDirection {
+  CREDIT
+  DEBIT
+}
+
+enum WalletTransactionStatus {
+  PENDING
+  POSTED
+  REVERSED
+  FAILED
+}
+
+enum LedgerReferenceType {
+  PAYMENT_ORDER
+  CALL
+  CALL_BILLING_INTERVAL
+  PAYOUT_REQUEST
+  ADMIN_ACTION
+  PROMOTION
+}
+
+enum ActorType {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+/// Append-only ledger. Rows are never updated except `status` (PENDING -> POSTED/FAILED).
+model WalletTransaction {
+  id             String                  @id @default(uuid(7)) @db.Uuid
+  tenantId       String                  @db.Uuid
+  walletId       String                  @db.Uuid
+  type           WalletTransactionType
+  direction      LedgerDirection
+  /// Absolute amount, > 0.
+  amount         BigInt
+  balanceBefore  BigInt
+  balanceAfter   BigInt
+  referenceType  LedgerReferenceType?
+  referenceId    String?                 @db.Uuid
+  /// Client- or system-supplied key; duplicates return the original row.
+  idempotencyKey String                  @db.VarChar(160)
+  status         WalletTransactionStatus @default(POSTED)
+  actorType      ActorType
+  actorId        String?                 @db.Uuid
+  /// Free-form, non-financial context (e.g. package name, call type).
+  metadata       Json                    @default("{}")
+  createdAt      DateTime                @default(now()) @db.Timestamptz(3)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Restrict)
+
+  paymentOrder     PaymentOrder?
+  payoutRequest    PayoutRequest?
+  chargeIntervals  CallBillingInterval[] @relation("IntervalCharge")
+  earningIntervals CallBillingInterval[] @relation("IntervalEarning")
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([tenantId, referenceType, referenceId])
+  @@index([tenantId, type, createdAt(sort: Desc)])
+  @@map("wallet_transactions")
+}
+
+// ---------------------------------------------------------------------------
+// Payments (provider-agnostic)
+// ---------------------------------------------------------------------------
+
+enum PaymentProviderKind {
+  WEB
+  GOOGLE_PLAY
+  APPLE_IAP
+  MANUAL
+}
+
+enum PaymentOrderStatus {
+  CREATED
+  PENDING_VERIFICATION
+  COMPLETED
+  FAILED
+  CANCELLED
+  EXPIRED
+  REFUNDED
+  CHARGED_BACK
+}
+
+model CoinPackage {
+  id                  String   @id @default(uuid(7)) @db.Uuid
+  tenantId            String   @db.Uuid
+  name                String   @db.VarChar(80)
+  coins               Int
+  bonusCoins          Int      @default(0)
+  /// Fiat price in minor units (paise/cents).
+  priceMinorUnits     Int
+  currency            String   @db.VarChar(3)
+  googlePlayProductId String?  @db.VarChar(160)
+  appleProductId      String?  @db.VarChar(160)
+  isActive            Boolean  @default(true)
+  isPopular           Boolean  @default(false)
+  sortOrder           Int      @default(0)
+  createdAt           DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime @updatedAt @db.Timestamptz(3)
+
+  tenant Tenant         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  orders PaymentOrder[]
+
+  @@index([tenantId, isActive, sortOrder])
+  @@map("coin_packages")
+}
+
+/// One purchase attempt. Coins are credited exactly once, on COMPLETED, in the
+/// same transaction that writes `walletTransactionId`.
+model PaymentOrder {
+  id                  String              @id @default(uuid(7)) @db.Uuid
+  tenantId            String              @db.Uuid
+  userId              String              @db.Uuid
+  coinPackageId       String              @db.Uuid
+  provider            PaymentProviderKind
+  platform            ClientPlatform
+  status              PaymentOrderStatus  @default(CREATED)
+  /// Snapshot of package at order time (packages may change later).
+  coins               Int
+  amountMinorUnits    Int
+  currency            String              @db.VarChar(3)
+  /// Provider-side identifier (order id, purchase token hash, transaction id).
+  providerOrderId     String?             @db.VarChar(255)
+  idempotencyKey      String              @db.VarChar(160)
+  walletTransactionId String?             @unique @db.Uuid
+  failureReason       String?             @db.VarChar(500)
+  expiresAt           DateTime?           @db.Timestamptz(3)
+  completedAt         DateTime?           @db.Timestamptz(3)
+  metadata            Json                @default("{}")
+  createdAt           DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime            @updatedAt @db.Timestamptz(3)
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  coinPackage       CoinPackage        @relation(fields: [coinPackageId], references: [id], onDelete: Restrict)
+  walletTransaction WalletTransaction? @relation(fields: [walletTransactionId], references: [id], onDelete: Restrict)
+  events            PaymentEvent[]
+
+  @@unique([tenantId, userId, idempotencyKey])
+  @@unique([provider, providerOrderId])
+  @@index([tenantId, userId, createdAt(sort: Desc)])
+  @@index([tenantId, status])
+  @@map("payment_orders")
+}
+
+/// Every inbound provider notification (webhook, server-to-server) is stored
+/// before processing so replays are detected by the unique constraint.
+model PaymentEvent {
+  id              String              @id @default(uuid(7)) @db.Uuid
+  tenantId        String?             @db.Uuid
+  paymentOrderId  String?             @db.Uuid
+  provider        PaymentProviderKind
+  providerEventId String              @db.VarChar(255)
+  eventType       String              @db.VarChar(120)
+  payload         Json
+  signatureValid  Boolean
+  processedAt     DateTime?           @db.Timestamptz(3)
+  processingError String?             @db.VarChar(1000)
+  receivedAt      DateTime            @default(now()) @db.Timestamptz(3)
+
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  paymentOrder PaymentOrder? @relation(fields: [paymentOrderId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([paymentOrderId])
+  @@map("payment_events")
+}
+
+enum PayoutStatus {
+  REQUESTED
+  APPROVED
+  PAID
+  REJECTED
+  FAILED
+}
+
+model PayoutRequest {
+  id                  String       @id @default(uuid(7)) @db.Uuid
+  tenantId            String       @db.Uuid
+  callerProfileId     String       @db.Uuid
+  coins               BigInt
+  amountMinorUnits    Int
+  currency            String       @db.VarChar(3)
+  status              PayoutStatus @default(REQUESTED)
+  /// Bank/UPI details reference. Sensitive fields must be tokenised upstream.
+  payoutMethod        Json         @default("{}")
+  walletTransactionId String?      @unique @db.Uuid
+  reviewedByAdminId   String?      @db.Uuid
+  reviewedAt          DateTime?    @db.Timestamptz(3)
+  reviewNote          String?      @db.VarChar(500)
+  paidAt              DateTime?    @db.Timestamptz(3)
+  createdAt           DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime     @updatedAt @db.Timestamptz(3)
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  callerProfile     CallerProfile      @relation(fields: [callerProfileId], references: [id], onDelete: Restrict)
+  walletTransaction WalletTransaction? @relation(fields: [walletTransactionId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status, createdAt(sort: Desc)])
+  @@index([callerProfileId])
+  @@map("payout_requests")
+}
+
+// ---------------------------------------------------------------------------
+// Calls & billing
+// ---------------------------------------------------------------------------
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallMode {
+  PRIVATE
+  RANDOM
+}
+
+enum CallState {
+  REQUESTED
+  RINGING
+  ACCEPTED
+  CONNECTING
+  CONNECTED
+  BILLING
+  ENDING
+  COMPLETED
+  REJECTED
+  MISSED
+  CANCELLED
+  FAILED
+  INSUFFICIENT_BALANCE
+  TIMEOUT
+}
+
+enum CallEndReason {
+  CALLER_HUNG_UP
+  CALLEE_HUNG_UP
+  INSUFFICIENT_BALANCE
+  NETWORK_LOST
+  RING_TIMEOUT
+  CONNECT_TIMEOUT
+  REJECTED
+  CANCELLED
+  MODERATION
+  SERVER_ERROR
+}
+
+/// Server-authoritative call record. Live state also lives in Redis for
+/// low-latency reads; this row is the durable truth and drives billing.
+model Call {
+  id                 String         @id @default(uuid(7)) @db.Uuid
+  tenantId           String         @db.Uuid
+  userId             String         @db.Uuid
+  callerProfileId    String         @db.Uuid
+  type               CallType
+  mode               CallMode
+  state              CallState      @default(REQUESTED)
+  endReason          CallEndReason?
+  /// Pricing snapshot at request time.
+  ratePerMinute      Int
+  commissionBps      Int
+  agoraChannelName   String         @unique @db.VarChar(64)
+  userAgoraUid       Int
+  callerAgoraUid     Int
+  requestedAt        DateTime       @default(now()) @db.Timestamptz(3)
+  ringingAt          DateTime?      @db.Timestamptz(3)
+  acceptedAt         DateTime?      @db.Timestamptz(3)
+  connectedAt        DateTime?      @db.Timestamptz(3)
+  endedAt            DateTime?      @db.Timestamptz(3)
+  /// Server-measured, from connectedAt to endedAt.
+  billedSeconds      Int            @default(0)
+  totalCharged       BigInt         @default(0)
+  callerEarnings     BigInt         @default(0)
+  platformCommission BigInt         @default(0)
+  idempotencyKey     String         @db.VarChar(160)
+  /// Incremented on every state change; used for optimistic concurrency.
+  stateVersion       Int            @default(0)
+  metadata           Json           @default("{}")
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime       @updatedAt @db.Timestamptz(3)
+
+  tenant        Tenant                @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user          User                  @relation("CallUser", fields: [userId], references: [id], onDelete: Restrict)
+  callerProfile CallerProfile         @relation("CallCaller", fields: [callerProfileId], references: [id], onDelete: Restrict)
+  intervals     CallBillingInterval[]
+  transitions   CallStateTransition[]
+  reports       Report[]
+  rating        Rating?
+
+  @@unique([tenantId, userId, idempotencyKey])
+  @@index([tenantId, userId, createdAt(sort: Desc)])
+  @@index([tenantId, callerProfileId, createdAt(sort: Desc)])
+  @@index([tenantId, state])
+  @@map("calls")
+}
+
+enum BillingIntervalStatus {
+  CHARGED
+  FAILED_INSUFFICIENT
+  REFUNDED
+}
+
+/// One row per billed interval; links the user charge and the caller earning.
+model CallBillingInterval {
+  id                   String                @id @default(uuid(7)) @db.Uuid
+  callId               String                @db.Uuid
+  intervalIndex        Int
+  startsAt             DateTime              @db.Timestamptz(3)
+  endsAt               DateTime              @db.Timestamptz(3)
+  amount               Int
+  callerAmount         Int
+  platformAmount       Int
+  status               BillingIntervalStatus
+  chargeTransactionId  String?               @db.Uuid
+  earningTransactionId String?               @db.Uuid
+  createdAt            DateTime              @default(now()) @db.Timestamptz(3)
+
+  call               Call               @relation(fields: [callId], references: [id], onDelete: Restrict)
+  chargeTransaction  WalletTransaction? @relation("IntervalCharge", fields: [chargeTransactionId], references: [id], onDelete: Restrict)
+  earningTransaction WalletTransaction? @relation("IntervalEarning", fields: [earningTransactionId], references: [id], onDelete: Restrict)
+
+  @@unique([callId, intervalIndex])
+  @@map("call_billing_intervals")
+}
+
+/// Audit trail of every state change for dispute resolution.
+model CallStateTransition {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  callId    String    @db.Uuid
+  fromState CallState
+  toState   CallState
+  actorType ActorType
+  actorId   String?   @db.Uuid
+  reason    String?   @db.VarChar(255)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([callId, createdAt])
+  @@map("call_state_transitions")
+}
+
+model Rating {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  tenantId        String   @db.Uuid
+  callId          String   @unique @db.Uuid
+  userId          String   @db.Uuid
+  callerProfileId String   @db.Uuid
+  /// 1..5, enforced in application code.
+  score           Int
+  comment         String?  @db.VarChar(1000)
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  call          Call          @relation(fields: [callId], references: [id], onDelete: Restrict)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  callerProfile CallerProfile @relation(fields: [callerProfileId], references: [id], onDelete: Restrict)
+
+  @@index([callerProfileId, createdAt(sort: Desc)])
+  @@map("ratings")
+}
+
+// ---------------------------------------------------------------------------
+// Moderation, audit, notifications
+// ---------------------------------------------------------------------------
+
+enum ReportReason {
+  HARASSMENT
+  SEXUAL_CONTENT
+  SCAM_OR_FRAUD
+  UNDERAGE
+  HATE_SPEECH
+  SPAM
+  IMPERSONATION
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  ACTION_TAKEN
+  DISMISSED
+}
+
+enum ModerationAction {
+  WARN
+  TEMPORARY_BLOCK
+  PERMANENT_BLOCK
+  CALLER_SUSPEND
+  CONTENT_REMOVED
+  NO_ACTION
+}
+
+model Report {
+  id                String            @id @default(uuid(7)) @db.Uuid
+  tenantId          String            @db.Uuid
+  reporterUserId    String            @db.Uuid
+  reportedUserId    String            @db.Uuid
+  callId            String?           @db.Uuid
+  reason            ReportReason
+  description       String?           @db.VarChar(2000)
+  status            ReportStatus      @default(OPEN)
+  actionTaken       ModerationAction?
+  resolutionNote    String?           @db.VarChar(1000)
+  resolvedByAdminId String?           @db.Uuid
+  resolvedAt        DateTime?         @db.Timestamptz(3)
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  reporter User   @relation("ReportReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
+  reported User   @relation("ReportReported", fields: [reportedUserId], references: [id], onDelete: Restrict)
+  call     Call?  @relation(fields: [callId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status, createdAt(sort: Desc)])
+  @@index([reportedUserId])
+  @@map("reports")
+}
+
+/// Immutable record of privileged actions (admin and system).
+model AuditLog {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  /// Null for platform-wide actions (e.g. tenant creation).
+  tenantId   String?   @db.Uuid
+  actorType  ActorType
+  actorId    String?   @db.Uuid
+  action     String    @db.VarChar(80)
+  targetType String    @db.VarChar(80)
+  targetId   String?   @db.VarChar(160)
+  before     Json?
+  after      Json?
+  reason     String?   @db.VarChar(1000)
+  requestId  String?   @db.VarChar(64)
+  ipAddress  String?   @db.VarChar(64)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, createdAt(sort: Desc)])
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+}
+
+enum NotificationCategory {
+  CALL
+  WALLET
+  AVAILABILITY
+  PROMOTION
+  ACCOUNT
+}
+
+enum NotificationOrigin {
+  SYSTEM
+  CALLER_AUTHORED
+}
+
+enum NotificationDeliveryStatus {
+  QUEUED
+  SENT
+  SUPPRESSED
+  FAILED
+}
+
+/// Every notification decision (sent or suppressed) for frequency caps,
+/// cooldowns and re-engagement tuning.
+model NotificationLog {
+  id                String                     @id @default(uuid(7)) @db.Uuid
+  tenantId          String                     @db.Uuid
+  userId            String                     @db.Uuid
+  category          NotificationCategory
+  origin            NotificationOrigin
+  /// ReengagementEvent that produced it, if any.
+  triggerEvent      String?                    @db.VarChar(64)
+  templateKey       String                     @db.VarChar(120)
+  status            NotificationDeliveryStatus
+  suppressionReason String?                    @db.VarChar(64)
+  deviceId          String?                    @db.Uuid
+  providerMessageId String?                    @db.VarChar(255)
+  /// Rendered title/body and data payload (no secrets).
+  payload           Json                       @default("{}")
+  createdAt         DateTime                   @default(now()) @db.Timestamptz(3)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([tenantId, triggerEvent, createdAt(sort: Desc)])
+  @@map("notification_logs")
+}

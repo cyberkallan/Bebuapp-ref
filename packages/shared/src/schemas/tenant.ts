@@ -39,20 +39,26 @@ export const tenantPricingSchema = z.object({
   minimumPayoutCoins: z.number().int().positive(),
 });
 
+/** Reverse-DNS Android application id, e.g. in.bebuapp.android. */
+export const androidPackageNameSchema = z
+  .string()
+  .regex(/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/)
+  .nullable();
+
+/** iOS bundle identifier, e.g. in.bebuapp.ios. */
+export const iosBundleIdSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/)
+  .nullable();
+
+const countryCodesSchema = z.array(z.string().length(2).toUpperCase());
+
 export const createTenantSchema = z.object({
   key: tenantKeySchema,
   name: z.string().min(1).max(80),
-  androidPackageName: z
-    .string()
-    .regex(/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/)
-    .nullable()
-    .default(null),
-  iosBundleId: z
-    .string()
-    .regex(/^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/)
-    .nullable()
-    .default(null),
-  supportedCountries: z.array(z.string().length(2).toUpperCase()).default([]),
+  androidPackageName: androidPackageNameSchema.default(null),
+  iosBundleId: iosBundleIdSchema.default(null),
+  supportedCountries: countryCodesSchema.default([]),
   branding: tenantBrandingSchema.partial().optional(),
   legal: tenantLegalUrlsSchema.partial().optional(),
   featureFlags: tenantFeatureFlagsSchema.optional(),
@@ -60,10 +66,25 @@ export const createTenantSchema = z.object({
 });
 export type CreateTenantInput = z.infer<typeof createTenantSchema>;
 
-export const updateTenantSchema = createTenantSchema
-  .omit({ key: true })
+/**
+ * Every field optional and WITHOUT defaults: a PATCH must only touch the
+ * fields it names. (Deriving this via `.partial()` would keep `.default()`
+ * values and silently reset columns.)
+ */
+export const updateTenantSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    status: z.enum(TenantStatus),
+    androidPackageName: androidPackageNameSchema,
+    iosBundleId: iosBundleIdSchema,
+    supportedCountries: countryCodesSchema,
+    branding: tenantBrandingSchema.partial(),
+    legal: tenantLegalUrlsSchema.partial(),
+    featureFlags: tenantFeatureFlagsSchema,
+    pricing: tenantPricingSchema.partial(),
+  })
   .partial()
-  .extend({ status: z.enum(TenantStatus).optional() });
+  .strict();
 export type UpdateTenantInput = z.infer<typeof updateTenantSchema>;
 
 /** What a mobile client is allowed to see about its own tenant at boot. */
