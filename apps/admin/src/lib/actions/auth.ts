@@ -1,8 +1,7 @@
 'use server';
 
-import { redirect } from 'next/navigation';
-
 import { adminConfig } from '@/lib/config';
+import { redirectWithinApp } from '@/lib/redirect';
 import { clearSessionToken, encodeDevBearer, fetchSession, writeSessionToken } from '@/lib/session';
 
 export interface SignInState {
@@ -41,10 +40,10 @@ export async function signInWithDevIdentity(
   }
 
   await writeSessionToken(token);
-  redirect('/');
+  return redirectWithinApp('/');
 }
 
 export async function signOut(): Promise<void> {
   await clearSessionToken();
-  redirect('/sign-in');
+  return redirectWithinApp('/sign-in');
 }
