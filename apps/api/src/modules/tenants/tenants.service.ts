@@ -31,7 +31,12 @@ const DEFAULT_BRANDING = {
   secondaryColor: '#0f172a',
   accentColor: '#f97316',
 };
-const DEFAULT_LEGAL = { privacyPolicyUrl: null, termsUrl: null, supportUrl: null, refundPolicyUrl: null };
+const DEFAULT_LEGAL = {
+  privacyPolicyUrl: null,
+  termsUrl: null,
+  supportUrl: null,
+  refundPolicyUrl: null,
+};
 const DEFAULT_PRICING = {
   currency: 'INR',
   platformCommissionBps: 3_000,
@@ -101,7 +106,8 @@ export class TenantsService {
 
   async create(input: CreateTenantInput): Promise<Tenant> {
     const existing = await this.prisma.tenant.findUnique({ where: { key: input.key } });
-    if (existing) throw AppException.conflict(ErrorCode.CONFLICT, `Tenant key "${input.key}" is taken`);
+    if (existing)
+      throw AppException.conflict(ErrorCode.CONFLICT, `Tenant key "${input.key}" is taken`);
 
     return this.prisma.tenant.create({
       data: {
@@ -110,7 +116,11 @@ export class TenantsService {
         androidPackageName: input.androidPackageName,
         iosBundleId: input.iosBundleId,
         supportedCountries: input.supportedCountries,
-        branding: { ...DEFAULT_BRANDING, displayName: input.name, ...stripUndefined(input.branding ?? {}) },
+        branding: {
+          ...DEFAULT_BRANDING,
+          displayName: input.name,
+          ...stripUndefined(input.branding ?? {}),
+        },
         legal: { ...DEFAULT_LEGAL, ...(input.legal ?? {}) },
         featureFlags: input.featureFlags ?? {},
         pricing: { ...DEFAULT_PRICING, ...(input.pricing ?? {}) },
@@ -125,15 +135,25 @@ export class TenantsService {
       data: {
         ...(input.name !== undefined ? { name: input.name } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
-        ...(input.androidPackageName !== undefined ? { androidPackageName: input.androidPackageName } : {}),
+        ...(input.androidPackageName !== undefined
+          ? { androidPackageName: input.androidPackageName }
+          : {}),
         ...(input.iosBundleId !== undefined ? { iosBundleId: input.iosBundleId } : {}),
-        ...(input.supportedCountries !== undefined ? { supportedCountries: input.supportedCountries } : {}),
-        ...(input.branding ? { branding: { ...this.brandingOf(before), ...stripUndefined(input.branding) } } : {}),
-        ...(input.legal ? { legal: { ...this.legalOf(before), ...stripUndefined(input.legal) } } : {}),
+        ...(input.supportedCountries !== undefined
+          ? { supportedCountries: input.supportedCountries }
+          : {}),
+        ...(input.branding
+          ? { branding: { ...this.brandingOf(before), ...stripUndefined(input.branding) } }
+          : {}),
+        ...(input.legal
+          ? { legal: { ...this.legalOf(before), ...stripUndefined(input.legal) } }
+          : {}),
         ...(input.featureFlags
           ? { featureFlags: { ...this.rawFlagsOf(before), ...stripUndefined(input.featureFlags) } }
           : {}),
-        ...(input.pricing ? { pricing: { ...this.pricingOf(before), ...stripUndefined(input.pricing) } } : {}),
+        ...(input.pricing
+          ? { pricing: { ...this.pricingOf(before), ...stripUndefined(input.pricing) } }
+          : {}),
       },
     });
     await this.invalidateContextCache(before.key);
@@ -161,7 +181,12 @@ export class TenantsService {
   }
 
   brandingOf(tenant: Tenant): TenantBranding {
-    const stored = this.parseColumn(tenant, 'branding', tenantBrandingSchema.partial(), tenant.branding);
+    const stored = this.parseColumn(
+      tenant,
+      'branding',
+      tenantBrandingSchema.partial(),
+      tenant.branding,
+    );
     return { ...DEFAULT_BRANDING, displayName: tenant.name, ...stripUndefined(stored) };
   }
 
@@ -171,7 +196,12 @@ export class TenantsService {
   }
 
   pricingOf(tenant: Tenant): TenantPricing {
-    const stored = this.parseColumn(tenant, 'pricing', tenantPricingSchema.partial(), tenant.pricing);
+    const stored = this.parseColumn(
+      tenant,
+      'pricing',
+      tenantPricingSchema.partial(),
+      tenant.pricing,
+    );
     return { ...DEFAULT_PRICING, ...stripUndefined(stored) };
   }
 
@@ -183,7 +213,10 @@ export class TenantsService {
   private parseColumn<T>(tenant: Tenant, column: string, schema: ZodType<T>, value: unknown): T {
     const parsed = schema.safeParse(value);
     if (!parsed.success) {
-      this.logger.error({ tenantId: tenant.id, column, issues: parsed.error.issues }, 'corrupt tenant configuration');
+      this.logger.error(
+        { tenantId: tenant.id, column, issues: parsed.error.issues },
+        'corrupt tenant configuration',
+      );
       throw new AppException(ErrorCode.INTERNAL_ERROR, 'Tenant configuration is invalid', 500);
     }
     return parsed.data;

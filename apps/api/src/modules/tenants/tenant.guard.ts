@@ -39,7 +39,10 @@ export class TenantGuard implements CanActivate {
 
     if (!headerValue) {
       if (required) {
-        throw AppException.badRequest(ErrorCode.TENANT_HEADER_MISSING, `Missing ${TENANT_HEADER} header`);
+        throw AppException.badRequest(
+          ErrorCode.TENANT_HEADER_MISSING,
+          `Missing ${TENANT_HEADER} header`,
+        );
       }
       return true;
     }
@@ -53,7 +56,10 @@ export class TenantGuard implements CanActivate {
     if (!tenant) throw AppException.notFound(ErrorCode.TENANT_NOT_FOUND, 'Unknown tenant');
 
     if (scope === 'user' && tenant.status !== TenantStatus.ACTIVE) {
-      throw AppException.forbidden(ErrorCode.TENANT_SUSPENDED, 'This application is currently unavailable');
+      throw AppException.forbidden(
+        ErrorCode.TENANT_SUSPENDED,
+        'This application is currently unavailable',
+      );
     }
 
     req.tenant = tenant;

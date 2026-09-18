@@ -54,7 +54,9 @@ const REDACTED_PATHS = [
           level: config.logging.level,
           genReqId: ensureRequestId,
           redact: { paths: REDACTED_PATHS, censor: '[REDACTED]' },
-          autoLogging: { ignore: (req) => (req.url ?? '').startsWith('/health') || req.url === '/metrics' },
+          autoLogging: {
+            ignore: (req) => (req.url ?? '').startsWith('/health') || req.url === '/metrics',
+          },
           customProps: (req) => ({
             tenantId: (req as { tenant?: { id: string } }).tenant?.id,
           }),
@@ -67,7 +69,10 @@ const REDACTED_PATHS = [
             }),
           },
           transport: config.logging.pretty
-            ? { target: 'pino-pretty', options: { colorize: true, singleLine: true, translateTime: 'SYS:HH:MM:ss.l' } }
+            ? {
+                target: 'pino-pretty',
+                options: { colorize: true, singleLine: true, translateTime: 'SYS:HH:MM:ss.l' },
+              }
             : undefined,
         },
       }),

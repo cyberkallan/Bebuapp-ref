@@ -33,10 +33,17 @@ export class AgoraTokenService {
     return randomInt(1, 2 ** 31 - 1);
   }
 
-  issueRtcToken(channelName: string, uid: number, ttlSeconds = this.config.agora.tokenTtlSeconds): RtcCredentials {
+  issueRtcToken(
+    channelName: string,
+    uid: number,
+    ttlSeconds = this.config.agora.tokenTtlSeconds,
+  ): RtcCredentials {
     const { appId, appCertificate } = this.config.agora;
     if (!appId || !appCertificate) {
-      throw AppException.serviceUnavailable(ErrorCode.SERVICE_UNAVAILABLE, 'Real-time calling is not configured');
+      throw AppException.serviceUnavailable(
+        ErrorCode.SERVICE_UNAVAILABLE,
+        'Real-time calling is not configured',
+      );
     }
     if (!Number.isInteger(uid) || uid <= 0 || uid >= 2 ** 32) {
       throw new RangeError('uid must be a positive 32-bit integer');

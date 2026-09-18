@@ -1,5 +1,10 @@
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, type HealthCheckResult, HealthIndicatorService } from '@nestjs/terminus';
+import {
+  HealthCheck,
+  HealthCheckService,
+  type HealthCheckResult,
+  HealthIndicatorService,
+} from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 
 import { PrismaService } from '../../infrastructure/database/prisma.service.js';

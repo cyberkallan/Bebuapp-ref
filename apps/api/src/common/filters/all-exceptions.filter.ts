@@ -99,7 +99,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private codeForStatus(status: number): ErrorCode {
     return (
-      STATUS_TO_CODE[status] ?? (status >= 500 ? ErrorCode.INTERNAL_ERROR : ErrorCode.VALIDATION_FAILED)
+      STATUS_TO_CODE[status] ??
+      (status >= 500 ? ErrorCode.INTERNAL_ERROR : ErrorCode.VALIDATION_FAILED)
     );
   }
 }

@@ -22,7 +22,10 @@ export class AppException extends HttpException {
   static unauthorized(code: ErrorCode = Codes.AUTH_REQUIRED, message = 'Authentication required') {
     return new AppException(code, message, HttpStatus.UNAUTHORIZED);
   }
-  static forbidden(code: ErrorCode = Codes.FORBIDDEN, message = 'You do not have access to this resource') {
+  static forbidden(
+    code: ErrorCode = Codes.FORBIDDEN,
+    message = 'You do not have access to this resource',
+  ) {
     return new AppException(code, message, HttpStatus.FORBIDDEN);
   }
   static notFound(code: ErrorCode = Codes.NOT_FOUND, message = 'Resource not found') {
@@ -34,7 +37,10 @@ export class AppException extends HttpException {
   static unprocessable(code: ErrorCode, message: string) {
     return new AppException(code, message, HttpStatus.UNPROCESSABLE_ENTITY);
   }
-  static serviceUnavailable(code: ErrorCode = Codes.SERVICE_UNAVAILABLE, message = 'Service unavailable') {
+  static serviceUnavailable(
+    code: ErrorCode = Codes.SERVICE_UNAVAILABLE,
+    message = 'Service unavailable',
+  ) {
     return new AppException(code, message, HttpStatus.SERVICE_UNAVAILABLE);
   }
 }

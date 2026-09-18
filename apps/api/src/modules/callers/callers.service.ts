@@ -37,7 +37,11 @@ export class CallersService {
    *     CallerTenantVisibility row exists for T (explicit allow-list), and
    *     T has the `sharedCallerPool` feature flag on (checked by the caller).
    */
-  async requireVisibleInTenant(tenantId: string, callerProfileId: string, sharedPoolEnabled: boolean): Promise<CallerProfile> {
+  async requireVisibleInTenant(
+    tenantId: string,
+    callerProfileId: string,
+    sharedPoolEnabled: boolean,
+  ): Promise<CallerProfile> {
     const caller = await this.prisma.callerProfile.findFirst({
       where: {
         id: callerProfileId,

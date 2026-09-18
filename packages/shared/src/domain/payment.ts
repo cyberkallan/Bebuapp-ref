@@ -27,16 +27,15 @@ export const PaymentOrderStatus = {
 } as const;
 export type PaymentOrderStatus = (typeof PaymentOrderStatus)[keyof typeof PaymentOrderStatus];
 
-export const TERMINAL_PAYMENT_STATUSES: ReadonlySet<PaymentOrderStatus> = new Set<PaymentOrderStatus>(
-  [
+export const TERMINAL_PAYMENT_STATUSES: ReadonlySet<PaymentOrderStatus> =
+  new Set<PaymentOrderStatus>([
     PaymentOrderStatus.COMPLETED,
     PaymentOrderStatus.FAILED,
     PaymentOrderStatus.CANCELLED,
     PaymentOrderStatus.EXPIRED,
     PaymentOrderStatus.REFUNDED,
     PaymentOrderStatus.CHARGED_BACK,
-  ],
-);
+  ]);
 
 /** Client platform that initiated a purchase (drives provider selection). */
 export const ClientPlatform = {

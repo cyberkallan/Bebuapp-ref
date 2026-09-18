@@ -112,7 +112,10 @@ export class AdminTenantsController {
     await this.audit.record({
       tenantId: after.id,
       actor: AuditLogService.actorOf(principal),
-      action: body.status && body.status !== before.status ? AuditAction.TENANT_SUSPENDED : AuditAction.TENANT_UPDATED,
+      action:
+        body.status && body.status !== before.status
+          ? AuditAction.TENANT_SUSPENDED
+          : AuditAction.TENANT_UPDATED,
       targetType: 'Tenant',
       targetId: after.id,
       before: this.toView(before),

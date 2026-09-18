@@ -17,13 +17,19 @@ describe('environment schema', () => {
   });
 
   it('parses comma-separated origins and boolean strings', () => {
-    const env = parseEnv({ ...base, CORS_ORIGINS: ' http://a.test, http://b.test ', LOG_PRETTY: '1' });
+    const env = parseEnv({
+      ...base,
+      CORS_ORIGINS: ' http://a.test, http://b.test ',
+      LOG_PRETTY: '1',
+    });
     expect(env.CORS_ORIGINS).toEqual(['http://a.test', 'http://b.test']);
     expect(env.LOG_PRETTY).toBe(true);
   });
 
   it('fails fast on missing database url with a readable message', () => {
-    expect(() => parseEnv({ REDIS_URL: 'redis://x', AUTH_MODE: 'dev' })).toThrow(EnvValidationError);
+    expect(() => parseEnv({ REDIS_URL: 'redis://x', AUTH_MODE: 'dev' })).toThrow(
+      EnvValidationError,
+    );
     try {
       parseEnv({ REDIS_URL: 'redis://x', AUTH_MODE: 'dev' });
     } catch (err) {
@@ -55,7 +61,9 @@ describe('environment schema', () => {
   });
 
   it('requires firebase credentials when AUTH_MODE=firebase', () => {
-    expect(() => parseEnv({ ...base, AUTH_MODE: 'firebase' })).toThrow(/GOOGLE_APPLICATION_CREDENTIALS/);
+    expect(() => parseEnv({ ...base, AUTH_MODE: 'firebase' })).toThrow(
+      /GOOGLE_APPLICATION_CREDENTIALS/,
+    );
     const env = parseEnv({
       ...base,
       AUTH_MODE: 'firebase',

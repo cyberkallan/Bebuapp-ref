@@ -1,7 +1,12 @@
 import { z } from 'zod';
 
 import { TenantFeatureFlag, TenantStatus } from '../domain/tenant.js';
-import { basisPointsSchema, currencyCodeSchema, hexColorSchema, tenantKeySchema } from './common.js';
+import {
+  basisPointsSchema,
+  currencyCodeSchema,
+  hexColorSchema,
+  tenantKeySchema,
+} from './common.js';
 
 export const tenantBrandingSchema = z.object({
   displayName: z.string().min(1).max(80),

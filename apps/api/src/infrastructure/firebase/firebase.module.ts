@@ -21,7 +21,9 @@ import { TOKEN_VERIFIER, type TokenVerifier } from './token-verifier.js';
         logger.setContext('FirebaseModule');
         if (config.auth.mode === 'dev') {
           if (config.isProduction) throw new Error('AUTH_MODE=dev is forbidden in production');
-          logger.warn('AUTH_MODE=dev: accepting unsigned dev tokens. Never use outside local development.');
+          logger.warn(
+            'AUTH_MODE=dev: accepting unsigned dev tokens. Never use outside local development.',
+          );
           return new DevTokenVerifier();
         }
         return new FirebaseTokenVerifier(config);

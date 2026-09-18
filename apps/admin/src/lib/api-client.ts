@@ -1,15 +1,15 @@
-import "server-only";
+import 'server-only';
 
-import type { ApiErrorBody } from "@bebu/shared";
+import type { ApiErrorBody } from '@bebu/shared';
 
-import { adminConfig } from "./config";
+import { adminConfig } from './config';
 
 export type ApiResult<T> =
   | { ok: true; data: T; status: number }
   | { ok: false; error: ApiErrorBody; status: number; unreachable: boolean; body: unknown };
 
 interface ApiRequestOptions {
-  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   token?: string | null;
   tenantKey?: string;
   body?: unknown;
@@ -20,21 +20,24 @@ interface ApiRequestOptions {
  * failures and non-2xx responses are folded into the same discriminated union
  * so pages can render precise error states instead of crashing.
  */
-export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<ApiResult<T>> {
-  const headers = new Headers({ Accept: "application/json" });
-  if (options.token) headers.set("Authorization", options.token);
-  if (options.tenantKey) headers.set("X-Tenant-Key", options.tenantKey);
-  if (options.body !== undefined) headers.set("Content-Type", "application/json");
+export async function apiFetch<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<ApiResult<T>> {
+  const headers = new Headers({ Accept: 'application/json' });
+  if (options.token) headers.set('Authorization', options.token);
+  if (options.tenantKey) headers.set('X-Tenant-Key', options.tenantKey);
+  if (options.body !== undefined) headers.set('Content-Type', 'application/json');
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), adminConfig.requestTimeoutMs);
 
   try {
     const res = await fetch(`${adminConfig.apiUrl}${path}`, {
-      method: options.method ?? "GET",
+      method: options.method ?? 'GET',
       headers,
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
-      cache: "no-store",
+      cache: 'no-store',
       signal: controller.signal,
     });
 
@@ -52,13 +55,13 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
         ? json
         : {
             statusCode: res.status,
-            code: "INTERNAL_ERROR",
+            code: 'INTERNAL_ERROR',
             message: `API responded with HTTP ${res.status}`,
-            requestId: res.headers.get("x-request-id") ?? "",
+            requestId: res.headers.get('x-request-id') ?? '',
           },
     };
   } catch (err) {
-    const aborted = err instanceof Error && err.name === "AbortError";
+    const aborted = err instanceof Error && err.name === 'AbortError';
     return {
       ok: false,
       status: 0,
@@ -66,11 +69,11 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
       body: null,
       error: {
         statusCode: 503,
-        code: "SERVICE_UNAVAILABLE",
+        code: 'SERVICE_UNAVAILABLE',
         message: aborted
           ? `API did not respond within ${adminConfig.requestTimeoutMs / 1000}s`
           : `API unreachable at ${adminConfig.apiUrl}`,
-        requestId: "",
+        requestId: '',
       },
     };
   } finally {
@@ -88,10 +91,10 @@ function safeJson(text: string): unknown {
 
 function isApiErrorBody(value: unknown): value is ApiErrorBody {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
-    typeof (value as ApiErrorBody).statusCode === "number" &&
-    typeof (value as ApiErrorBody).code === "string" &&
-    typeof (value as ApiErrorBody).message === "string"
+    typeof (value as ApiErrorBody).statusCode === 'number' &&
+    typeof (value as ApiErrorBody).code === 'string' &&
+    typeof (value as ApiErrorBody).message === 'string'
   );
 }

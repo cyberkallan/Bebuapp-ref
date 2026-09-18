@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { cn } from "cn";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { cn } from 'cn';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { NAV_SECTIONS } from "@/components/nav";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { NAV_SECTIONS } from '@/components/nav';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -21,7 +21,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             {section.items.map((item) => {
               const Icon = item.icon;
 
-              if (item.kind === "planned") {
+              if (item.kind === 'planned') {
                 return (
                   <li key={item.label}>
                     <Tooltip>
@@ -35,29 +35,35 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                       >
                         <Icon className="size-4" />
                         <span className="flex-1 truncate">{item.label}</span>
-                        <span className="rounded-md border px-1.5 py-px text-[10px] font-medium">{item.stage}</span>
+                        <span className="rounded-md border px-1.5 py-px text-[10px] font-medium">
+                          {item.stage}
+                        </span>
                       </TooltipTrigger>
-                      <TooltipContent side="right">Planned for {item.stage.toLowerCase()} of the build.</TooltipContent>
+                      <TooltipContent side="right">
+                        Planned for {item.stage.toLowerCase()} of the build.
+                      </TooltipContent>
                     </Tooltip>
                   </li>
                 );
               }
 
-              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={onNavigate}
-                    aria-current={active ? "page" : undefined}
+                    aria-current={active ? 'page' : undefined}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors",
+                      'flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors',
                       active
-                        ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                        ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
                     )}
                   >
-                    <Icon className={cn("size-4", active ? "text-primary" : "text-muted-foreground")} />
+                    <Icon
+                      className={cn('size-4', active ? 'text-primary' : 'text-muted-foreground')}
+                    />
                     <span className="truncate">{item.label}</span>
                   </Link>
                 </li>

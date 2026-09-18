@@ -12,7 +12,8 @@
 export const PresenceKey = {
   user: (userId: string) => ['presence', 'user', userId] as const,
   caller: (callerId: string) => ['presence', 'caller', callerId] as const,
-  availableSet: (tenantId: string, callType: 'AUDIO' | 'VIDEO') => ['avail', tenantId, callType] as const,
+  availableSet: (tenantId: string, callType: 'AUDIO' | 'VIDEO') =>
+    ['avail', tenantId, callType] as const,
   activeCallForUser: (userId: string) => ['activecall', 'user', userId] as const,
   activeCallForCaller: (callerId: string) => ['activecall', 'caller', callerId] as const,
   callSnapshot: (callId: string) => ['call', callId] as const,

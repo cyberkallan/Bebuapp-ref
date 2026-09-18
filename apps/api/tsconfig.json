@@ -15,5 +15,12 @@
     },
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "prisma/**/*.ts", "prisma.config.ts", "vitest.config.ts", "vitest.config.e2e.ts"]
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "prisma/**/*.ts",
+    "prisma.config.ts",
+    "vitest.config.ts",
+    "vitest.config.e2e.ts"
+  ]
 }

@@ -67,7 +67,9 @@ export class WalletLedgerService {
     const direction = this.resolveDirection(input);
 
     const existing = await tx.walletTransaction.findUnique({
-      where: { tenantId_idempotencyKey: { tenantId: input.tenantId, idempotencyKey: input.idempotencyKey } },
+      where: {
+        tenantId_idempotencyKey: { tenantId: input.tenantId, idempotencyKey: input.idempotencyKey },
+      },
     });
     if (existing) {
       if (existing.walletId !== input.walletId || existing.amount !== BigInt(input.amount)) {
@@ -93,7 +95,10 @@ export class WalletLedgerService {
     const balanceBefore = wallet.balance;
     const balanceAfter = direction === 'CREDIT' ? balanceBefore + amount : balanceBefore - amount;
     if (balanceAfter < 0n) {
-      throw AppException.unprocessable(ErrorCode.WALLET_INSUFFICIENT_BALANCE, 'Insufficient coin balance');
+      throw AppException.unprocessable(
+        ErrorCode.WALLET_INSUFFICIENT_BALANCE,
+        'Insufficient coin balance',
+      );
     }
 
     await tx.wallet.update({
@@ -126,7 +131,10 @@ export class WalletLedgerService {
   private resolveDirection(input: LedgerEntryInput): LedgerDirection {
     if (input.type === 'ADMIN_ADJUSTMENT') {
       if (!input.direction) {
-        throw AppException.badRequest(ErrorCode.WALLET_INVALID_AMOUNT, 'direction is required for adjustments');
+        throw AppException.badRequest(
+          ErrorCode.WALLET_INVALID_AMOUNT,
+          'direction is required for adjustments',
+        );
       }
       return input.direction;
     }

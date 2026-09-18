@@ -1,10 +1,10 @@
-import "server-only";
+import 'server-only';
 
-import type { ApiInfo, HealthCheckResult } from "@bebu/shared";
+import type { ApiInfo, HealthCheckResult } from '@bebu/shared';
 
-import { apiFetch, type ApiResult } from "./api-client";
+import { apiFetch, type ApiResult } from './api-client';
 
-export type DependencyState = "up" | "down" | "unknown";
+export type DependencyState = 'up' | 'down' | 'unknown';
 
 export interface DependencyStatus {
   key: string;
@@ -21,17 +21,17 @@ export interface PlatformStatus {
 }
 
 const DEPENDENCY_LABELS: Record<string, string> = {
-  process: "API process",
-  postgres: "PostgreSQL",
-  redis: "Redis",
-  memory: "Memory",
+  process: 'API process',
+  postgres: 'PostgreSQL',
+  redis: 'Redis',
+  memory: 'Memory',
 };
 
 /** Fetches API metadata and the full health report in parallel. */
 export async function loadPlatformStatus(): Promise<PlatformStatus> {
   const [info, health] = await Promise.all([
-    apiFetch<ApiInfo>("/"),
-    apiFetch<HealthCheckResult>("/health"),
+    apiFetch<ApiInfo>('/'),
+    apiFetch<HealthCheckResult>('/health'),
   ]);
   return {
     info,
@@ -54,7 +54,7 @@ function toDependencies(health: ApiResult<HealthCheckResult>): DependencyStatus[
     return Object.entries(DEPENDENCY_LABELS).map(([key, label]) => ({
       key,
       label,
-      state: "unknown",
+      state: 'unknown',
       detail: null,
     }));
   }
@@ -64,7 +64,7 @@ function toDependencies(health: ApiResult<HealthCheckResult>): DependencyStatus[
     return {
       key,
       label: DEPENDENCY_LABELS[key] ?? key,
-      state: status === "up" ? "up" : status === "down" ? "down" : "unknown",
+      state: status === 'up' ? 'up' : status === 'down' ? 'down' : 'unknown',
       detail: describeDetail(rest),
     };
   });
@@ -72,24 +72,26 @@ function toDependencies(health: ApiResult<HealthCheckResult>): DependencyStatus[
 
 /** Turns indicator metadata into a short human string, e.g. "latency 14 ms". */
 function describeDetail(rest: Record<string, unknown>): string | null {
-  if (typeof rest.message === "string") return rest.message;
+  if (typeof rest.message === 'string') return rest.message;
   const parts: string[] = [];
-  if (typeof rest.latencyMs === "number") parts.push(`latency ${rest.latencyMs} ms`);
-  if (typeof rest.uptimeSeconds === "number") parts.push(`uptime ${formatUptime(rest.uptimeSeconds)}`);
-  if (typeof rest.heapUsedMb === "number" && typeof rest.heapTotalMb === "number") {
+  if (typeof rest.latencyMs === 'number') parts.push(`latency ${rest.latencyMs} ms`);
+  if (typeof rest.uptimeSeconds === 'number')
+    parts.push(`uptime ${formatUptime(rest.uptimeSeconds)}`);
+  if (typeof rest.heapUsedMb === 'number' && typeof rest.heapTotalMb === 'number') {
     parts.push(`heap ${rest.heapUsedMb}/${rest.heapTotalMb} MB`);
   }
-  if (typeof rest.rssMb === "number") parts.push(`rss ${rest.rssMb} MB`);
-  return parts.length > 0 ? parts.join(" · ") : null;
+  if (typeof rest.rssMb === 'number') parts.push(`rss ${rest.rssMb} MB`);
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 function formatUptime(seconds: number): string {
   if (seconds < 60) return `${Math.round(seconds)}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  if (seconds < 86_400) return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+  if (seconds < 86_400)
+    return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
   return `${Math.floor(seconds / 86_400)}d ${Math.floor((seconds % 86_400) / 3600)}h`;
 }
 
 function isHealthBody(value: unknown): value is HealthCheckResult {
-  return typeof value === "object" && value !== null && "details" in value && "status" in value;
+  return typeof value === 'object' && value !== null && 'details' in value && 'status' in value;
 }

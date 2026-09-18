@@ -19,7 +19,11 @@ export type Role = (typeof Role)[keyof typeof Role];
 export const ALL_ROLES: readonly Role[] = Object.values(Role);
 
 /** Roles that may use the admin panel. */
-export const ADMIN_ROLES: readonly Role[] = [Role.SUPER_ADMIN, Role.TENANT_ADMIN, Role.TENANT_STAFF];
+export const ADMIN_ROLES: readonly Role[] = [
+  Role.SUPER_ADMIN,
+  Role.TENANT_ADMIN,
+  Role.TENANT_STAFF,
+];
 
 /** Roles that are scoped to a single tenant (everything except SUPER_ADMIN). */
 export const TENANT_SCOPED_ROLES: readonly Role[] = [

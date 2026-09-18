@@ -18,7 +18,10 @@ export interface TestApp {
 /** Boots the full application exactly as production does (guards, filters, helmet). */
 export async function createTestApp(): Promise<TestApp> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-  const app = moduleRef.createNestApplication<NestExpressApplication>({ bufferLogs: true, rawBody: true });
+  const app = moduleRef.createNestApplication<NestExpressApplication>({
+    bufferLogs: true,
+    rawBody: true,
+  });
   configureApp(app);
   await app.init();
   registerFallbackNotFound(app);
@@ -42,4 +45,5 @@ export async function resetDatabase(prisma: PrismaService): Promise<void> {
 export const userToken = (uid: string, email = `${uid}@example.com`) =>
   `Bearer ${encodeDevToken({ uid, email, provider: 'google.com' })}`;
 
-export const adminToken = (uid: string) => `Bearer ${encodeDevToken({ uid, email: `${uid}@bebuapp.in` })}`;
+export const adminToken = (uid: string) =>
+  `Bearer ${encodeDevToken({ uid, email: `${uid}@bebuapp.in` })}`;

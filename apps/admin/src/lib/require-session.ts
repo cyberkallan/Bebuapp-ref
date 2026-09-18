@@ -1,8 +1,8 @@
-import "server-only";
+import 'server-only';
 
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-import { fetchSession, readSessionToken, type AdminSession } from "./session";
+import { fetchSession, readSessionToken, type AdminSession } from './session';
 
 export interface AuthedContext {
   token: string;
@@ -17,7 +17,7 @@ export interface AuthedContext {
  */
 export async function requireSession(): Promise<AuthedContext> {
   const token = await readSessionToken();
-  if (!token) redirect("/sign-in");
+  if (!token) redirect('/sign-in');
 
   const result = await fetchSession(token);
   if (result.ok) return { token, session: result.data };
@@ -27,5 +27,5 @@ export async function requireSession(): Promise<AuthedContext> {
   }
   // Cookies cannot be mutated during render; the stale cookie is replaced on
   // the next successful sign-in.
-  redirect("/sign-in?reason=expired");
+  redirect('/sign-in?reason=expired');
 }

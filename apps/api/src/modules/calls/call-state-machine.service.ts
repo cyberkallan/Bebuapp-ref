@@ -38,7 +38,10 @@ export class CallStateMachineService {
     if (!current) throw AppException.notFound(ErrorCode.CALL_NOT_FOUND, 'Call not found');
 
     if (current.stateVersion !== input.expectedVersion) {
-      throw AppException.conflict(ErrorCode.CALL_INVALID_TRANSITION, 'Call was modified concurrently');
+      throw AppException.conflict(
+        ErrorCode.CALL_INVALID_TRANSITION,
+        'Call was modified concurrently',
+      );
     }
     if (!canTransitionCall(current.state, input.to)) {
       throw AppException.conflict(
@@ -72,7 +75,10 @@ export class CallStateMachineService {
     return updated;
   }
 
-  private timestampsFor(state: CallState, at: Date): Partial<Pick<Call, 'ringingAt' | 'acceptedAt' | 'connectedAt' | 'endedAt'>> {
+  private timestampsFor(
+    state: CallState,
+    at: Date,
+  ): Partial<Pick<Call, 'ringingAt' | 'acceptedAt' | 'connectedAt' | 'endedAt'>> {
     switch (state) {
       case 'RINGING':
         return { ringingAt: at };

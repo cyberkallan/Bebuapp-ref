@@ -2,7 +2,11 @@ import { type App, applicationDefault, cert, getApps, initializeApp } from 'fire
 import { type Auth, getAuth } from 'firebase-admin/auth';
 
 import type { AppConfig } from '../../config/app-config.js';
-import { TokenVerificationError, type TokenVerifier, type VerifiedIdentity } from './token-verifier.js';
+import {
+  TokenVerificationError,
+  type TokenVerifier,
+  type VerifiedIdentity,
+} from './token-verifier.js';
 
 /**
  * Verifies Firebase ID tokens with the Admin SDK. Credentials come from a
@@ -41,9 +45,7 @@ export class FirebaseTokenVerifier implements TokenVerifier {
       const decoded = await this.auth.verifyIdToken(idToken, true);
       const { uid, email, phone_number, email_verified, firebase, ...rest } = decoded;
       const reserved = new Set(['aud', 'auth_time', 'exp', 'iat', 'iss', 'sub']);
-      const claims = Object.fromEntries(
-        Object.entries(rest).filter(([k]) => !reserved.has(k)),
-      );
+      const claims = Object.fromEntries(Object.entries(rest).filter(([k]) => !reserved.has(k)));
       return {
         uid,
         email: email ?? null,

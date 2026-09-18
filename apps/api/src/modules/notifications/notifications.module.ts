@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { NOTIFICATION_SENDER, type NotificationSender, type PushMessage, type PushSendResult } from './notification-sender.interface.js';
+import {
+  NOTIFICATION_SENDER,
+  type NotificationSender,
+  type PushMessage,
+  type PushSendResult,
+} from './notification-sender.interface.js';
 
 /**
  * Push delivery. This stage wires the contract and a no-op sender so the rest

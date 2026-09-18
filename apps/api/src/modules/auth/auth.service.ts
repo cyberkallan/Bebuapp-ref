@@ -30,19 +30,28 @@ export class AuthService {
     if (!authorization) throw AppException.unauthorized(ErrorCode.AUTH_REQUIRED);
     const [scheme, token, ...rest] = authorization.split(' ');
     if (scheme?.toLowerCase() !== 'bearer' || !token || rest.length > 0) {
-      throw AppException.unauthorized(ErrorCode.AUTH_TOKEN_INVALID, 'Malformed Authorization header');
+      throw AppException.unauthorized(
+        ErrorCode.AUTH_TOKEN_INVALID,
+        'Malformed Authorization header',
+      );
     }
     try {
       return await this.verifier.verify(token);
     } catch (err) {
       if (err instanceof TokenVerificationError && err.reason === 'expired') {
-        throw AppException.unauthorized(ErrorCode.AUTH_TOKEN_EXPIRED, 'Session expired, please sign in again');
+        throw AppException.unauthorized(
+          ErrorCode.AUTH_TOKEN_EXPIRED,
+          'Session expired, please sign in again',
+        );
       }
       throw AppException.unauthorized(ErrorCode.AUTH_TOKEN_INVALID, 'Invalid credentials');
     }
   }
 
-  async resolveUserPrincipal(tenant: TenantContext, identity: VerifiedIdentity): Promise<UserPrincipal> {
+  async resolveUserPrincipal(
+    tenant: TenantContext,
+    identity: VerifiedIdentity,
+  ): Promise<UserPrincipal> {
     const user = await this.users.findOrProvision(tenant.id, identity);
     if (user.status !== 'ACTIVE') {
       throw AppException.forbidden(ErrorCode.ACCOUNT_BLOCKED, 'This account has been blocked');
@@ -64,13 +73,21 @@ export class AuthService {
     identity: VerifiedIdentity,
     tenant: TenantContext | undefined,
   ): Promise<AdminPrincipal> {
-    const admin = await this.prisma.adminAccount.findUnique({ where: { firebaseUid: identity.uid } });
+    const admin = await this.prisma.adminAccount.findUnique({
+      where: { firebaseUid: identity.uid },
+    });
     if (!admin || admin.status !== 'ACTIVE') {
-      throw AppException.forbidden(ErrorCode.FORBIDDEN, 'No active admin account for this identity');
+      throw AppException.forbidden(
+        ErrorCode.FORBIDDEN,
+        'No active admin account for this identity',
+      );
     }
     // Tenant-scoped admins may only ever act inside their own tenant.
     if (admin.tenantId && tenant && tenant.id !== admin.tenantId) {
-      throw AppException.forbidden(ErrorCode.TENANT_MISMATCH, 'You do not have access to this tenant');
+      throw AppException.forbidden(
+        ErrorCode.TENANT_MISMATCH,
+        'You do not have access to this tenant',
+      );
     }
     const roles: Role[] = [admin.role];
     return {

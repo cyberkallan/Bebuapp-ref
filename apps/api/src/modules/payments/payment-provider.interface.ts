@@ -53,13 +53,19 @@ export interface PaymentProvider {
    * receipt) directly with the provider. Must throw on any mismatch. Must be
    * safe to call repeatedly for the same proof.
    */
-  verifyPurchase(orderId: string, providerPayload: Record<string, unknown>): Promise<VerifiedPurchase>;
+  verifyPurchase(
+    orderId: string,
+    providerPayload: Record<string, unknown>,
+  ): Promise<VerifiedPurchase>;
 
   /**
    * Parse and authenticate an inbound webhook. Returns a normalised event;
    * the caller persists it (PaymentEvent) before acting on it.
    */
-  parseWebhook(rawBody: Buffer, headers: Record<string, string | string[] | undefined>): Promise<ProviderWebhookEvent>;
+  parseWebhook(
+    rawBody: Buffer,
+    headers: Record<string, string | string[] | undefined>,
+  ): Promise<ProviderWebhookEvent>;
 
   /** Acknowledge consumption with the store (Google Play) if applicable. */
   acknowledge?(purchase: VerifiedPurchase): Promise<void>;

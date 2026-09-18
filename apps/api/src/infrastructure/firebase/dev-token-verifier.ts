@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { TokenVerificationError, type TokenVerifier, type VerifiedIdentity } from './token-verifier.js';
+import {
+  TokenVerificationError,
+  type TokenVerifier,
+  type VerifiedIdentity,
+} from './token-verifier.js';
 
 /**
  * Dev-only credential format: `dev:<base64url(json)>` where the JSON matches
@@ -37,7 +41,9 @@ export class DevTokenVerifier implements TokenVerifier {
     }
     let parsed: unknown;
     try {
-      parsed = JSON.parse(Buffer.from(idToken.slice(DEV_TOKEN_PREFIX.length), 'base64url').toString('utf8'));
+      parsed = JSON.parse(
+        Buffer.from(idToken.slice(DEV_TOKEN_PREFIX.length), 'base64url').toString('utf8'),
+      );
     } catch {
       return Promise.reject(new TokenVerificationError('invalid', 'malformed dev token'));
     }

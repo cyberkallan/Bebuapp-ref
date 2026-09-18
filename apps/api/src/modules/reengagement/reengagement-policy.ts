@@ -55,7 +55,11 @@ export type PolicyDecision =
 export function isInQuietHours(quiet: QuietHours | null, now: Date): boolean {
   if (!quiet) return false;
   const hour = Number(
-    new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: quiet.timezone }).format(now),
+    new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: quiet.timezone,
+    }).format(now),
   );
   const h = hour === 24 ? 0 : hour;
   const { startHour, endHour } = quiet;
@@ -75,9 +79,11 @@ export function evaluateReengagement(input: PolicyInput): PolicyDecision {
   if (!input.tenantAllowsEvent) return deny(SuppressionReason.TENANT_RULE);
   if (!input.hasDeviceToken) return deny(SuppressionReason.NO_DEVICE_TOKEN);
   if (!input.preferences.categories[category]) return deny(SuppressionReason.USER_OPTED_OUT);
-  if (isInQuietHours(input.preferences.quietHours, input.now)) return deny(SuppressionReason.QUIET_HOURS);
+  if (isInQuietHours(input.preferences.quietHours, input.now))
+    return deny(SuppressionReason.QUIET_HOURS);
 
-  const cooldown = input.cooldownSecondsOverride ?? DEFAULT_EVENT_COOLDOWN_SECONDS[input.event] ?? 0;
+  const cooldown =
+    input.cooldownSecondsOverride ?? DEFAULT_EVENT_COOLDOWN_SECONDS[input.event] ?? 0;
   if (input.lastSentAt && input.now.getTime() - input.lastSentAt.getTime() < cooldown * 1000) {
     return deny(SuppressionReason.COOLDOWN);
   }

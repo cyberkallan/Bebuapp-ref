@@ -1,10 +1,10 @@
-import "server-only";
+import 'server-only';
 
-import type { Permission, Role } from "@bebu/shared";
-import { cookies } from "next/headers";
+import type { Permission, Role } from '@bebu/shared';
+import { cookies } from 'next/headers';
 
-import { apiFetch, type ApiResult } from "./api-client";
-import { adminConfig } from "./config";
+import { apiFetch, type ApiResult } from './api-client';
+import { adminConfig } from './config';
 
 /** Mirrors `AdminMeView` from the API. */
 export interface AdminSession {
@@ -27,9 +27,9 @@ export async function writeSessionToken(token: string): Promise<void> {
   const store = await cookies();
   store.set(adminConfig.sessionCookie, token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
     maxAge: SESSION_MAX_AGE_SECONDS,
   });
 }
@@ -44,7 +44,7 @@ export async function clearSessionToken(): Promise<void> {
  * on roles/permissions; the panel never decodes the token itself.
  */
 export async function fetchSession(token: string): Promise<ApiResult<AdminSession>> {
-  return apiFetch<AdminSession>("/api/v1/admin/me", { token });
+  return apiFetch<AdminSession>('/api/v1/admin/me', { token });
 }
 
 export function hasPermission(session: AdminSession, permission: Permission): boolean {
@@ -57,6 +57,6 @@ export function hasPermission(session: AdminSession, permission: Permission): bo
  * rejects these tokens outright when it runs with Firebase auth.
  */
 export function encodeDevBearer(uid: string, email: string): string {
-  const payload = JSON.stringify({ uid, email, provider: "dev" });
-  return `Bearer dev:${Buffer.from(payload, "utf8").toString("base64url")}`;
+  const payload = JSON.stringify({ uid, email, provider: 'dev' });
+  return `Bearer dev:${Buffer.from(payload, 'utf8').toString('base64url')}`;
 }

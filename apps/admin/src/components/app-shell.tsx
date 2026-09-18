@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { LogOut, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { LogOut, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
-import { BrandMark } from "@/components/brand-mark";
-import { SidebarNav } from "@/components/sidebar-nav";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import type { AdminSession } from "@/lib/session";
+import { BrandMark } from '@/components/brand-mark';
+import { SidebarNav } from '@/components/sidebar-nav';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import type { AdminSession } from '@/lib/session';
 
 interface AppShellProps {
   session: AdminSession;
@@ -18,9 +18,15 @@ interface AppShellProps {
   children: React.ReactNode;
 }
 
-export function AppShell({ session, environment, authMode, signOutAction, children }: AppShellProps) {
+export function AppShell({
+  session,
+  environment,
+  authMode,
+  signOutAction,
+  children,
+}: AppShellProps) {
   const [open, setOpen] = useState(false);
-  const roleLabel = session.roles.map(humanizeRole).join(", ");
+  const roleLabel = session.roles.map(humanizeRole).join(', ');
 
   const sidebar = (
     <div className="flex h-full flex-col gap-6 p-4">
@@ -43,7 +49,12 @@ export function AppShell({ session, environment, authMode, signOutAction, childr
           <p className="truncate font-medium">{session.email ?? session.adminId}</p>
           <p className="text-muted-foreground">{roleLabel}</p>
           <p className="text-muted-foreground">
-            Scope: {session.tenantId ? <span className="font-mono">{session.tenantId.slice(0, 8)}…</span> : "all applications"}
+            Scope:{' '}
+            {session.tenantId ? (
+              <span className="font-mono">{session.tenantId.slice(0, 8)}…</span>
+            ) : (
+              'all applications'
+            )}
           </p>
         </div>
         <form action={signOutAction}>
@@ -93,7 +104,7 @@ export function AppShell({ session, environment, authMode, signOutAction, childr
             <Badge variant="outline" className="font-mono">
               {environment}
             </Badge>
-            <Badge variant={authMode === "dev" ? "destructive" : "secondary"}>
+            <Badge variant={authMode === 'dev' ? 'destructive' : 'secondary'}>
               auth: {authMode}
             </Badge>
           </div>
@@ -105,5 +116,5 @@ export function AppShell({ session, environment, authMode, signOutAction, childr
 }
 
 function humanizeRole(role: string): string {
-  return role.toLowerCase().replaceAll("_", " ");
+  return role.toLowerCase().replaceAll('_', ' ');
 }

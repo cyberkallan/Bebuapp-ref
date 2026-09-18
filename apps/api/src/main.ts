@@ -29,7 +29,9 @@ export function configureApp(app: NestExpressApplication): INestApplication {
       // API only: no HTML is served, so a strict CSP is safe.
       contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
       crossOriginResourcePolicy: { policy: 'same-site' },
-      hsts: config.isProduction ? { maxAge: 31_536_000, includeSubDomains: true, preload: true } : false,
+      hsts: config.isProduction
+        ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
+        : false,
     }),
   );
 
@@ -41,7 +43,13 @@ export function configureApp(app: NestExpressApplication): INestApplication {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Authorization', 'Content-Type', 'X-Tenant-Key', 'X-Request-Id', 'Idempotency-Key'],
+    allowedHeaders: [
+      'Authorization',
+      'Content-Type',
+      'X-Tenant-Key',
+      'X-Request-Id',
+      'Idempotency-Key',
+    ],
     exposedHeaders: ['X-Request-Id'],
     maxAge: 600,
   });
@@ -86,7 +94,12 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(config.http.port, config.http.host);
   logger.info(
-    { port: config.http.port, host: config.http.host, env: config.nodeEnv, authMode: config.auth.mode },
+    {
+      port: config.http.port,
+      host: config.http.host,
+      env: config.nodeEnv,
+      authMode: config.auth.mode,
+    },
     'bebu api listening',
   );
 }

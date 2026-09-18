@@ -24,7 +24,9 @@ describe('WalletLedgerService (integration)', () => {
     const tenant = await t.prisma.tenant.create({ data: { key: 'ledger', name: 'Ledger' } });
     tenantId = tenant.id;
     const user = await t.prisma.user.create({ data: { tenantId, firebaseUid: 'w1' } });
-    const wallet = await t.prisma.wallet.create({ data: { tenantId, kind: 'USER', userId: user.id } });
+    const wallet = await t.prisma.wallet.create({
+      data: { tenantId, kind: 'USER', userId: user.id },
+    });
     walletId = wallet.id;
   });
 
@@ -34,20 +36,43 @@ describe('WalletLedgerService (integration)', () => {
 
   const credit = (amount: number, key: string) =>
     t.prisma.financialTransaction((tx) =>
-      ledger.apply(tx, { tenantId, walletId, type: 'PURCHASE', amount, idempotencyKey: key, actor }),
+      ledger.apply(tx, {
+        tenantId,
+        walletId,
+        type: 'PURCHASE',
+        amount,
+        idempotencyKey: key,
+        actor,
+      }),
     );
   const debit = (amount: number, key: string) =>
     t.prisma.financialTransaction((tx) =>
-      ledger.apply(tx, { tenantId, walletId, type: 'CALL_CHARGE', amount, idempotencyKey: key, actor }),
+      ledger.apply(tx, {
+        tenantId,
+        walletId,
+        type: 'CALL_CHARGE',
+        amount,
+        idempotencyKey: key,
+        actor,
+      }),
     );
 
   it('posts credits and debits with exact before/after balances', async () => {
     const c = await credit(100, 'p-1');
     expect(c.replayed).toBe(false);
-    expect(c.transaction).toMatchObject({ direction: 'CREDIT', balanceBefore: 0n, balanceAfter: 100n });
+    expect(c.transaction).toMatchObject({
+      direction: 'CREDIT',
+      balanceBefore: 0n,
+      balanceAfter: 100n,
+    });
 
     const d = await debit(30, 'c-1');
-    expect(d.transaction).toMatchObject({ direction: 'DEBIT', amount: 30n, balanceBefore: 100n, balanceAfter: 70n });
+    expect(d.transaction).toMatchObject({
+      direction: 'DEBIT',
+      amount: 30n,
+      balanceBefore: 100n,
+      balanceAfter: 70n,
+    });
 
     const wallet = await t.prisma.wallet.findUniqueOrThrow({ where: { id: walletId } });
     expect(wallet.balance).toBe(70n);
@@ -83,7 +108,14 @@ describe('WalletLedgerService (integration)', () => {
   it('requires an explicit direction for admin adjustments', async () => {
     await expect(
       t.prisma.financialTransaction((tx) =>
-        ledger.apply(tx, { tenantId, walletId, type: 'ADMIN_ADJUSTMENT', amount: 5, idempotencyKey: 'a-1', actor }),
+        ledger.apply(tx, {
+          tenantId,
+          walletId,
+          type: 'ADMIN_ADJUSTMENT',
+          amount: 5,
+          idempotencyKey: 'a-1',
+          actor,
+        }),
       ),
     ).rejects.toBeInstanceOf(AppException);
     const r = await t.prisma.financialTransaction((tx) =>
@@ -121,7 +153,10 @@ describe('WalletLedgerService (integration)', () => {
     const wallet = await t.prisma.wallet.findUniqueOrThrow({ where: { id: walletId } });
     expect(wallet.balance).toBe(BigInt(50 - ok * 10));
 
-    const rows = await t.prisma.walletTransaction.findMany({ where: { walletId }, orderBy: { createdAt: 'asc' } });
+    const rows = await t.prisma.walletTransaction.findMany({
+      where: { walletId },
+      orderBy: { createdAt: 'asc' },
+    });
     expect(rows).toHaveLength(1 + ok);
     // Ledger chain is contiguous: each entry starts where the previous ended.
     for (let i = 1; i < rows.length; i++) {

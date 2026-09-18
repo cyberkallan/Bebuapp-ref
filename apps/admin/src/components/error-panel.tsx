@@ -1,6 +1,6 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from 'lucide-react';
 
-import type { ApiErrorBody } from "@bebu/shared";
+import type { ApiErrorBody } from '@bebu/shared';
 
 export function ErrorPanel({
   title,
@@ -22,7 +22,7 @@ export function ErrorPanel({
               {error.message}
               {error.code ? (
                 <>
-                  {" "}
+                  {' '}
                   <span className="font-mono text-xs">({error.code})</span>
                 </>
               ) : null}

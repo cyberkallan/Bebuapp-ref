@@ -17,7 +17,8 @@ if (!testDbUrl) throw new Error('DATABASE_URL_TEST must be set to run integratio
 process.env['NODE_ENV'] = 'test';
 process.env['DATABASE_URL'] = testDbUrl;
 process.env['PRISMA_DATABASE_URL'] = testDbUrl;
-process.env['REDIS_URL'] = (process.env['REDIS_URL'] ?? 'redis://127.0.0.1:6379').replace(/\/\d+$/, '') + '/1';
+process.env['REDIS_URL'] =
+  (process.env['REDIS_URL'] ?? 'redis://127.0.0.1:6379').replace(/\/\d+$/, '') + '/1';
 process.env['REDIS_KEY_PREFIX'] = 'bebu:test';
 process.env['AUTH_MODE'] = 'dev';
 process.env['LOG_LEVEL'] = 'fatal';

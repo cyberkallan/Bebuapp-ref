@@ -16,8 +16,10 @@ export interface TenantContext {
 }
 
 /** Injects the resolved {@link TenantContext}. Only valid on tenant-scoped routes. */
-export const CurrentTenant = createParamDecorator((_data: unknown, ctx: ExecutionContext): TenantContext => {
-  const req = ctx.switchToHttp().getRequest<ContextualRequest>();
-  if (!req.tenant) throw new Error('CurrentTenant used on a route without tenant resolution');
-  return req.tenant;
-});
+export const CurrentTenant = createParamDecorator(
+  (_data: unknown, ctx: ExecutionContext): TenantContext => {
+    const req = ctx.switchToHttp().getRequest<ContextualRequest>();
+    if (!req.tenant) throw new Error('CurrentTenant used on a route without tenant resolution');
+    return req.tenant;
+  },
+);

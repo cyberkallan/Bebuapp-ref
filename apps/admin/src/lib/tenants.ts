@@ -1,8 +1,13 @@
-import "server-only";
+import 'server-only';
 
-import type { TenantBranding, TenantFeatureFlag, TenantLegalUrls, TenantStatus } from "@bebu/shared";
+import type {
+  TenantBranding,
+  TenantFeatureFlag,
+  TenantLegalUrls,
+  TenantStatus,
+} from '@bebu/shared';
 
-import { apiFetch, type ApiResult } from "./api-client";
+import { apiFetch, type ApiResult } from './api-client';
 
 /** Mirrors `AdminTenantView` from the API. */
 export interface AdminTenant {
@@ -29,7 +34,7 @@ export interface AdminTenant {
 }
 
 export function listTenants(token: string): Promise<ApiResult<AdminTenant[]>> {
-  return apiFetch<AdminTenant[]>("/api/v1/admin/tenants", { token });
+  return apiFetch<AdminTenant[]>('/api/v1/admin/tenants', { token });
 }
 
 export function getTenant(token: string, tenantId: string): Promise<ApiResult<AdminTenant>> {

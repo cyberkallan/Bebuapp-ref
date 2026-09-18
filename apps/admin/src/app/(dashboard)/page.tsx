@@ -1,37 +1,48 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, Database, Server, Waypoints } from "lucide-react";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight, Database, Server, Waypoints } from 'lucide-react';
 
-import { ErrorPanel } from "@/components/error-panel";
-import { PageHeader } from "@/components/page-header";
-import { RefreshButton } from "@/components/refresh-button";
-import { StatusPill, type PillTone } from "@/components/status-pill";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { adminConfig } from "@/lib/config";
-import { loadPlatformStatus, type DependencyState } from "@/lib/platform";
-import { requireSession } from "@/lib/require-session";
-import { listTenants } from "@/lib/tenants";
+import { ErrorPanel } from '@/components/error-panel';
+import { PageHeader } from '@/components/page-header';
+import { RefreshButton } from '@/components/refresh-button';
+import { StatusPill, type PillTone } from '@/components/status-pill';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { adminConfig } from '@/lib/config';
+import { loadPlatformStatus, type DependencyState } from '@/lib/platform';
+import { requireSession } from '@/lib/require-session';
+import { listTenants } from '@/lib/tenants';
 
-export const metadata: Metadata = { title: "Overview" };
-export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: 'Overview' };
+export const dynamic = 'force-dynamic';
 
-const STATE_TONE: Record<DependencyState, PillTone> = { up: "success", down: "danger", unknown: "neutral" };
-const STATE_LABEL: Record<DependencyState, string> = { up: "Healthy", down: "Down", unknown: "Unknown" };
+const STATE_TONE: Record<DependencyState, PillTone> = {
+  up: 'success',
+  down: 'danger',
+  unknown: 'neutral',
+};
+const STATE_LABEL: Record<DependencyState, string> = {
+  up: 'Healthy',
+  down: 'Down',
+  unknown: 'Unknown',
+};
 
 export default async function OverviewPage() {
   const { token, session } = await requireSession();
   const [status, tenants] = await Promise.all([loadPlatformStatus(), listTenants(token)]);
 
-  const overall: DependencyState = !status.health.ok && status.health.unreachable
-    ? "down"
-    : status.dependencies.every((d) => d.state === "up")
-      ? "up"
-      : status.dependencies.some((d) => d.state === "down")
-        ? "down"
-        : "unknown";
+  const overall: DependencyState =
+    !status.health.ok && status.health.unreachable
+      ? 'down'
+      : status.dependencies.every((d) => d.state === 'up')
+        ? 'up'
+        : status.dependencies.some((d) => d.state === 'down')
+          ? 'down'
+          : 'unknown';
 
   const tenantCount = tenants.ok ? tenants.data.length : null;
-  const activeTenantCount = tenants.ok ? tenants.data.filter((t) => t.status === "ACTIVE").length : null;
+  const activeTenantCount = tenants.ok
+    ? tenants.data.filter((t) => t.status === 'ACTIVE').length
+    : null;
 
   return (
     <>
@@ -48,7 +59,8 @@ export default async function OverviewPage() {
             error={status.info.error}
             hint={
               <>
-                Check that the API is running at <code className="font-mono">{adminConfig.apiUrl}</code> and that{" "}
+                Check that the API is running at{' '}
+                <code className="font-mono">{adminConfig.apiUrl}</code> and that{' '}
                 <code className="font-mono">BEBU_API_URL</code> points at it.
               </>
             }
@@ -60,10 +72,12 @@ export default async function OverviewPage() {
         <SummaryCard
           icon={<Server className="size-4" />}
           label="API"
-          value={status.info.ok ? `v${status.info.data.version}` : "—"}
+          value={status.info.ok ? `v${status.info.data.version}` : '—'}
           footer={
             status.info.ok ? (
-              <span className="font-mono text-xs text-muted-foreground">{status.info.data.environment}</span>
+              <span className="font-mono text-xs text-muted-foreground">
+                {status.info.data.environment}
+              </span>
             ) : (
               <StatusPill tone="danger">Unreachable</StatusPill>
             )
@@ -72,13 +86,13 @@ export default async function OverviewPage() {
         <SummaryCard
           icon={<Waypoints className="size-4" />}
           label="Dependencies"
-          value={`${status.dependencies.filter((d) => d.state === "up").length}/${status.dependencies.length}`}
+          value={`${status.dependencies.filter((d) => d.state === 'up').length}/${status.dependencies.length}`}
           footer={<StatusPill tone={STATE_TONE[overall]}>{STATE_LABEL[overall]}</StatusPill>}
         />
         <SummaryCard
           icon={<Database className="size-4" />}
           label="Applications"
-          value={tenantCount === null ? "—" : String(tenantCount)}
+          value={tenantCount === null ? '—' : String(tenantCount)}
           footer={
             tenantCount === null ? (
               <StatusPill tone="neutral">Unavailable</StatusPill>
@@ -89,10 +103,11 @@ export default async function OverviewPage() {
         />
         <SummaryCard
           label="Your access"
-          value={session.roles.map((r) => r.toLowerCase().replaceAll("_", " ")).join(", ")}
+          value={session.roles.map((r) => r.toLowerCase().replaceAll('_', ' ')).join(', ')}
           footer={
             <span className="text-xs text-muted-foreground">
-              {session.permissions.length} permissions · {session.tenantId ? "single application" : "all applications"}
+              {session.permissions.length} permissions ·{' '}
+              {session.tenantId ? 'single application' : 'all applications'}
             </span>
           }
         />
@@ -103,14 +118,17 @@ export default async function OverviewPage() {
           <CardHeader>
             <CardTitle>Dependency health</CardTitle>
             <CardDescription>
-              Readiness probes as reported by <code className="font-mono">/health</code>. A failing check removes the
-              instance from the load balancer.
+              Readiness probes as reported by <code className="font-mono">/health</code>. A failing
+              check removes the instance from the load balancer.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="divide-y">
               {status.dependencies.map((dep) => (
-                <li key={dep.key} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                <li
+                  key={dep.key}
+                  className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+                >
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{dep.label}</p>
                     <p className="truncate font-mono text-xs text-muted-foreground">
@@ -136,8 +154,8 @@ export default async function OverviewPage() {
             {tenants.ok ? (
               tenants.data.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  No applications yet. Run <code className="font-mono">pnpm db:seed</code> to create the default
-                  bebu app.
+                  No applications yet. Run <code className="font-mono">pnpm db:seed</code> to create
+                  the default bebu app.
                 </p>
               ) : (
                 <ul className="space-y-2">
@@ -154,9 +172,11 @@ export default async function OverviewPage() {
                             style={{ backgroundColor: t.branding.primaryColor }}
                           />
                           <span className="truncate text-sm font-medium">{t.name}</span>
-                          <span className="truncate font-mono text-xs text-muted-foreground">{t.key}</span>
+                          <span className="truncate font-mono text-xs text-muted-foreground">
+                            {t.key}
+                          </span>
                         </span>
-                        <StatusPill tone={t.status === "ACTIVE" ? "success" : "warning"}>
+                        <StatusPill tone={t.status === 'ACTIVE' ? 'success' : 'warning'}>
                           {t.status.toLowerCase()}
                         </StatusPill>
                       </Link>
@@ -167,7 +187,10 @@ export default async function OverviewPage() {
             ) : (
               <ErrorPanel title="Could not load applications" error={tenants.error} />
             )}
-            <Link href="/tenants" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            <Link
+              href="/tenants"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
               Manage applications <ArrowRight className="size-3.5" />
             </Link>
           </CardContent>

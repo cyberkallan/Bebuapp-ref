@@ -47,7 +47,12 @@ async function main(): Promise<void> {
         supportUrl: 'https://bebuapp.in/support',
         refundPolicyUrl: 'https://bebuapp.in/refunds',
       },
-      featureFlags: { voiceCalls: true, videoCalls: true, randomMatching: true, becomeCaller: true },
+      featureFlags: {
+        voiceCalls: true,
+        videoCalls: true,
+        randomMatching: true,
+        becomeCaller: true,
+      },
       pricing: {
         currency: 'INR',
         platformCommissionBps: 3000,
@@ -72,18 +77,43 @@ async function main(): Promise<void> {
   });
 
   const packages = [
-    { name: 'Starter', coins: 100, bonusCoins: 0, priceMinorUnits: 9_900, sortOrder: 1, isPopular: false },
-    { name: 'Popular', coins: 550, bonusCoins: 50, priceMinorUnits: 49_900, sortOrder: 2, isPopular: true },
-    { name: 'Pro', coins: 1_200, bonusCoins: 200, priceMinorUnits: 99_900, sortOrder: 3, isPopular: false },
+    {
+      name: 'Starter',
+      coins: 100,
+      bonusCoins: 0,
+      priceMinorUnits: 9_900,
+      sortOrder: 1,
+      isPopular: false,
+    },
+    {
+      name: 'Popular',
+      coins: 550,
+      bonusCoins: 50,
+      priceMinorUnits: 49_900,
+      sortOrder: 2,
+      isPopular: true,
+    },
+    {
+      name: 'Pro',
+      coins: 1_200,
+      bonusCoins: 200,
+      priceMinorUnits: 99_900,
+      sortOrder: 3,
+      isPopular: false,
+    },
   ];
   for (const pkg of packages) {
-    const existing = await prisma.coinPackage.findFirst({ where: { tenantId: tenant.id, name: pkg.name } });
+    const existing = await prisma.coinPackage.findFirst({
+      where: { tenantId: tenant.id, name: pkg.name },
+    });
     if (!existing) {
       await prisma.coinPackage.create({ data: { ...pkg, tenantId: tenant.id, currency: 'INR' } });
     }
   }
 
-  console.warn(`seeded tenant "${tenant.key}" (${tenant.id}) and super admin uid "${SUPER_ADMIN_UID}"`);
+  console.warn(
+    `seeded tenant "${tenant.key}" (${tenant.id}) and super admin uid "${SUPER_ADMIN_UID}"`,
+  );
 }
 
 main()

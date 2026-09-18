@@ -1,4 +1,8 @@
-import { DEFAULT_NOTIFICATION_PREFERENCES, type NotificationPreferences, SuppressionReason } from '@bebu/shared';
+import {
+  DEFAULT_NOTIFICATION_PREFERENCES,
+  type NotificationPreferences,
+  SuppressionReason,
+} from '@bebu/shared';
 
 import { evaluateReengagement, isInQuietHours, type PolicyInput } from './reengagement-policy.js';
 
@@ -52,7 +56,9 @@ describe('evaluateReengagement', () => {
       reason: SuppressionReason.NO_DEVICE_TOKEN,
     });
     expect(
-      evaluateReengagement(input({ preferences: prefs({ categories: { AVAILABILITY: false } as never }) })),
+      evaluateReengagement(
+        input({ preferences: prefs({ categories: { AVAILABILITY: false } as never }) }),
+      ),
     ).toMatchObject({ reason: SuppressionReason.USER_OPTED_OUT });
     expect(
       evaluateReengagement(
@@ -72,7 +78,8 @@ describe('evaluateReengagement', () => {
     });
     expect(evaluateReengagement(input({ now, lastSentAt: fiveHoursAgo })).allow).toBe(true);
     expect(
-      evaluateReengagement(input({ now, lastSentAt: oneHourAgo, cooldownSecondsOverride: 60 })).allow,
+      evaluateReengagement(input({ now, lastSentAt: oneHourAgo, cooldownSecondsOverride: 60 }))
+        .allow,
     ).toBe(true);
   });
 

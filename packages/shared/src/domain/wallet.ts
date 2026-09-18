@@ -50,21 +50,22 @@ export const LedgerDirection = {
 } as const;
 export type LedgerDirection = (typeof LedgerDirection)[keyof typeof LedgerDirection];
 
-export const WALLET_TRANSACTION_DIRECTION: Readonly<Record<WalletTransactionType, LedgerDirection>> =
-  {
-    PURCHASE: LedgerDirection.CREDIT,
-    BONUS: LedgerDirection.CREDIT,
-    CALL_CHARGE: LedgerDirection.DEBIT,
-    CALL_EARNING: LedgerDirection.CREDIT,
-    PLATFORM_COMMISSION: LedgerDirection.CREDIT,
-    REFUND: LedgerDirection.CREDIT,
-    HOLD: LedgerDirection.DEBIT,
-    HOLD_RELEASE: LedgerDirection.CREDIT,
-    PAYOUT: LedgerDirection.DEBIT,
-    PAYOUT_REVERSAL: LedgerDirection.CREDIT,
-    ADMIN_ADJUSTMENT: LedgerDirection.CREDIT, // sign carried by amount; see ledger service
-    CHARGEBACK: LedgerDirection.DEBIT,
-  };
+export const WALLET_TRANSACTION_DIRECTION: Readonly<
+  Record<WalletTransactionType, LedgerDirection>
+> = {
+  PURCHASE: LedgerDirection.CREDIT,
+  BONUS: LedgerDirection.CREDIT,
+  CALL_CHARGE: LedgerDirection.DEBIT,
+  CALL_EARNING: LedgerDirection.CREDIT,
+  PLATFORM_COMMISSION: LedgerDirection.CREDIT,
+  REFUND: LedgerDirection.CREDIT,
+  HOLD: LedgerDirection.DEBIT,
+  HOLD_RELEASE: LedgerDirection.CREDIT,
+  PAYOUT: LedgerDirection.DEBIT,
+  PAYOUT_REVERSAL: LedgerDirection.CREDIT,
+  ADMIN_ADJUSTMENT: LedgerDirection.CREDIT, // sign carried by amount; see ledger service
+  CHARGEBACK: LedgerDirection.DEBIT,
+};
 
 export const WalletTransactionStatus = {
   PENDING: 'PENDING',

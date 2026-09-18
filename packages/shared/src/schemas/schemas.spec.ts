@@ -34,7 +34,9 @@ describe('shared validation schemas', () => {
       iosBundleId: 'in.bebuapp.ios',
     });
     expect(parsed.supportedCountries).toEqual([]);
-    expect(createTenantSchema.safeParse({ key: 'bebu', name: 'x', androidPackageName: 'bad' }).success).toBe(false);
+    expect(
+      createTenantSchema.safeParse({ key: 'bebu', name: 'x', androidPackageName: 'bad' }).success,
+    ).toBe(false);
   });
 
   it('requires non-zero deltas and a reason for admin wallet adjustments', () => {
@@ -47,7 +49,9 @@ describe('shared validation schemas', () => {
     expect(adminWalletAdjustmentSchema.safeParse({ ...base, deltaCoins: -50 }).success).toBe(true);
     expect(adminWalletAdjustmentSchema.safeParse({ ...base, deltaCoins: 0 }).success).toBe(false);
     expect(adminWalletAdjustmentSchema.safeParse({ ...base, deltaCoins: 1.5 }).success).toBe(false);
-    expect(adminWalletAdjustmentSchema.safeParse({ ...base, deltaCoins: 5, reason: 'short' }).success).toBe(false);
+    expect(
+      adminWalletAdjustmentSchema.safeParse({ ...base, deltaCoins: 5, reason: 'short' }).success,
+    ).toBe(false);
   });
 
   it('never lets a client select the MANUAL payment provider', () => {
@@ -56,7 +60,9 @@ describe('shared validation schemas', () => {
       platform: 'ANDROID',
       idempotencyKey: 'order-2026-09-18-0001',
     };
-    expect(createPaymentOrderSchema.safeParse({ ...base, provider: 'GOOGLE_PLAY' }).success).toBe(true);
+    expect(createPaymentOrderSchema.safeParse({ ...base, provider: 'GOOGLE_PLAY' }).success).toBe(
+      true,
+    );
     expect(createPaymentOrderSchema.safeParse({ ...base, provider: 'MANUAL' }).success).toBe(false);
   });
 

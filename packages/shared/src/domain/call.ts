@@ -91,7 +91,12 @@ export const CALL_STATE_TRANSITIONS: Readonly<Record<CallState, readonly CallSta
   ],
   ACCEPTED: [CallState.CONNECTING, CallState.CANCELLED, CallState.TIMEOUT, CallState.FAILED],
   CONNECTING: [CallState.CONNECTED, CallState.ENDING, CallState.TIMEOUT, CallState.FAILED],
-  CONNECTED: [CallState.BILLING, CallState.ENDING, CallState.INSUFFICIENT_BALANCE, CallState.FAILED],
+  CONNECTED: [
+    CallState.BILLING,
+    CallState.ENDING,
+    CallState.INSUFFICIENT_BALANCE,
+    CallState.FAILED,
+  ],
   BILLING: [
     CallState.CONNECTED,
     CallState.ENDING,
