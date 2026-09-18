@@ -103,7 +103,7 @@ export default async function OverviewPage() {
         />
         <SummaryCard
           label="Your access"
-          value={session.roles.map((r) => r.toLowerCase().replaceAll('_', ' ')).join(', ')}
+          value={session.roles.map(humanizeRole).join(', ')}
           footer={
             <span className="text-xs text-muted-foreground">
               {session.permissions.length} permissions ·{' '}
@@ -218,9 +218,15 @@ function SummaryCard({
           {icon}
           {label}
         </div>
-        <p className="truncate text-2xl font-semibold tracking-tight capitalize">{value}</p>
+        <p className="truncate text-2xl font-semibold tracking-tight">{value}</p>
         <div>{footer}</div>
       </CardContent>
     </Card>
   );
+}
+
+/** SUPER_ADMIN -> "Super admin" */
+function humanizeRole(role: string): string {
+  const words = role.toLowerCase().replaceAll('_', ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }
