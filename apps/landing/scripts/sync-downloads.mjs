@@ -1,7 +1,15 @@
 // Copies the signed APKs and their checksums from /releases into the site's
 // public folder so `vite build` ships them under /downloads/. Also writes a
 // small JSON manifest the page reads to show sizes and checksums.
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
@@ -12,7 +20,10 @@ mkdirSync(outDir, { recursive: true });
 
 if (!existsSync(releasesDir)) {
   console.warn(`[landing] no releases directory at ${releasesDir}; download links will be empty`);
-  writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify({ version: null, builds: [] }, null, 2));
+  writeFileSync(
+    path.join(outDir, 'manifest.json'),
+    JSON.stringify({ version: null, builds: [] }, null, 2),
+  );
   process.exit(0);
 }
 
@@ -26,7 +37,9 @@ if (existsSync(sumsFile)) {
 }
 
 const builds = [];
-for (const name of readdirSync(releasesDir).filter((f) => f.endsWith('.apk')).sort()) {
+for (const name of readdirSync(releasesDir)
+  .filter((f) => f.endsWith('.apk'))
+  .sort()) {
   copyFileSync(path.join(releasesDir, name), path.join(outDir, name));
   const abi = /-(arm64-v8a|armeabi-v7a|x86_64)\.apk$/.exec(name)?.[1] ?? 'universal';
   const version = /^bebu-([0-9]+\.[0-9]+\.[0-9]+)/.exec(name)?.[1] ?? null;

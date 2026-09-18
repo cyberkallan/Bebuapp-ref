@@ -7,7 +7,10 @@
     <title>bebu operator console</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         --violet-700: #6d28d9;
@@ -31,8 +34,7 @@
         color: var(--ink-900);
         background:
           radial-gradient(60% 50% at 100% 0%, rgba(167, 139, 250, 0.35), transparent 60%),
-          radial-gradient(50% 40% at 0% 100%, rgba(251, 191, 36, 0.25), transparent 60%),
-          #fbfaff;
+          radial-gradient(50% 40% at 0% 100%, rgba(251, 191, 36, 0.25), transparent 60%), #fbfaff;
         line-height: 1.6;
       }
       .card {
@@ -170,7 +172,9 @@
       <a class="brand" href="/">
         <span class="mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+            <path
+              d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
+            />
           </svg>
         </span>
         bebu
@@ -179,9 +183,10 @@
       <div class="pill">Operator console · not deployed on this host</div>
       <h1>The console needs an application server</h1>
       <p>
-        <code>ayushaura.in</code> is currently on shared web hosting, which serves static files and PHP only. The
-        bebu operator console is a Node.js application backed by the bebu API, PostgreSQL and Redis, so it cannot
-        run here. It will be available at this address once the platform is moved to a VPS.
+        <code>ayushaura.in</code> is currently on shared web hosting, which serves static files and
+        PHP only. The bebu operator console is a Node.js application backed by the bebu API,
+        PostgreSQL and Redis, so it cannot run here. It will be available at this address once the
+        platform is moved to a VPS.
       </p>
 
       <div class="grid">
@@ -191,8 +196,9 @@
       </div>
 
       <p>
-        The repository ships a production Docker Compose stack (<code>infra/deploy</code>) that brings up all of
-        the above behind HTTPS and serves the console at <code>/admin</code> with a single command.
+        The repository ships a production Docker Compose stack (<code>infra/deploy</code>) that
+        brings up all of the above behind HTTPS and serves the console at <code>/admin</code> with a
+        single command.
       </p>
 
       <div class="actions">
@@ -200,7 +206,9 @@
         <a class="btn btn--ghost" href="/#download">Download the app</a>
       </div>
 
-      <div class="foot">Deployment guide: <code>docs/deployment.md</code> in the bebu repository.</div>
+      <div class="foot">
+        Deployment guide: <code>docs/deployment.md</code> in the bebu repository.
+      </div>
     </main>
   </body>
 </html>
