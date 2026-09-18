@@ -16,7 +16,7 @@ export class AppController {
     return {
       name: 'bebu-api',
       version: API_VERSION,
-      environment: this.config.nodeEnv,
+      environment: this.config.appEnv,
       docsUrl: null,
       time: new Date().toISOString(),
     };
