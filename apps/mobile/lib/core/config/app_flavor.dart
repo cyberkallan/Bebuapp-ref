@@ -19,11 +19,18 @@ class AppFlavor {
 
   bool get isDevAuth => authMode == AuthMode.dev;
 
+  /// `10.0.2.2` is the Android emulator's alias for the host machine. It is
+  /// unreachable from a physical phone, so a build that still carries this
+  /// default must ask the tester for a server address instead of hanging.
+  static const emulatorHostUrl = 'http://10.0.2.2:4180';
+
+  bool get hasPlaceholderApiUrl => apiBaseUrl == emulatorHostUrl;
+
   factory AppFlavor.fromEnvironment() {
     const tenantKey = String.fromEnvironment('TENANT_KEY', defaultValue: 'bebu');
     const apiBaseUrl = String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: 'http://10.0.2.2:4180',
+      defaultValue: emulatorHostUrl,
     );
     const authMode = String.fromEnvironment('AUTH_MODE', defaultValue: 'firebase');
 

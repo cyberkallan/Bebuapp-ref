@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/config/server_settings.dart';
 import '../features/tenant/tenant_config_provider.dart';
 import '../features/startup/startup_screen.dart';
 import 'router.dart';
@@ -11,6 +12,15 @@ class BebuApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(needsServerSetupProvider)) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: BebuTheme.light(null),
+        darkTheme: BebuTheme.dark(null),
+        home: const StartupScreen.setup(),
+      );
+    }
+
     final config = ref.watch(tenantConfigProvider);
 
     // Until the tenant config resolves the app has no brand, so we render a

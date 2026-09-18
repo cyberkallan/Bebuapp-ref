@@ -51,6 +51,17 @@ class ServerOverride extends Notifier<String?> {
 
 final serverOverrideProvider = NotifierProvider<ServerOverride, String?>(ServerOverride.new);
 
+/// True when this build has no usable API address yet: it was compiled with
+/// the emulator placeholder, no override is stored, and it is not running on
+/// an emulator-friendly debug build. The app shows the server setup screen
+/// instead of attempting a connection that can never succeed.
+final needsServerSetupProvider = Provider<bool>((ref) {
+  const isRelease = bool.fromEnvironment('dart.vm.product');
+  final flavor = ref.watch(appFlavorProvider);
+  final override = ref.watch(serverOverrideProvider);
+  return isRelease && override == null && flavor.hasPlaceholderApiUrl;
+});
+
 /// The API base URL actually in use: the override when set, else the flavor's.
 final effectiveApiBaseUrlProvider = Provider<String>((ref) {
   return ref.watch(serverOverrideProvider) ?? ref.watch(appFlavorProvider).apiBaseUrl;
