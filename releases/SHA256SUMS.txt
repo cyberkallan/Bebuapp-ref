@@ -1,2 +1,2 @@
-4dd35070be1a9ade6b9124f3801689bb17de9cfe76b067839ce16cb7b6ffe510  bebu-0.1.0-foundation-arm64-v8a.apk
-f73c698fd378f78f8a19f85a8bd83e88c9ac271fbdd2ef6fa62ce9dd9a45bb67  bebu-0.1.0-foundation-armeabi-v7a.apk
+5d481d6e47ca7d2c3767d3cf490e1c5c8d5eb53824774488ffaf1da305c7d266  bebu-0.1.1-foundation-arm64-v8a.apk
+313c5b7e36e76ea2ac167ea7e0a26bf45a096ff0dd8c95890f7d698fedb43ca3  bebu-0.1.1-foundation-armeabi-v7a.apk

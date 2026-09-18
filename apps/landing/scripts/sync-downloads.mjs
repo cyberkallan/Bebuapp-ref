@@ -7,6 +7,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
@@ -16,6 +17,8 @@ const root = path.resolve(import.meta.dirname, '..');
 const releasesDir = path.resolve(root, '../../releases');
 const outDir = path.join(root, 'public/downloads');
 
+// Start clean so APKs removed from /releases do not linger in the site.
+rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
 if (!existsSync(releasesDir)) {
