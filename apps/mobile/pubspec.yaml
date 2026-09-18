@@ -1,7 +1,7 @@
 name: bebu_mobile
 description: bebu - real-time 1-to-1 voice and video calling. White-label Flutter client; one build per tenant via flavors.
 publish_to: 'none'
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ^3.6.0
