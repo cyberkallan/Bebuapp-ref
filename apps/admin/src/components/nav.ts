@@ -10,43 +10,53 @@ import {
   ShieldAlert,
   Users,
 } from "lucide-react";
+import type { Route } from "next";
 
-export interface NavItem {
-  href: string;
+interface BuiltNavItem {
+  kind: "route";
+  href: Route;
   label: string;
   icon: LucideIcon;
-  /** Present when the screen is not built yet; shown as a disabled entry. */
-  stage?: string;
 }
+
+/** Screens that exist in the roadmap but have no route yet; rendered disabled. */
+interface PlannedNavItem {
+  kind: "planned";
+  label: string;
+  icon: LucideIcon;
+  stage: string;
+}
+
+export type NavItem = BuiltNavItem | PlannedNavItem;
 
 export const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: "Platform",
     items: [
-      { href: "/", label: "Overview", icon: Activity },
-      { href: "/tenants", label: "Applications", icon: Building2 },
+      { kind: "route", href: "/", label: "Overview", icon: Activity },
+      { kind: "route", href: "/tenants", label: "Applications", icon: Building2 },
     ],
   },
   {
     title: "Operations",
     items: [
-      { href: "/users", label: "Users", icon: Users, stage: "Stage 2" },
-      { href: "/callers", label: "Callers", icon: Headset, stage: "Stage 2" },
-      { href: "/calls", label: "Calls", icon: PhoneCall, stage: "Stage 4" },
+      { kind: "planned", label: "Users", icon: Users, stage: "Stage 2" },
+      { kind: "planned", label: "Callers", icon: Headset, stage: "Stage 2" },
+      { kind: "planned", label: "Calls", icon: PhoneCall, stage: "Stage 4" },
     ],
   },
   {
     title: "Finance",
     items: [
-      { href: "/wallets", label: "Wallets & ledger", icon: Coins, stage: "Stage 3" },
-      { href: "/payments", label: "Payments & payouts", icon: CreditCard, stage: "Stage 3" },
+      { kind: "planned", label: "Wallets & ledger", icon: Coins, stage: "Stage 3" },
+      { kind: "planned", label: "Payments & payouts", icon: CreditCard, stage: "Stage 3" },
     ],
   },
   {
     title: "Trust",
     items: [
-      { href: "/moderation", label: "Moderation", icon: ShieldAlert, stage: "Stage 5" },
-      { href: "/analytics", label: "Analytics", icon: BarChart3, stage: "Stage 6" },
+      { kind: "planned", label: "Moderation", icon: ShieldAlert, stage: "Stage 5" },
+      { kind: "planned", label: "Analytics", icon: BarChart3, stage: "Stage 6" },
     ],
   },
 ];

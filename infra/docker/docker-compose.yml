@@ -1,0 +1,64 @@
+# Local infrastructure for the bebu platform.
+#
+#   pnpm infra:up      # start Postgres + Redis in the background
+#   pnpm infra:logs    # follow logs
+#   pnpm infra:down    # stop (data is kept in named volumes)
+#
+# Ports are intentionally uncommon so they do not collide with system services.
+# Credentials here are for LOCAL DEVELOPMENT ONLY.
+
+name: bebu
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bebu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bebu
+      POSTGRES_PASSWORD: bebu
+      POSTGRES_DB: bebu
+    command:
+      - postgres
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - log_min_duration_statement=500
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bebu -d bebu']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: bebu-redis
+    restart: unless-stopped
+    # AOF persistence keeps queue state across restarts; noeviction is
+    # mandatory for BullMQ so jobs are never silently dropped.
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --maxmemory-policy
+      - noeviction
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:

@@ -19,12 +19,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           </p>
           <ul className="space-y-0.5">
             {section.items.map((item) => {
-              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               const Icon = item.icon;
 
-              if (item.stage) {
+              if (item.kind === "planned") {
                 return (
-                  <li key={item.href}>
+                  <li key={item.label}>
                     <Tooltip>
                       <TooltipTrigger
                         render={
@@ -44,6 +43,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                 );
               }
 
+              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
                 <li key={item.href}>
                   <Link

@@ -1,0 +1,42 @@
+name: bebu_mobile
+description: bebu - real-time 1-to-1 voice and video calling. White-label Flutter client; one build per tenant via flavors.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.6.0
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State & DI
+  flutter_riverpod: ^2.6.1
+  # Navigation
+  go_router: ^14.6.2
+  # HTTP (interceptors for tenant key, auth, request id, retries)
+  dio: ^5.7.0
+  # Auth (ID tokens verified by the API; no client-side authorization)
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  # Push (re-engagement) - wired in a later stage
+  firebase_messaging: ^15.1.5
+  # Real-time media - wired in the calling stage
+  agora_rtc_engine: ^6.3.2
+  # Local persistence for tokens/preferences
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
+  # Misc
+  intl: ^0.20.1
+  uuid: ^4.5.1
+  url_launcher: ^6.3.1
+  cached_network_image: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
