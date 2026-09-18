@@ -74,6 +74,28 @@ describe('environment schema', () => {
     expect(env.FIREBASE_PRIVATE_KEY).toBe('-----BEGIN\nabc\n-----END');
   });
 
+  it('derives APP_ENV from NODE_ENV and lets staging use signed dev auth', () => {
+    expect(parseEnv(base).APP_ENV).toBe('development');
+
+    // Staging: production runtime, dev auth allowed only with a shared secret.
+    expect(() => parseEnv({ ...base, NODE_ENV: 'production', APP_ENV: 'staging' })).toThrow(
+      /DEV_AUTH_SECRET/,
+    );
+    const staging = parseEnv({
+      ...base,
+      NODE_ENV: 'production',
+      APP_ENV: 'staging',
+      DEV_AUTH_SECRET: 'x'.repeat(32),
+    });
+    expect(staging.APP_ENV).toBe('staging');
+    expect(staging.AUTH_MODE).toBe('dev');
+
+    // APP_ENV=production is fail-closed regardless of NODE_ENV.
+    expect(() =>
+      parseEnv({ ...base, APP_ENV: 'production', DEV_AUTH_SECRET: 'x'.repeat(32) }),
+    ).toThrow(/AUTH_MODE must be "firebase"/);
+  });
+
   it('requires Agora credentials in production', () => {
     expect(() =>
       parseEnv({

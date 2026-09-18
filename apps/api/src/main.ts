@@ -98,6 +98,7 @@ async function bootstrap(): Promise<void> {
       port: config.http.port,
       host: config.http.host,
       env: config.nodeEnv,
+      appEnv: config.appEnv,
       authMode: config.auth.mode,
     },
     'bebu api listening',

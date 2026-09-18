@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { createHmac } from 'node:crypto';
+
 import type { Permission, Role } from '@bebu/shared';
 import { cookies } from 'next/headers';
 
@@ -53,10 +55,15 @@ export function hasPermission(session: AdminSession, permission: Permission): bo
 
 /**
  * Builds the dev-mode credential understood by the API's DevTokenVerifier
- * (`dev:<base64url(json)>`). Only used when ADMIN_AUTH_MODE=dev; the API
- * rejects these tokens outright when it runs with Firebase auth.
+ * (`dev:<base64url(json)>[.<hmac>]`). Only used when ADMIN_AUTH_MODE=dev; the
+ * API rejects these tokens outright when it runs with Firebase auth. When a
+ * shared secret is configured (staging), the body is HMAC-SHA256 signed.
  */
-export function encodeDevBearer(uid: string, email: string): string {
+export function encodeDevBearer(uid: string, email: string, secret?: string): string {
   const payload = JSON.stringify({ uid, email, provider: 'dev' });
-  return `Bearer dev:${Buffer.from(payload, 'utf8').toString('base64url')}`;
+  const body = Buffer.from(payload, 'utf8').toString('base64url');
+  const key = secret ?? adminConfig.devAuthSecret;
+  if (!key) return `Bearer dev:${body}`;
+  const signature = createHmac('sha256', key).update(body).digest('base64url');
+  return `Bearer dev:${body}.${signature}`;
 }

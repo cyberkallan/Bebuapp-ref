@@ -9,7 +9,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/'>) {
   return (
     <AppShell
       session={session}
-      environment={process.env.NODE_ENV}
+      environment={adminConfig.appEnv}
       authMode={adminConfig.authMode}
       signOutAction={signOut}
     >

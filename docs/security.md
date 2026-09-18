@@ -13,10 +13,13 @@
 
 - Users and admins authenticate with **Firebase ID tokens**, verified with the
   Admin SDK (`AUTH_MODE=firebase`, required in production; the env schema
-  refuses `dev` when `NODE_ENV=production`).
-- The `dev` verifier accepts unsigned `dev:` tokens for local work and tests.
-  It throws if instantiated in production, and the admin console likewise
-  refuses `ADMIN_AUTH_MODE=dev` in production.
+  refuses `dev` when `APP_ENV=production`).
+- The `dev` verifier accepts `dev:` tokens for local work and tests. In
+  `APP_ENV=staging` a `DEV_AUTH_SECRET` is mandatory and every dev token must
+  carry a matching HMAC-SHA256 signature (constant-time compared), so a
+  publicly reachable staging API cannot be impersonated with a bare uid. The
+  verifier throws if instantiated in production, and the admin console
+  likewise refuses `ADMIN_AUTH_MODE=dev` in production.
 - Authorization never trusts token claims. Roles and permissions for admins are
   read from `admin_accounts`; user status (`BLOCKED`) is read from `users`.
 - Admin routes are explicitly `@AdminScope()`; user routes require a resolved
@@ -80,7 +83,7 @@
 
 ## Before production checklist
 
-- [ ] `NODE_ENV=production`, `AUTH_MODE=firebase`, `ADMIN_AUTH_MODE=firebase`
+- [ ] `APP_ENV=production`, `AUTH_MODE=firebase`, `ADMIN_AUTH_MODE=firebase`, `DEV_AUTH_SECRET` unset
 - [ ] Firebase service account configured; test token verification end to end
 - [ ] `CORS_ORIGINS` limited to the real admin/web origins
 - [ ] `TRUST_PROXY_HOPS` set for the ingress topology

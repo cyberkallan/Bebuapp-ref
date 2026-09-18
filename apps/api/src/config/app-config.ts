@@ -6,6 +6,8 @@ import type { Env } from './env.schema.js';
  */
 export class AppConfig {
   readonly nodeEnv: Env['NODE_ENV'];
+  /** Deployment environment; drives the fail-closed security rules. */
+  readonly appEnv: Env['APP_ENV'];
   readonly isProduction: boolean;
   readonly isTest: boolean;
 
@@ -24,6 +26,7 @@ export class AppConfig {
 
   readonly auth: Readonly<{
     mode: Env['AUTH_MODE'];
+    devSecret: string | undefined;
     firebaseProjectId: string | undefined;
     credentialsFile: string | undefined;
     clientEmail: string | undefined;
@@ -42,7 +45,8 @@ export class AppConfig {
 
   constructor(env: Env) {
     this.nodeEnv = env.NODE_ENV;
-    this.isProduction = env.NODE_ENV === 'production';
+    this.appEnv = env.APP_ENV;
+    this.isProduction = env.APP_ENV === 'production';
     this.isTest = env.NODE_ENV === 'test';
 
     this.http = {
@@ -58,6 +62,7 @@ export class AppConfig {
     this.redis = { url: env.REDIS_URL, keyPrefix: env.REDIS_KEY_PREFIX };
     this.auth = {
       mode: env.AUTH_MODE,
+      devSecret: env.DEV_AUTH_SECRET,
       firebaseProjectId: env.FIREBASE_PROJECT_ID,
       credentialsFile: env.GOOGLE_APPLICATION_CREDENTIALS,
       clientEmail: env.FIREBASE_CLIENT_EMAIL,

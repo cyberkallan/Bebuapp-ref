@@ -19,9 +19,25 @@ const csv = z
  * missing or malformed aborts startup with a precise message instead of
  * failing later at runtime.
  */
+export const APP_ENVS = ['development', 'staging', 'production'] as const;
+export type AppEnv = (typeof APP_ENVS)[number];
+
+/**
+ * `NODE_ENV` controls runtime behaviour (bundling, logging, caching).
+ * `APP_ENV` describes the deployment: a *staging* VPS runs production builds
+ * but may still use dev auth (behind a shared secret), whereas *production*
+ * is fail-closed. When unset, it is derived from NODE_ENV.
+ */
+export function resolveAppEnv(source: { NODE_ENV?: string; APP_ENV?: string }): AppEnv {
+  const explicit = source.APP_ENV;
+  if (explicit && (APP_ENVS as readonly string[]).includes(explicit)) return explicit as AppEnv;
+  return source.NODE_ENV === 'production' ? 'production' : 'development';
+}
+
 export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    APP_ENV: z.enum(APP_ENVS).optional(),
     API_PORT: z.coerce.number().int().min(1).max(65_535).default(4180),
     API_HOST: z.string().default('0.0.0.0'),
     API_PUBLIC_URL: z.url().default('http://127.0.0.1:4180'),
@@ -45,6 +61,12 @@ export const envSchema = z
       .default('bebu'),
 
     AUTH_MODE: z.enum(['firebase', 'dev']).default('firebase'),
+    /**
+     * When set, dev tokens must carry an HMAC-SHA256 signature made with this
+     * secret. Mandatory for AUTH_MODE=dev outside local development so a
+     * publicly reachable staging API cannot be impersonated.
+     */
+    DEV_AUTH_SECRET: z.string().min(32).optional(),
     FIREBASE_PROJECT_ID: z.string().optional(),
     GOOGLE_APPLICATION_CREDENTIALS: z.string().optional(),
     FIREBASE_CLIENT_EMAIL: z.string().optional(),
@@ -62,8 +84,9 @@ export const envSchema = z
     METRICS_ENABLED: booleanString.default(true),
     METRICS_TOKEN: z.string().optional(),
   })
+  .transform((env) => ({ ...env, APP_ENV: resolveAppEnv(env) }))
   .superRefine((env, ctx) => {
-    const prod = env.NODE_ENV === 'production';
+    const prod = env.APP_ENV === 'production';
 
     if (prod && env.AUTH_MODE !== 'firebase') {
       ctx.addIssue({
@@ -72,7 +95,14 @@ export const envSchema = z
         message: 'AUTH_MODE must be "firebase" in production',
       });
     }
-    if (prod && env.LOG_PRETTY) {
+    if (env.AUTH_MODE === 'dev' && env.APP_ENV !== 'development' && !env.DEV_AUTH_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['DEV_AUTH_SECRET'],
+        message: 'AUTH_MODE=dev outside development requires DEV_AUTH_SECRET (>= 32 chars)',
+      });
+    }
+    if (env.NODE_ENV === 'production' && env.LOG_PRETTY) {
       ctx.addIssue({
         code: 'custom',
         path: ['LOG_PRETTY'],
