@@ -18,13 +18,16 @@ apps/
   api/        NestJS modular monolith (TypeScript, Prisma 7, PostgreSQL, Redis, BullMQ)
   admin/      Next.js 16 operations console (Tailwind 4, shadcn/ui)
   mobile/     Flutter white-label client (one build per tenant)
+  landing/    Static marketing site + Android APK download page (Vite)
 packages/
   shared/     Domain enums, call state machine, coin arithmetic, Zod schemas, error codes
   config/     Shared tsconfig and ESLint presets
 infra/
   docker/     docker compose for local Postgres + Redis
+  deploy/     single-VPS production stack (Docker Compose + Caddy HTTPS, console at /admin)
   scripts/    bootstrap and readiness helpers
-docs/         architecture, development, security
+releases/     signed test APKs + checksums
+docs/         architecture, development, security, deployment
 ```
 
 ## Quick start
@@ -116,6 +119,8 @@ Firebase sign-in for the admin console, and the Flutter feature screens.
   testing strategy, conventions.
 - [docs/security.md](docs/security.md) — threat model, controls, secrets,
   what to check before production.
+- [docs/deployment.md](docs/deployment.md) — hosting requirements, the VPS
+  stack (`infra/deploy`), staging vs production, current ayushaura.in setup.
 - [apps/mobile/README.md](apps/mobile/README.md) — Flutter client.
 
 ## Roadmap (next stages)

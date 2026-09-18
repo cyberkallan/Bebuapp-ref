@@ -55,3 +55,6 @@ apps/mobile/**/google-services.json
 apps/mobile/**/GoogleService-Info.plist
 apps/mobile/**/*.jks
 apps/mobile/**/*.keystore
+
+# VPS deployment secrets
+infra/deploy/.env

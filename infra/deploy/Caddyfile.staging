@@ -1,0 +1,94 @@
+# bebu edge (STAGING variant): automatic HTTPS (Let's Encrypt), static landing site, API and
+# operator console on one domain. Environment variables come from compose.
+{
+	email {$ACME_EMAIL}
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+}
+
+(admin_guard) {
+	# Staging: dev sign-in is enabled on the console, so the whole /admin
+	# surface sits behind HTTP basic auth at the edge as a second factor.
+	# Generate the hash with: docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'
+	basic_auth {
+		{$ADMIN_BASIC_AUTH_USER} {$ADMIN_BASIC_AUTH_HASH}
+	}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+	import security_headers
+
+	# Prometheus scrape endpoint is internal-only; never expose it at the edge.
+	@metrics path /metrics
+	respond @metrics 404
+
+	# --- API -------------------------------------------------------------
+	@api path /api/* /health /health/*
+	handle @api {
+		reverse_proxy api:4180 {
+			header_up X-Request-Id {http.request.uuid}
+			transport http {
+				dial_timeout 5s
+				response_header_timeout 30s
+			}
+		}
+	}
+
+	# --- Operator console (Next.js, basePath={$ADMIN_BASE_PATH}) ----------
+	@admin path {$ADMIN_BASE_PATH} {$ADMIN_BASE_PATH}/*
+	handle @admin {
+		import admin_guard
+		reverse_proxy admin:4181
+	}
+
+	# --- Landing site + APK downloads (static) ----------------------------
+	handle {
+		root * /srv/landing
+		@apk path *.apk
+		header @apk Content-Type application/vnd.android.package-archive
+		header @apk Content-Disposition attachment
+		header @apk Cache-Control "public, max-age=3600"
+
+		@immutable path /assets/*
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+		@nocache path / /index.html /downloads/manifest.json
+		header @nocache Cache-Control "no-cache"
+
+		try_files {path} {path}/index.html
+		file_server
+	}
+
+	handle_errors {
+		@notfound expression {err.status_code} == 404
+		handle @notfound {
+			root * /srv/landing
+			rewrite * /404.html
+			file_server
+		}
+		respond "{err.status_code} {err.status_text}" {err.status_code}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+# Redirect the bare www host to the apex.
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}

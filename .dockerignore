@@ -1,0 +1,19 @@
+# Keep Docker build contexts small (Dockerfiles live in apps/*, context = repo root)
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/*.tsbuildinfo
+apps/api/src/generated
+apps/mobile
+apps/landing/public/downloads
+infra/deploy/.env
+releases/*
+!releases/*.apk
+!releases/SHA256SUMS.txt
+docs
+infra/docker
+.git
+.env
+.env.*
+!.env.example

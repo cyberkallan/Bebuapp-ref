@@ -1,0 +1,184 @@
+# bebu production / staging stack for a single VPS.
+#
+#   cp infra/deploy/.env.example infra/deploy/.env   # then edit
+#   docker compose -f infra/deploy/docker-compose.yml --env-file infra/deploy/.env up -d --build
+#
+# Topology (one public entrypoint, everything else on a private network):
+#   caddy  :80/:443  ->  /            static landing site (built by the `landing` job)
+#                        /api/*       api   (NestJS)
+#                        /health*     api
+#                        /admin/*     admin (Next.js, basePath=/admin)
+#   api    <-> postgres, redis
+#   migrate (one-shot) applies Prisma migrations before the API starts.
+
+name: bebu
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: '20m'
+    max-file: '5'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bebu}
+      POSTGRES_USER: ${POSTGRES_USER:-bebu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/deploy/.env}
+    command:
+      - postgres
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=256MB
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --maxmemory
+      - 512mb
+      - --maxmemory-policy
+      - noeviction
+      - --requirepass
+      - ${REDIS_PASSWORD:?set REDIS_PASSWORD in infra/deploy/.env}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$${REDIS_PASSWORD}" ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks: [internal]
+    logging: *default-logging
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+      target: migrate
+    restart: 'no'
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bebu}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bebu}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal]
+    logging: *default-logging
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${APP_ENV:-production}
+      API_PORT: 4180
+      API_HOST: 0.0.0.0
+      API_PUBLIC_URL: https://${DOMAIN:?set DOMAIN in infra/deploy/.env}
+      # Caddy terminates TLS one hop in front of the API.
+      TRUST_PROXY_HOPS: 1
+      LOG_PRETTY: 'false'
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bebu}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bebu}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks: [internal]
+    logging: *default-logging
+
+  admin:
+    build:
+      context: ../..
+      dockerfile: apps/admin/Dockerfile
+      args:
+        ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${APP_ENV:-production}
+      ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+      ADMIN_AUTH_MODE: ${ADMIN_AUTH_MODE:-firebase}
+      DEV_AUTH_SECRET: ${DEV_AUTH_SECRET:-}
+      # Server-to-server call over the private network; never leaves the host.
+      BEBU_API_URL: http://api:4180
+      PORT: 4181
+      HOSTNAME: 0.0.0.0
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal]
+    logging: *default-logging
+
+  landing:
+    build:
+      context: ../..
+      dockerfile: apps/landing/Dockerfile
+    restart: 'no'
+    volumes:
+      - landing-dist:/srv/landing
+    logging: *default-logging
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in infra/deploy/.env}
+      ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+      ADMIN_BASIC_AUTH_USER: ${ADMIN_BASIC_AUTH_USER:-}
+      ADMIN_BASIC_AUTH_HASH: ${ADMIN_BASIC_AUTH_HASH:-}
+    volumes:
+      - ./${CADDYFILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
+      - landing-dist:/srv/landing:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      landing:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
+      admin:
+        condition: service_started
+    networks: [internal]
+    logging: *default-logging
+
+volumes:
+  postgres-data:
+  redis-data:
+  landing-dist:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:
+    driver: bridge
