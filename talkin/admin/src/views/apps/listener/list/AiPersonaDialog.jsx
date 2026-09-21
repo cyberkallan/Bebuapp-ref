@@ -133,7 +133,16 @@ const AiPersonaDialog = ({ open, onClose, listener, onSaved }) => {
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth>
                 <InputLabel>Language</InputLabel>
-                <Select label='Language' value={form.language} onChange={e => set('language', e.target.value)}>
+                <Select
+                  label='Language'
+                  value={form.language}
+                  onChange={e => set('language', e.target.value)}
+                  renderValue={v => {
+                    const l = languages.find(x => x.id === v)
+
+                    return l ? `${l.label} · ${l.native}` : v
+                  }}
+                >
                   <MenuItem value=''>
                     <em>Use default{defaultLang ? ` (${defaultLang.label})` : ''}</em>
                   </MenuItem>
