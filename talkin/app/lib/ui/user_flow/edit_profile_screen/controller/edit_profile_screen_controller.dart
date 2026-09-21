@@ -1,56 +1,55 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:talk_in/custom/custom_country_picker/country_picker.dart';
-import 'package:talk_in/custom/progress_indicator/progress_dialog.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/api/edit_profile_api.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/model/edit_profile_model.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/api/fetch_login_user_profile_api.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/fetch_login_user_profile_model.dart';
 import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
-import 'package:talk_in/utils/font_style.dart';
 import 'package:talk_in/utils/utils.dart';
 
+/// Edit-profile form state. The instance is long-lived (the profile screen
+/// listens to it for [Constant.idProfile] broadcasts), so the form reloads
+/// its fields from storage every time the screen opens via [load].
 class EditProfileController extends GetxController {
+  static const idForm = 'edit.form';
+
   final formKey = GlobalKey<FormState>();
-  TextEditingController dateController = TextEditingController();
-  TextEditingController nickNameCnt = TextEditingController();
-  TextEditingController nameCnt = TextEditingController();
-  TextEditingController emailCnt = TextEditingController();
-  TextEditingController genderCnt = TextEditingController();
-  TextEditingController mobileNumberCnt = TextEditingController();
-  TextEditingController flagController = TextEditingController();
-  TextEditingController countryController = TextEditingController();
-  // MainScreenController mainScreenController = Get.put(MainScreenController());
-  XFile? xFiles;
+  final dateController = TextEditingController();
+  final nickNameCnt = TextEditingController();
+  final nameCnt = TextEditingController();
+  final emailCnt = TextEditingController();
+  final genderCnt = TextEditingController();
+  final mobileNumberCnt = TextEditingController();
+  final flagController = TextEditingController();
+  final countryController = TextEditingController();
+
   final ImagePicker imagePicker = ImagePicker();
-  int selectedIndex = 0; // Already hase
+  XFile? xFiles;
+  int selectedIndex = 0; // 0 male, 1 female
   String? profilePic;
   String? pickImage;
   EditProfileModel? editProfileModel;
   String? dialCode;
+  bool saving = false;
 
   FetchLoginUserProfileModel? fetchLoginUserProfileModel;
 
   @override
   void onInit() {
-    log("Database.loginUserNickName  :: ${Database.loginUserNickName}");
-    log("Database.loginUserBirthDate :: ${Database.loginUserBirthDate}");
-    log("Database.loginUserEmail  :: ${Database.loginUserEmail}");
-    log("Database.loginUserNickName  :: ${Database.loginUserNickName}");
-    log("Database.loginUserGender  :: ${Database.loginUserGender}");
-    log("Database.loginUserPhoneNumber  :: ${Database.loginUserPhoneNumber}");
-    log("Database.loginUserProfilePic  ::  ${Database.loginUserProfilePic}");
-    log("fetchLoginUserProfileModel?.user?.country  ::  ${fetchLoginUserProfileModel?.user?.country ?? ''}");
-    log("fetchLoginUserProfileModel?.user?.countryFlag  ::  ${fetchLoginUserProfileModel?.user?.countryFlag ?? ''}");
+    load();
+    super.onInit();
+  }
 
+  /// Copies the stored profile into the text fields (discarding unsaved edits).
+  void load() {
     dateController.text = Database.loginUserBirthDate;
     nameCnt.text = Database.loginUserName;
     emailCnt.text = Database.loginUserEmail;
@@ -61,206 +60,171 @@ class EditProfileController extends GetxController {
     flagController.text = Database.countryFlag;
     profilePic = Database.loginUserProfilePic;
     dialCode = Database.dialCode;
-
-    if (Database.loginUserGender.toLowerCase() == EnumLocale.txtFemale.name.tr.toLowerCase()) {
-      selectedIndex = 1;
-    } else {
-      selectedIndex = 0;
-    }
-
-    super.onInit();
+    pickImage = null;
+    xFiles = null;
+    selectedIndex = Database.loginUserGender.toLowerCase() == 'female' ? 1 : 0;
+    update([idForm, Constant.idGenderSelect, Constant.idChangeCountry]);
   }
 
-  List<Map<String, dynamic>> gender = [
-    {
-      "txt": EnumLocale.txtMale.name.tr,
-      "image": AppAsset.maleImage,
-    },
-    {
-      "txt": EnumLocale.txtFemale.name.tr,
-      "image": AppAsset.femaleImage,
-    },
-  ];
+  bool get isDirty =>
+      pickImage != null ||
+      dateController.text != Database.loginUserBirthDate ||
+      nameCnt.text != Database.loginUserName ||
+      nickNameCnt.text != Database.loginUserNickName ||
+      mobileNumberCnt.text != Database.loginUserPhoneNumber ||
+      countryController.text != Database.country ||
+      selectedGenderText.toLowerCase() != Database.loginUserGender.toLowerCase();
 
-  /// select gender
+  List<Map<String, dynamic>> get gender => [
+        {"txt": EnumLocale.txtMale.name.tr, "image": AppAsset.maleImage},
+        {"txt": EnumLocale.txtFemale.name.tr, "image": AppAsset.femaleImage},
+      ];
+
+  String get selectedGenderText => selectedIndex == 1 ? 'Female' : 'Male';
+
+  /// Gender is only persisted on save (used to write straight to storage).
   void selectGender(int index) {
+    if (selectedIndex == index) return;
     selectedIndex = index;
-    final selectedGenderText = gender[selectedIndex]['txt'] ?? 'Male';
-    genderCnt.text = selectedGenderText;
-
-    // Save selected gender locally
-    Database.onSetLoginUserGender(selectedGenderText ?? 'Male');
-
-    log("Database.loginUserGender :: ${Database.loginUserGender}");
-
-    update([Constant.idGenderSelect]);
-    // update();
+    genderCnt.text = gender[index]['txt'];
+    Sfx.tick();
+    update([Constant.idGenderSelect, idForm]);
   }
 
-  /// select date
   Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime initial = DateTime(DateTime.now().year - 20);
+    final parts = dateController.text.split('/').map((e) => e.trim()).toList();
+    if (parts.length == 3) {
+      final d = int.tryParse(parts[0]), m = int.tryParse(parts[1]), y = int.tryParse(parts[2]);
+      if (d != null && m != null && y != null) initial = DateTime(y, m, d);
+    }
+    final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dividerColor: Colors.transparent,
-            colorScheme: ColorScheme.light(
-              primary: AppColors.appColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.appColor,
-                textStyle: AppFontStyle.fontStyleW600(
-                  fontSize: 14,
-                  fontColor: AppColors.appColor,
-                ),
-              ),
-            ),
+      initialDate: initial,
+      firstDate: DateTime(1940),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      helpText: 'Your birthday',
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: (BebuTheme.isLight ? const ColorScheme.light() : const ColorScheme.dark()).copyWith(
+            primary: BebuTheme.pink,
+            onPrimary: Colors.white,
+            surface: BebuTheme.surface,
+            onSurface: BebuTheme.text,
           ),
-          child: child!,
-        );
-      },
+          dialogTheme: DialogThemeData(backgroundColor: BebuTheme.surface, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(BebuTheme.radiusLg))),
+          textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: BebuTheme.pink)),
+        ),
+        child: child!,
+      ),
     );
-
     if (picked != null) {
       dateController.text = "${picked.day.toString().padLeft(2, '0')} / ${picked.month.toString().padLeft(2, '0')} / ${picked.year}";
-      update(); // For GetBuilder to update
+      Sfx.tick();
+      update([idForm]);
     }
   }
 
-  /// Image Picker from gallery
-  getImageFromGallery() async {
-    xFiles = await imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+  Future<void> getImageFromGallery() => _pick(ImageSource.gallery);
+
+  Future<void> takePhoto() => _pick(ImageSource.camera);
+
+  Future<void> _pick(ImageSource source) async {
+    xFiles = await imagePicker.pickImage(source: source, imageQuality: 88, maxWidth: 1600);
     if (xFiles != null) {
       pickImage = xFiles!.path;
-      log("Gallery Image Path ::: $pickImage");
+      Sfx.pop();
     }
-    update();
+    update([idForm]);
   }
 
-  /// Take Photo
-  takePhoto() async {
-    xFiles = await imagePicker.pickImage(source: ImageSource.camera, imageQuality: 100);
-    if (xFiles != null) {
-      pickImage = xFiles!.path;
-      log("Camera Image Path ::: $pickImage");
-    }
-    update();
+  void onChangeCountry(BuildContext context) {
+    CustomCountryPicker.pickCountry(context, false, (country) {
+      flagController.text = country.flagEmoji;
+      countryController.text = country.name;
+      Sfx.tick();
+      update([Constant.idChangeCountry, idForm]);
+    });
   }
 
-  /// save profile button on tap
-  Future<void> onSaveProfile() async {
+  /// Validates and saves. Returns true when the profile was updated.
+  Future<bool> onSaveProfile() async {
+    if (saving) return false;
+    final ctx = Get.context!;
+    if ((profilePic ?? '').isEmpty && pickImage == null) {
+      Utils.showToast(ctx, EnumLocale.txtPleaseSelectProfileImage.name.tr);
+      return false;
+    }
+    if (nickNameCnt.text.trim().isEmpty) {
+      Utils.showToast(ctx, EnumLocale.txtPleaseEnterNickName.name.tr);
+      return false;
+    }
+    if (dateController.text.trim().isEmpty) {
+      Utils.showToast(ctx, EnumLocale.txtPleaseSelectBirthDate.name.tr);
+      return false;
+    }
+    if (mobileNumberCnt.text.trim().isEmpty) {
+      Utils.showToast(ctx, EnumLocale.txtPleaseEnterMobileNumber.name.tr);
+      return false;
+    }
     Database.onSetFillProfile(true);
-
-    Utils.showLog("Click On Save Profile => ${Database.loginUserId}");
-
-    if (profilePic == "" && pickImage == null) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseSelectProfileImage.name.tr);
-    } else if (nickNameCnt.text.trim().isEmpty) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseEnterNickName.name.tr);
-    } else if (dateController.text.trim().isEmpty) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseSelectBirthDate.name.tr);
-    } else if (mobileNumberCnt.text.trim().isEmpty) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseEnterMobileNumber.name.tr);
-    } else {
-      Get.dialog(const LoadingWidget(), barrierDismissible: false); // Start Loading...
-
-      await callEditApi();
-    }
+    saving = true;
+    update([idForm]);
+    final ok = await callEditApi();
+    saving = false;
+    update([idForm]);
+    return ok;
   }
 
-  /// edit profile api
-  Future<void> callEditApi({String? image}) async {
-    final token = await FirebaseAccessToken.onGet();
-
-    log('Database.countryCode  ::::  ${Database.selectedCountryCode}');
-    log('countryController.text  ::::  ${countryController.text}');
-    log('flagController.text  ::::  ${flagController.text}');
-
-    debugPrint("Calling EditProfileApi with following data:");
-    debugPrint("country: ${countryController.text}");
-    debugPrint("countryFlag: ${flagController.text}");
-    debugPrint("countryCode: ${Database.selectedCountryCode}");
-    debugPrint("uid: ${Database.loginUserFirebaseId}");
-    debugPrint("birthDate: ${dateController.text}");
-    debugPrint("image: ${pickImage == "" ? profilePic : pickImage}");
-    debugPrint("nickName: ${nickNameCnt.text}");
-    debugPrint("gender: ${Database.loginUserGender}");
-    debugPrint("phoneNumber: ${mobileNumberCnt.text}");
-    debugPrint("fullName: ${nameCnt.text}");
-
+  Future<bool> callEditApi() async {
     editProfileModel = await EditProfileApi.callApi(
       country: countryController.text,
       countryFlag: flagController.text,
       countryCode: Database.selectedCountryCode,
       uid: Database.loginUserFirebaseId,
       birthDate: dateController.text,
-      image: pickImage == "" ? profilePic : pickImage,
-      nickName: nickNameCnt.text,
-      gender: Database.loginUserGender,
-      phoneNumber: mobileNumberCnt.text,
-      fullName: nameCnt.text,
+      image: pickImage,
+      nickName: nickNameCnt.text.trim(),
+      gender: selectedGenderText,
+      phoneNumber: mobileNumberCnt.text.trim(),
+      fullName: nameCnt.text.trim(),
     );
 
-    debugPrint("Calling EditProfileApi with following data:");
-    debugPrint("country: ${countryController.text}");
-    debugPrint("countryFlag: ${flagController.text}");
-    debugPrint("countryCode: ${Database.selectedCountryCode}");
-    debugPrint("uid: ${Database.loginUserFirebaseId}");
-    debugPrint("birthDate: ${dateController.text}");
-    debugPrint("image: ${pickImage == "" ? profilePic : pickImage}");
-    debugPrint("nickName: ${nickNameCnt.text}");
-    debugPrint("gender: ${Database.loginUserGender}");
-    debugPrint("phoneNumber: ${mobileNumberCnt.text}");
-    debugPrint("fullName: ${nameCnt.text}");
-
-    if (editProfileModel?.status == true) {
-      Utils.showToast(Get.context!, EnumLocale.txtProfileUpdateSuccessfully.name.tr);
-      fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: Database.loginUserFirebaseId, token: token ?? '');
-
-      Database.onSetLoginUserProfilePic(fetchLoginUserProfileModel?.user?.profilePic ?? "");
-      Database.onSetLoginUserName(fetchLoginUserProfileModel!.user!.fullName!);
-      Database.onSetLoginUserNickName(fetchLoginUserProfileModel?.user?.nickName ?? "");
-      Database.onSetLoginUserEmail(fetchLoginUserProfileModel!.user!.email!);
-      Database.onSetLoginUserCountry(fetchLoginUserProfileModel!.user!.country!);
-      Database.onSetLoginUserCountryFlag(fetchLoginUserProfileModel!.user!.countryFlag!);
-      Database.onSetLoginUserBirthDate(fetchLoginUserProfileModel?.user?.birthDate ?? "");
-      Database.onSetLoginUserGender(fetchLoginUserProfileModel?.user?.gender ?? "Male");
-      Database.onSetLoginUserPhoneNumber(fetchLoginUserProfileModel?.user?.phoneNumber ?? "");
-      Database.fetchLoginUserProfileModel = fetchLoginUserProfileModel;
-
-      update([Constant.idProfile]);
-
-      Get.close(2);
-      fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: Database.loginUserFirebaseId, token: token ?? '');
-      Database.fetchLoginUserProfileModel = fetchLoginUserProfileModel;
-
-      update();
-    } else {
-      Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
+    if (editProfileModel?.status != true) {
+      Sfx.deny();
+      Utils.showToast(Get.context!, editProfileModel?.message ?? EnumLocale.txtSomeThingWentWrong.name.tr);
+      return false;
     }
-  }
 
-  /// Country
-  Future<void> onChangeCountry(BuildContext context) async {
-    CustomCountryPicker.pickCountry(
-      context,
-      false,
-      (country) {
-        flagController.text = country.flagEmoji;
-        countryController.text = country.name;
-        update([Constant.idChangeCountry]);
-        debugPrint("Country selected: ${country.name}, Flag: ${country.flagEmoji}");
-        log("Selected Country => Flag: ${flagController.text}, Name: ${countryController.text}");
-      },
-    );
-
-    update([Constant.idChangeCountry]);
+    // The server now saves before responding, so one fetch is enough.
+    final token = await FirebaseAccessToken.onGet();
+    fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: Database.loginUserFirebaseId, token: token ?? '');
+    final u = fetchLoginUserProfileModel?.user;
+    if (u != null) {
+      await Database.onSetLoginUserProfilePic(u.profilePic ?? '');
+      await Database.onSetLoginUserName(u.fullName ?? '');
+      await Database.onSetLoginUserNickName(u.nickName ?? '');
+      await Database.onSetLoginUserEmail(u.email ?? '');
+      await Database.onSetLoginUserCountry(u.country ?? '');
+      await Database.onSetLoginUserCountryFlag(u.countryFlag ?? '');
+      await Database.onSetLoginUserBirthDate(u.birthDate ?? '');
+      await Database.onSetLoginUserGender(u.gender ?? selectedGenderText);
+      await Database.onSetLoginUserPhoneNumber(u.phoneNumber ?? '');
+      Database.fetchLoginUserProfileModel = fetchLoginUserProfileModel;
+    } else {
+      // Offline fallback: keep what we sent.
+      await Database.onSetLoginUserGender(selectedGenderText);
+      await Database.onSetLoginUserNickName(nickNameCnt.text.trim());
+      await Database.onSetLoginUserName(nameCnt.text.trim());
+      await Database.onSetLoginUserBirthDate(dateController.text);
+      await Database.onSetLoginUserPhoneNumber(mobileNumberCnt.text.trim());
+      final pic = editProfileModel?.user?.profilePic;
+      if (pic != null && pic.isNotEmpty) await Database.onSetLoginUserProfilePic(pic);
+    }
+    profilePic = Database.loginUserProfilePic;
+    pickImage = null;
+    Sfx.select();
+    update([Constant.idProfile, idForm]);
+    return true;
   }
 }

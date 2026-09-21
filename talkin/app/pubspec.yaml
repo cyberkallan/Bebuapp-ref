@@ -140,6 +140,7 @@ flutter:
     - assets/images/
     - assets/all_language.json
     - assets/audio/
+    - assets/avatar_studio/
     - assets/lottie/
 
 

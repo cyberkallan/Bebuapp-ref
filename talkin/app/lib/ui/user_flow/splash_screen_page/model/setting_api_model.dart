@@ -53,6 +53,7 @@ class Data {
   final bool? isApplicationLive;
   final bool? allowBecomeHostOption;
   final Map<String, dynamic>? appearance;
+  final Map<String, dynamic>? avatarStudio;
   final int? adminCommissionPercent;
   final int? minimumCoinsForConversion;
   final int? minimumCoinsForPayout;
@@ -91,6 +92,7 @@ class Data {
     this.isApplicationLive,
     this.allowBecomeHostOption,
     this.appearance,
+    this.avatarStudio,
     this.adminCommissionPercent,
     this.minimumCoinsForConversion,
     this.minimumCoinsForPayout,
@@ -130,6 +132,7 @@ class Data {
         isApplicationLive: json["isApplicationLive"],
         allowBecomeHostOption: json["allowBecomeHostOption"],
         appearance: json["appearance"] is Map ? Map<String, dynamic>.from(json["appearance"]) : null,
+        avatarStudio: json["avatarStudio"] is Map ? Map<String, dynamic>.from(json["avatarStudio"]) : null,
         adminCommissionPercent: json["adminCommissionPercent"],
         minimumCoinsForConversion: json["minimumCoinsForConversion"],
         minimumCoinsForPayout: json["minimumCoinsForPayout"],
@@ -169,6 +172,7 @@ class Data {
         "isApplicationLive": isApplicationLive,
         "allowBecomeHostOption": allowBecomeHostOption,
         "appearance": appearance,
+        "avatarStudio": avatarStudio,
         "adminCommissionPercent": adminCommissionPercent,
         "minimumCoinsForConversion": minimumCoinsForConversion,
         "minimumCoinsForPayout": minimumCoinsForPayout,

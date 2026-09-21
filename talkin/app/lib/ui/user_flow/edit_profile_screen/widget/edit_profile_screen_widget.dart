@@ -1,508 +1,370 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:talk_in/custom/app_bar/custom_app_bar.dart';
-import 'package:talk_in/custom/app_button/primary_app_button.dart';
-import 'package:talk_in/custom/custom_profile/custom_profile_image.dart';
-import 'package:talk_in/custom/custom_select_gender_bottom_sheet/custom_select_gender_bottom_sheet.dart';
-import 'package:talk_in/custom/text_field/custom_text_field.dart';
-import 'package:talk_in/custom/title/custom_title.dart';
+import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/controller/edit_profile_screen_controller.dart';
-import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
-import 'package:talk_in/utils/font_style.dart';
-import 'package:talk_in/utils/utils.dart';
 
-class EditProfileScreenAppBar extends StatelessWidget {
-  const EditProfileScreenAppBar({super.key});
+/// Photo with change action. Tapping opens a small source sheet.
+class EditProfilePhoto extends StatelessWidget {
+  const EditProfilePhoto({super.key, this.onAvatarStudio});
+  final VoidCallback? onAvatarStudio;
 
   @override
   Widget build(BuildContext context) {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(120),
-      child: CustomAppBar(
-        appBarColor: AppColors.lightPurple,
-        title: EnumLocale.txtMyProfile.name.tr,
-        showLeadingIcon: true,
+    return GetBuilder<EditProfileController>(
+      id: EditProfileController.idForm,
+      builder: (c) {
+        final local = c.pickImage;
+        return Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: 116,
+                  height: 116,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: BebuTheme.pinkGradient,
+                    boxShadow: [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.3), blurRadius: 26, offset: const Offset(0, 10))],
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: BebuTheme.bg),
+                    child: ClipOval(
+                      child: local != null ? Image.file(File(local), fit: BoxFit.cover) : ListenerPhoto(image: c.profilePic, scrim: false, cacheWidth: 400),
+                    ),
+                  ),
+                ),
+                PressScale(
+                  onTap: () => _sourceSheet(context, c),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(shape: BoxShape.circle, gradient: BebuTheme.pinkGradient, border: Border.all(color: BebuTheme.bg, width: 3)),
+                    child: const Icon(Icons.photo_camera_rounded, size: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(local != null ? 'New photo selected' : 'Tap the camera to change your photo', style: BebuTheme.body(size: 12, color: BebuTheme.textFaint)),
+          ],
+        );
+      },
+    );
+  }
+
+  void _sourceSheet(BuildContext context, EditProfileController c) {
+    Get.bottomSheet(
+      Container(
+        decoration: BoxDecoration(color: BebuTheme.bg, borderRadius: BorderRadius.vertical(top: Radius.circular(BebuTheme.radiusXl)), border: Border(top: BorderSide(color: BebuTheme.borderStrong))),
+        padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.paddingOf(context).bottom + 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: BebuTheme.borderStrong, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 14),
+            Text('Profile photo', style: BebuTheme.title(size: 17)),
+            const SizedBox(height: 14),
+            _SheetRow(icon: Icons.photo_library_rounded, color: BebuTheme.violet, label: 'Choose from gallery', onTap: () {
+              Get.back();
+              c.getImageFromGallery();
+            }),
+            _SheetRow(icon: Icons.photo_camera_rounded, color: BebuTheme.blue, label: 'Take a photo', onTap: () {
+              Get.back();
+              c.takePhoto();
+            }),
+            if (onAvatarStudio != null)
+              _SheetRow(icon: Icons.auto_awesome_rounded, color: BebuTheme.pink, label: 'Use a 3D avatar instead', onTap: () {
+                Get.back();
+                onAvatarStudio!();
+              }),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+    );
+  }
+}
+
+class _SheetRow extends StatelessWidget {
+  const _SheetRow({required this.icon, required this.color, required this.label, required this.onTap});
+  final IconData icon;
+  final Color color;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressScale(
+      scale: 0.985,
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusMd), border: Border.all(color: BebuTheme.border)),
+        child: Row(
+          children: [
+            Container(width: 38, height: 38, decoration: BoxDecoration(borderRadius: BorderRadius.circular(BebuTheme.radiusSm), color: color.withValues(alpha: 0.18)), child: Icon(icon, size: 19, color: color)),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: BebuTheme.label(size: 14))),
+            Icon(Icons.chevron_right_rounded, color: BebuTheme.textFaint),
+          ],
+        ),
       ),
     );
   }
 }
 
-class EditProfileImageView extends StatelessWidget {
-  const EditProfileImageView({super.key});
+/// Section label + card.
+class EditSection extends StatelessWidget {
+  const EditSection({super.key, required this.title, required this.children});
+  final String title;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GetBuilder<EditProfileController>(
-          builder: (controller) {
-            final String? localImagePath = controller.pickImage;
-
-            return Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.appColor),
-                shape: BoxShape.circle,
-              ),
-              child: Container(
-                // clipBehavior: Clip.hardEdge,
-                height: Get.height * 0.1,
-                width: Get.height * 0.1,
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.white),
-                  color: AppColors.lightGrey,
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: localImagePath != null
-                      ? Image.file(
-                          File(localImagePath),
-                          fit: BoxFit.cover,
-                        )
-                      : CustomProfileImage(
-                          image: Database.loginUserProfilePic,
-                        ),
-                ),
-              ).paddingAll(1),
-            ).paddingOnly(top: 34, bottom: 16);
-          },
-        ),
-        GestureDetector(
-          onTap: () {
-            Get.defaultDialog(
-                backgroundColor: AppColors.white,
-                title: EnumLocale.changeYourImage.name.tr,
-                titlePadding: const EdgeInsets.only(top: 30),
-                titleStyle: AppFontStyle.fontStyleW700(fontSize: 16, fontColor: AppColors.appColor),
-                content: GetBuilder<EditProfileController>(
-                  builder: (controller) {
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Divider(
-                            thickness: 1,
-                            color: Colors.grey.shade100,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.back();
-                            controller.takePhoto();
-                          },
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                            child: Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: Image(
-                                    color: AppColors.appColor,
-                                    image: const AssetImage(AppAsset.cameraFlipIcon),
-                                    height: 20,
-                                  ),
-                                ),
-                                Text(
-                                  EnumLocale.txtTakeAphoto.name.tr,
-                                  style: AppFontStyle.fontStyleW700(fontSize: 15, fontColor: AppColors.appColor),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              Get.back();
-                              controller.getImageFromGallery();
-                            },
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                    child: Image(
-                                      color: AppColors.appColor,
-                                      image: const AssetImage(AppAsset.chatImageIcon),
-                                      height: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    EnumLocale.txtChooseFromYourFile.name.tr,
-                                    style: AppFontStyle.fontStyleW700(fontSize: 15, fontColor: AppColors.appColor),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ));
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.appColor,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  AppAsset.uploadImageIcon,
-                  height: 22,
-                  width: 22,
-                ),
-                Text(
-                  EnumLocale.txtChangeImage.name.tr,
-                  style: AppFontStyle.fontStyleW700(fontSize: 12, fontColor: AppColors.appColor),
-                ).paddingOnly(left: 6, right: 6)
-              ],
-            ),
-          ),
+        Padding(padding: const EdgeInsets.fromLTRB(4, 0, 4, 8), child: Text(title, style: BebuTheme.label(size: 12, color: BebuTheme.textFaint))),
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+          decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusLg), border: Border.all(color: BebuTheme.border)),
+          child: Column(children: children),
         ),
       ],
     );
   }
 }
 
-class EditProfileEditInfoView extends StatelessWidget {
-  const EditProfileEditInfoView({super.key});
+/// Labelled text field row inside an [EditSection].
+class EditField extends StatelessWidget {
+  const EditField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.hint,
+    this.icon,
+    this.readOnly = false,
+    this.onTap,
+    this.keyboardType,
+    this.trailing,
+    this.last = false,
+    this.onChanged,
+  });
+  final String label;
+  final TextEditingController controller;
+  final String? hint;
+  final IconData? icon;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final TextInputType? keyboardType;
+  final Widget? trailing;
+  final bool last;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<EditProfileController>(
-      builder: (logic) {
-        return Form(
-          // key: logic.formKey,
-          child: Column(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
             children: [
-              CustomTitle(
-                title: EnumLocale.txtNickName.name.tr,
-                method: CustomTextField(
-                  filled: true,
-                  hintText: EnumLocale.txtAddYourNickName.name.tr,
-                  controller: logic.nickNameCnt,
-                  fillColor: AppColors.white,
-                  cursorColor: AppColors.black,
-                  fontColor: AppColors.black,
-                  fontSize: 15,
-                  textInputAction: TextInputAction.next,
-                  // inputFormatters: [UpperCaseTextFormatter()],
-                ),
-              ).paddingOnly(bottom: 30, top: 30),
-              CustomTitle(
-                title: EnumLocale.txtFullName.name.tr,
-                method: CustomTextField(
-                  filled: true,
-                  hintText: EnumLocale.txtAddYOurFullName.name.tr,
-                  controller: logic.nameCnt,
-                  fillColor: AppColors.white,
-                  cursorColor: AppColors.black,
-                  fontColor: AppColors.black,
-                  fontSize: 15,
-                  textInputAction: TextInputAction.next,
-                ),
-              ).paddingOnly(bottom: 30),
-              if (Database.loginType != 2)
-                CustomTitle(
-                  title: EnumLocale.txtEnterMail.name.tr,
-                  method: CustomTextField(
-                      filled: true,
-                      hintText: EnumLocale.txtEnterYourMail.name.tr,
-                      controller: logic.emailCnt,
-                      fillColor: AppColors.white,
-                      cursorColor: AppColors.black,
-                      fontColor: AppColors.black,
-                      fontSize: 15,
-                      textInputAction: TextInputAction.next,
-                      textInputType: TextInputType.emailAddress,
-                      readOnly: Database.loginType == 1 || Database.loginType == 4),
-                ).paddingOnly(bottom: 30),
-              GetBuilder<EditProfileController>(
-                // init: DatePickerController(),
-                builder: (controller) {
-                  return CustomTitle(
-                    title: EnumLocale.txtDateOfBirth.name.tr,
-                    method: CustomTextField(
-                      filled: true,
-                      hintText: "DD / MM / YYYY",
-                      controller: controller.dateController,
-                      fillColor: AppColors.white,
-                      cursorColor: AppColors.black,
-                      fontColor: AppColors.black,
-                      fontSize: 15,
-                      textInputAction: TextInputAction.next,
-                      maxLines: 1,
-                      readOnly: true,
-                      onTap: () => controller.selectDate(context),
+              if (icon != null) ...[Icon(icon, size: 18, color: readOnly ? BebuTheme.textFaint : BebuTheme.pink), const SizedBox(width: 12)],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: BebuTheme.body(size: 11, color: BebuTheme.textFaint)),
+                    TextField(
+                      controller: controller,
+                      readOnly: readOnly,
+                      onTap: onTap,
+                      keyboardType: keyboardType,
+                      onChanged: onChanged,
+                      style: BebuTheme.label(size: 15, color: readOnly && onTap == null ? BebuTheme.textMuted : BebuTheme.text),
+                      cursorColor: BebuTheme.pink,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                        border: InputBorder.none,
+                        hintText: hint,
+                        hintStyle: BebuTheme.body(size: 15, color: BebuTheme.textFaint),
+                      ),
                     ),
-                  ).paddingOnly(bottom: 30);
-                },
-              ),
-              CustomTitle(
-                title: EnumLocale.txtGenderIdentity.name.tr,
-                method: GetBuilder<EditProfileController>(
-                  // init: SelectGenderScreenController(), // <<=== ADD THIS
-
-                  builder: (logic) {
-                    return CustomTextField(
-                      onTap: () {
-                        // Get.toNamed(AppRoutes.selectGenderScreen);
-                        Get.bottomSheet(
-                          const CustomSelectGenderBottomSheet(),
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                        );
-                      },
-                      filled: true,
-                      controller: logic.genderCnt,
-                      fillColor: AppColors.white,
-                      cursorColor: AppColors.black,
-                      fontColor: AppColors.black,
-                      fontSize: 15,
-                      textInputAction: TextInputAction.next,
-                      maxLines: 1,
-                      readOnly: true,
-                      suffixIcon: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: RotatedBox(
-                          quarterTurns: 2,
-                          child: Image.asset(
-                            AppAsset.backArrowIcon,
-                            height: 8,
-                            width: 8,
-                          ).paddingAll(17),
-                        ),
-                      ),
-                    );
-                  },
+                  ],
                 ),
-              ).paddingOnly(bottom: 30),
-              CustomTitle(
-                title: EnumLocale.txtSelectCountry.name.tr,
-                method: GetBuilder<EditProfileController>(
-                  id: Constant.idChangeCountry,
-                  builder: (logic) {
-                    return GestureDetector(
-                      onTap: () {
-                        debugPrint("GestureDetector TAPPED");
-
-                        logic.onChangeCountry(context);
-                      },
-                      child: Container(
-                        height: 55,
-                        width: Get.width,
-                        // padding: const EdgeInsets.only(left: 20),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          border: Border.all(color: AppColors.black),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: logic.countryController.text.isEmpty
-                            ? Row(
-                                children: [
-                                  Text(
-                                    EnumLocale.txtSelectCountry.name.tr,
-                                    style: AppFontStyle.fontStyleW500(
-                                      fontSize: 13,
-                                      fontColor: AppColors.black.withValues(alpha: 0.2),
-                                    ),
-                                  ).paddingOnly(left: 10),
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  Text(
-                                    logic.flagController.text,
-                                    style: AppFontStyle.fontStyleW500(fontColor: AppColors.black, fontSize: 20),
-                                  ),
-                                  10.width,
-                                  Text(
-                                    logic.countryController.text,
-                                    style: AppFontStyle.fontStyleW600(fontColor: AppColors.black, fontSize: 15),
-                                  ),
-                                  const Spacer(),
-                                  Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                                      child: Icon(
-                                        Icons.keyboard_arrow_down_sharp,
-                                        color: AppColors.black,
-                                        size: 18,
-                                      )),
-                                  10.width,
-                                ],
-                              ).paddingOnly(left: 10),
-                      ),
-                    );
-                  },
-                ).paddingOnly(bottom: 30),
               ),
-              CustomTitle(
-                title: EnumLocale.txtEnterMobileNumber.name.tr,
-                method: GetBuilder<EditProfileController>(
-                  builder: (logic) {
-                    return Form(
-                      key: logic.formKey,
-                      child: IntlPhoneField(
-                        flagsButtonPadding: const EdgeInsets.all(8),
-                        flagsButtonMargin: const EdgeInsets.only(right: 13),
-                        dropdownIconPosition: IconPosition.trailing,
-                        controller: logic.mobileNumberCnt,
-                        obscureText: false,
-                        validator: (value) {
-                          if (value == null) {
-                            return EnumLocale.desEnterMobile.name.tr;
-                          }
-                          return null;
-                        },
-                        style: AppFontStyle.fontStyleW600(
-                          // Style for phone number text
-                          fontSize: 14, // Increased font size here
-                          fontColor: AppColors.appColor,
-                        ),
-                        cursorColor: AppColors.appColor,
-                        dropdownTextStyle: AppFontStyle.fontStyleW700(
-                          fontSize: 16,
-                          fontColor: AppColors.black,
-                        ),
-                        pickerDialogStyle: PickerDialogStyle(
-                          countryCodeStyle: AppFontStyle.fontStyleW700(
-                            fontSize: 13,
-                            fontColor: AppColors.appColor,
-                          ),
-                          countryNameStyle: AppFontStyle.fontStyleW700(
-                            fontSize: 13,
-                            fontColor: AppColors.appColor,
-                          ),
-                          searchFieldCursorColor: AppColors.appColor,
-                          searchFieldInputDecoration: InputDecoration(
-                            hintStyle: AppFontStyle.fontStyleW400(
-                              fontSize: 14,
-                              fontColor: AppColors.grey,
-                            ),
-                            hintText: EnumLocale.txtSearchCountryCode.name.tr,
-                          ),
-                        ),
-                        dropdownIcon: Icon(
-                          Icons.arrow_drop_down_outlined,
-                          color: AppColors.black,
-                        ),
-                        keyboardType: TextInputType.number,
-                        showCountryFlag: false,
-                        decoration: InputDecoration(
-                          counterText: '',
-                          hintStyle: AppFontStyle.fontStyleW600(
-                            fontSize: 12,
-                            fontColor: AppColors.white,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.black),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.black),
-                          ),
-                          filled: true,
-                          fillColor: AppColors.white,
-                          errorStyle: AppFontStyle.fontStyleW500(
-                            fontSize: 8,
-                            fontColor: AppColors.red,
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.red),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.red),
-                          ),
-                          counterStyle: AppFontStyle.fontStyleW500(
-                            fontSize: 9,
-                            fontColor: AppColors.grey,
-                          ),
-                        ),
-                        onCountryChanged: (value) {
-                          log("message================= ${value.code}");
-                          Database.onSetSelectedCountryCode(value.code);
-                          Database.getDialCode();
-                          log("Database.selectedCountryCode message================= ${Database.selectedCountryCode}");
-                        },
-                        initialCountryCode: Database.selectedCountryCode,
-                        onChanged: (phone) {
-                          logic.dialCode = phone.countryCode; // example: +91
-                          logic.mobileNumberCnt.text = phone.number; // only number part
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ).paddingOnly(bottom: 30)
+              if (trailing != null) trailing!,
+              if (readOnly && onTap != null) Icon(Icons.chevron_right_rounded, color: BebuTheme.textFaint),
+              if (readOnly && onTap == null) Icon(Icons.lock_outline_rounded, size: 15, color: BebuTheme.textFaint),
             ],
           ),
-        );
-      },
+        ),
+        if (!last) Divider(height: 1, color: BebuTheme.border),
+      ],
     );
   }
 }
 
-GetBuilder<GetxController> saveProfileButton() {
-  return GetBuilder<EditProfileController>(
-    builder: (controller) {
-      return Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.10),
-              blurRadius: 18,
-              offset: Offset(0, 0),
-              spreadRadius: 0,
+/// Male / female toggle, only persisted on save.
+class EditGenderRow extends StatelessWidget {
+  const EditGenderRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EditProfileController>(
+      id: Constant.idGenderSelect,
+      builder: (c) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Icon(Icons.wc_rounded, size: 18, color: BebuTheme.pink),
+            const SizedBox(width: 12),
+            Expanded(child: Text(EnumLocale.txtGenderIdentity.name.tr, style: BebuTheme.body(size: 13.5))),
+            SizedBox(
+              width: 170,
+              child: SegmentedPill(
+                height: 38,
+                index: c.selectedIndex,
+                onChanged: c.selectGender,
+                segments: [SegmentItem(EnumLocale.txtMale.name.tr, Icons.male_rounded), SegmentItem(EnumLocale.txtFemale.name.tr, Icons.female_rounded)],
+              ),
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      ),
+    );
+  }
+}
+
+/// Country picker row (flag + name).
+class EditCountryRow extends StatelessWidget {
+  const EditCountryRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EditProfileController>(
+      id: Constant.idChangeCountry,
+      builder: (c) => Column(
+        children: [
+          PressScale(
+            scale: 0.99,
+            onTap: () => c.onChangeCountry(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.public_rounded, size: 18, color: BebuTheme.pink),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(EnumLocale.txtSelectCountry.name.tr, style: BebuTheme.body(size: 11, color: BebuTheme.textFaint)),
+                        const SizedBox(height: 4),
+                        Text(
+                          c.countryController.text.isEmpty ? 'Choose your country' : '${c.flagController.text}  ${c.countryController.text}',
+                          style: BebuTheme.label(size: 15, color: c.countryController.text.isEmpty ? BebuTheme.textFaint : BebuTheme.text),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: BebuTheme.textFaint),
+                ],
+              ),
+            ),
+          ),
+          Divider(height: 1, color: BebuTheme.border),
+        ],
+      ),
+    );
+  }
+}
+
+/// Phone number with dial-code dropdown, themed.
+class EditPhoneRow extends StatelessWidget {
+  const EditPhoneRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EditProfileController>(
+      builder: (c) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PrimaryAppButton(
-              onTap: () {
-                controller.onSaveProfile();
-              },
-              color: AppColors.appColor,
-              height: Get.height * 0.056,
-              text: EnumLocale.txtSaveProfile.name.tr,
-              textStyle: AppFontStyle.fontStyleW500(fontSize: 16, fontColor: AppColors.white),
-            ).paddingSymmetric(horizontal: 24),
+            Padding(padding: const EdgeInsets.only(top: 22), child: Icon(Icons.phone_rounded, size: 18, color: BebuTheme.pink)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(EnumLocale.txtEnterMobileNumber.name.tr, style: BebuTheme.body(size: 11, color: BebuTheme.textFaint)),
+                  Form(
+                    key: c.formKey,
+                    child: IntlPhoneField(
+                      controller: c.mobileNumberCnt,
+                      initialCountryCode: Database.selectedCountryCode,
+                      showCountryFlag: true,
+                      disableLengthCheck: true,
+                      flagsButtonPadding: EdgeInsets.zero,
+                      flagsButtonMargin: const EdgeInsets.only(right: 8),
+                      dropdownIconPosition: IconPosition.trailing,
+                      dropdownIcon: Icon(Icons.arrow_drop_down_rounded, color: BebuTheme.textMuted),
+                      dropdownTextStyle: BebuTheme.label(size: 14),
+                      style: BebuTheme.label(size: 15),
+                      cursorColor: BebuTheme.pink,
+                      keyboardType: TextInputType.phone,
+                      pickerDialogStyle: PickerDialogStyle(
+                        backgroundColor: BebuTheme.surface,
+                        countryCodeStyle: BebuTheme.label(size: 13),
+                        countryNameStyle: BebuTheme.body(size: 13.5),
+                        searchFieldCursorColor: BebuTheme.pink,
+                        searchFieldInputDecoration: InputDecoration(
+                          hintText: EnumLocale.txtSearchCountryCode.name.tr,
+                          hintStyle: BebuTheme.body(size: 14, color: BebuTheme.textFaint),
+                          prefixIcon: Icon(Icons.search_rounded, color: BebuTheme.textFaint),
+                          filled: true,
+                          fillColor: BebuTheme.surface2,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(BebuTheme.radiusMd), borderSide: BorderSide.none),
+                        ),
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        counterText: '',
+                        contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                        border: InputBorder.none,
+                        hintText: '98765 43210',
+                        hintStyle: BebuTheme.body(size: 15, color: BebuTheme.textFaint),
+                      ),
+                      onCountryChanged: (value) {
+                        Database.onSetSelectedCountryCode(value.code);
+                        Database.getDialCode();
+                      },
+                      onChanged: (phone) {
+                        c.dialCode = phone.countryCode;
+                        c.update([EditProfileController.idForm]);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        ).paddingOnly(top: 10, bottom: 10),
-      );
-    },
-  );
+        ),
+      ),
+    );
+  }
 }

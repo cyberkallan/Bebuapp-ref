@@ -75,6 +75,8 @@ import 'package:talk_in/ui/user_flow/main_screen/binding/main_screen_binding.dar
 import 'package:talk_in/ui/user_flow/main_screen/view/main_screen.dart';
 import 'package:talk_in/ui/user_flow/mobile_number_screen/binding/mobile_number_binding.dart';
 import 'package:talk_in/ui/user_flow/mobile_number_screen/view/mobile_number_screen.dart';
+import 'package:talk_in/ui/user_flow/avatar_studio/binding/avatar_studio_binding.dart';
+import 'package:talk_in/ui/user_flow/avatar_studio/view/avatar_studio_screen.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/binding/my_profile_screen_binding.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/view/my_profile_screen_view.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/binding/my_wallet_screen_binding.dart';
@@ -214,6 +216,12 @@ class AppPages {
       name: AppRoutes.callCutScreen,
       page: () => CallCutScreen(),
       binding: CallCutBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.avatarStudio,
+      page: () => const AvatarStudioScreen(),
+      binding: AvatarStudioBinding(),
+      transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.myProfileScreen,

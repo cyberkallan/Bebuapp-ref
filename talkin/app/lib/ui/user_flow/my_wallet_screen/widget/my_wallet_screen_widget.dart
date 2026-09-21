@@ -349,6 +349,7 @@ class WalletActivityRow extends StatelessWidget {
       4 => (Icons.videocam_rounded, BebuTheme.pink, 'Video call'),
       5 => (Icons.shuffle_rounded, BebuTheme.green, 'Random voice call'),
       6 => (Icons.shuffle_rounded, BebuTheme.pink, 'Random video call'),
+      8 => (Icons.auto_awesome_rounded, BebuTheme.violet, 'Avatar item unlocked'),
       _ => (Icons.swap_horiz_rounded, BebuTheme.blue, 'Coins'),
     };
     final who = (type >= 3 && (item.receiverName ?? '').isNotEmpty) ? ' · ${item.receiverName}' : '';

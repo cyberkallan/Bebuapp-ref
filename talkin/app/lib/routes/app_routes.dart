@@ -23,6 +23,7 @@ class AppRoutes {
   static const String videoCallScreen = '/videoCallScreen';
   static const String callCutScreen = '/callCutScreen';
   static const String myProfileScreen = '/myProfileScreen';
+  static const String avatarStudio = '/avatarStudio';
   static const String editProfileScreen = '/editProfileScreen';
   static const String selectGenderScreen = '/selectGenderScreen';
   static const String myWalletScreen = '/myWalletScreen';

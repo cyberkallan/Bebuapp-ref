@@ -48,4 +48,19 @@ class Sfx {
 
   /// Light confirmation tick with no sound.
   static void tick() => HapticFeedback.selectionClick();
+
+  /// Item equipped / popped onto the stage: light tap + short pop.
+  static Future<void> pop() {
+    HapticFeedback.lightImpact();
+    return _play('audio/pop.mp3', volume: 0.5);
+  }
+
+  /// Premium item unlocked: heavy tap + rising four-note chime.
+  static Future<void> unlock() {
+    HapticFeedback.heavyImpact();
+    return _play('audio/unlock.mp3', volume: 0.65);
+  }
+
+  /// Something was refused (locked, not enough coins): vibrate only.
+  static void deny() => HapticFeedback.vibrate();
 }
