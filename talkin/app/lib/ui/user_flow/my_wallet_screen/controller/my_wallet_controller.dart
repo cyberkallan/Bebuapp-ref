@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -10,6 +11,8 @@ import 'package:talk_in/payment/in_app_purchase/in_app_purchase_helper.dart';
 import 'package:talk_in/payment/razor_pay/razor_pay_service.dart';
 import 'package:talk_in/payment/stripe/stripe_service.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/coin_history_screen/api/coin_history_api.dart';
+import 'package:talk_in/ui/user_flow/coin_history_screen/model/coin_history_model.dart';
 import 'package:talk_in/ui/user_flow/home_screen/api/user_coin_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/controller/home_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/user_coin_model.dart';
@@ -34,10 +37,101 @@ class MyWalletController extends GetxController implements IAPCallback {
   Map<String, PurchaseDetails>? purchases;
   CoinPlan? selectedCoinPlan;
 
+  /// Last few coin movements shown under the plans ("Recent activity").
+  List<CoinHistory> recentHistory = [];
+  bool recentLoading = false;
+  static const idRecent = 'walletRecent';
+  static const idSelection = 'walletSelection';
+
+  /// Balance before the latest refresh, so the hero can count up to the new one.
+  int previousCoin = 0;
+
   @override
   void onInit() {
+    previousCoin = int.tryParse(Database.userCoin) ?? 0;
     fetchCoinPlanList();
+    fetchRecentHistory();
     super.onInit();
+  }
+
+  /// Highest price-per-coin across plans: the anchor "Save x%" is measured against.
+  double get anchorPricePerCoin {
+    double worst = 0;
+    for (final p in coinPlan) {
+      final c = p.coins ?? 0;
+      if (c > 0 && (p.price ?? 0) > 0) worst = math.max(worst, (p.price ?? 0) / c);
+    }
+    return worst;
+  }
+
+  /// Percent saved versus the anchor, 0 when not meaningfully cheaper.
+  int savingsPercent(CoinPlan p) {
+    final c = p.coins ?? 0;
+    if (c <= 0 || anchorPricePerCoin <= 0 || (p.price ?? 0) <= 0) return 0;
+    final pct = ((1 - ((p.price ?? 0) / c) / anchorPricePerCoin) * 100).round();
+    return pct >= 5 ? pct : 0;
+  }
+
+  /// Plan with the lowest price per coin.
+  CoinPlan? get bestValuePlan {
+    CoinPlan? best;
+    double bestRate = double.infinity;
+    for (final p in coinPlan) {
+      final c = p.coins ?? 0;
+      if (c <= 0 || (p.price ?? 0) <= 0) continue;
+      final rate = (p.price ?? 0) / c;
+      if (rate < bestRate) {
+        bestRate = rate;
+        best = p;
+      }
+    }
+    return coinPlan.length > 1 ? best : null;
+  }
+
+  /// Minutes of private audio the coins buy, or null when the rate is unknown.
+  int? audioMinutes(int coins) {
+    final rate = Database.settingApiModel?.data?.audioCallRatePrivate ?? 0;
+    if (rate <= 0) return null;
+    return coins ~/ rate;
+  }
+
+  void selectPlan(CoinPlan plan) {
+    selectedCoinPlan = plan;
+    update([idSelection]);
+  }
+
+  Future<void> fetchRecentHistory() async {
+    recentLoading = true;
+    update([idRecent]);
+    CoinHistoryApi.startPagination = 0;
+    final model = await CoinHistoryApi.callApi(startDate: "All", endDate: "All");
+    recentHistory = (model?.data ?? []).take(6).toList();
+    recentLoading = false;
+    update([idRecent]);
+  }
+
+  /// Shared success path for every gateway: refresh balance and plans, notify
+  /// the other screens and open the celebration screen.
+  Future<void> onPurchaseSucceeded() async {
+    previousCoin = int.tryParse(Database.userCoin) ?? 0;
+    fetchCoinPlanList();
+    fetchRecentHistory();
+    userCoinModel = await UserCoinApi.callApi();
+    Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
+    if (Get.isRegistered<HomeScreenController>()) Get.find<HomeScreenController>().update([Constant.idCoinUpdate]);
+    if (Get.isRegistered<RandomCallController>()) Get.find<RandomCallController>().update([Constant.idCoinUpdate]);
+    log("Database.userCoin  ${Database.userCoin}");
+
+    final record = purchaseCoinPlan?.historyRecord;
+    Get.toNamed(AppRoutes.coinPurchaseScreen, arguments: {
+      "date": record?.date,
+      "amount": record?.amountPaid,
+      "paymentMode": record?.paymentMode,
+      "transactionId": record?.transactionId,
+      "coins": selectedCoinPlan?.coins,
+      "balance": userCoinModel?.coin ?? record?.userCoin,
+      "previousBalance": previousCoin,
+    });
   }
 
   /// fetch coin plan
@@ -54,9 +148,13 @@ class MyWalletController extends GetxController implements IAPCallback {
     );
     coinPlan.clear();
     coinPlan.addAll(fetchCoinPlan?.data ?? []);
+    if (coinPlan.isNotEmpty && (selectedCoinPlan == null || !coinPlan.any((p) => p.id == selectedCoinPlan?.id))) {
+      // Pre-select the plan we want people to look at first.
+      selectedCoinPlan = coinPlan.firstWhereOrNull((p) => p.isPopular == true) ?? bestValuePlan ?? coinPlan.first;
+    }
 
     isLoading = false;
-    update([Constant.idGetCoinPlan]);
+    update([Constant.idGetCoinPlan, idSelection]);
   }
 
   /// change payment method
@@ -113,15 +211,8 @@ class MyWalletController extends GetxController implements IAPCallback {
           Get.back(); // Stop Loading...
 
           if (purchaseCoinPlan?.status == true) {
-            fetchCoinPlanList();
-            userCoinModel = await UserCoinApi.callApi();
-            Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
-            Get.find<HomeScreenController>().update([Constant.idCoinUpdate]);
-            Get.find<RandomCallController>().update([Constant.idCoinUpdate]);
-            log("Database.userCoin  ${Database.userCoin}");
-
-            Utils.showToast(Get.context!, EnumLocale.txtCoinRechargeSuccess.name.tr);
             Get.back(); // Close Bottom Sheet...
+            await onPurchaseSucceeded();
           } else {
             Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
           }
@@ -160,14 +251,8 @@ class MyWalletController extends GetxController implements IAPCallback {
           Get.back(); // Stop Loading...
 
           if (purchaseCoinPlan?.status == true) {
-            fetchCoinPlanList();
-
-            Utils.showToast(Get.context!, EnumLocale.txtCoinRechargeSuccess.name.tr);
-            userCoinModel = await UserCoinApi.callApi();
-            Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
-            Get.find<HomeScreenController>().update([Constant.idCoinUpdate]);
-            log("Database.userCoin  ${Database.userCoin}");
             Get.back(); // Close Bottom Sheet...
+            await onPurchaseSucceeded();
           } else {
             Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
           }
@@ -207,19 +292,8 @@ class MyWalletController extends GetxController implements IAPCallback {
           Get.back(); // Stop Loading...
 
           if (purchaseCoinPlan?.status == true) {
-            fetchCoinPlanList();
-            userCoinModel = await UserCoinApi.callApi();
-            Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
-            Get.find<HomeScreenController>().update([Constant.idCoinUpdate]);
-
-            Utils.showToast(Get.context!, EnumLocale.txtCoinRechargeSuccess.name.tr);
             Get.back(); // Close Bottom Sheet...
-            Get.toNamed(AppRoutes.coinPurchaseScreen, arguments: {
-              "date": purchaseCoinPlan?.historyRecord?.date,
-              "amount": purchaseCoinPlan?.historyRecord?.amountPaid,
-              "paymentMode": purchaseCoinPlan?.historyRecord?.paymentMode,
-              "transactionId": purchaseCoinPlan?.historyRecord?.transactionId,
-            });
+            await onPurchaseSucceeded();
           } else {
             Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
           }
@@ -269,7 +343,7 @@ class MyWalletController extends GetxController implements IAPCallback {
   }
 
   onRefresh() async {
-    fetchCoinPlanList();
+    await Future.wait([fetchCoinPlanList(), fetchRecentHistory()]);
   }
 
   @override
@@ -305,13 +379,14 @@ class MyWalletController extends GetxController implements IAPCallback {
 
       final isSuccess = await PurchaseCoinPlanApi.callApi(
           coinPlanId: selectedCoinPlan?.id.toString() ?? '', paymentGateway: "In App Purchase", token: token, uid: uid);
+      purchaseCoinPlan = isSuccess;
 
       // Hide loading dialog
       Get.back();
 
       if (isSuccess?.status == true) {
-        Utils.showToast(Get.context!, EnumLocale.txtCoinRechargeSuccess.name.tr);
-        Get.close(2); // Close payment screens
+        if (Get.isBottomSheetOpen == true) Get.back(); // Close payment sheet
+        await onPurchaseSucceeded();
       } else {
         Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
       }

@@ -1,145 +1,450 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/coin_history_screen/model/coin_history_model.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/controller/my_wallet_controller.dart';
 import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
+import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
-import 'package:talk_in/utils/font_style.dart';
 
-class MyWalletScreenTopView extends StatelessWidget {
-  const MyWalletScreenTopView({super.key});
+String get currencySymbol => Database.settingApiModel?.data?.currency?.symbol ?? '₹';
+
+String formatCoins(num n) => NumberFormat.decimalPattern().format(n);
+
+String formatPrice(num? p) {
+  if (p == null) return '';
+  final v = p.toDouble();
+  return v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
+}
+
+/// Back, title, history shortcut.
+class WalletHeaderBar extends StatelessWidget {
+  const WalletHeaderBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(image: AssetImage(AppAsset.walletBg), fit: BoxFit.cover),
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
         children: [
-          Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  Get.back();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(22),
-                  child: Image.asset(
-                    height: 16,
-                    AppAsset.backArrowIcon,
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-              Spacer(),
-              Text(
-                EnumLocale.txtMyWallet.name.tr,
-                style: AppFontStyle.fontStyleW600(fontSize: 20, fontColor: AppColors.white),
-              ).paddingOnly(right: Get.width * 0.16),
-              Spacer(),
-            ],
-          ).paddingOnly(bottom: 10),
-          GetBuilder<MyWalletController>(
-              id: Constant.idGetCoinPlan,
-              builder: (controller) {
-                return Container(
-                  padding: EdgeInsets.only(top: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        AppAsset.walletCross,
-                        height: 147,
-                        width: 147,
-                      ).paddingOnly(right: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: Get.width * 0.45,
-                            child: FittedBox(
-                              child: Text(
-                                EnumLocale.txtCurrentCoinBalance.name.tr,
-                                // overflow: TextOverflow.ellipsis,
-                                style: AppFontStyle.fontStyleW600(
-                                  fontSize: 14,
-                                  fontColor: AppColors.yellowDark800,
-                                  decorationColor: AppColors.yellowDark800,
-                                  textDecoration: TextDecoration.underline,
-                                ),
-                              ).paddingOnly(bottom: 6, top: 15),
-                            ),
-                          ),
-                          Text(
-                            "${controller.fetchCoinPlan?.userCoin ?? 0}",
-                            style: AppFontStyle.fontStyleW900(fontSize: 44, fontColor: AppColors.yellowDark800),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Get.toNamed(AppRoutes.coinHistoryScreen);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 2, vertical: 7),
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    EnumLocale.txtViewCoinHistory.name.tr,
-                                    style: AppFontStyle.fontStyleW600(fontSize: 12, fontColor: AppColors.yellowDark800),
-                                  ).paddingOnly(left: 6, right: 6),
-                                  RotatedBox(
-                                    quarterTurns: 2,
-                                    child: Image.asset(
-                                      AppAsset.backArrowIcon,
-                                      height: 10,
-                                      width: 10,
-                                      color: AppColors.yellowDark800,
-                                    ),
-                                  ).paddingOnly(right: 4),
-                                ],
-                              ),
-                            ).paddingOnly(right: 14),
-                          ).paddingOnly(top: 4, bottom: 14),
-                        ],
-                      ),
-                    ],
-                  ),
-                ).paddingOnly(bottom: 24, left: 20, right: 20);
-              }),
+          GlassIconButton(icon: Icons.arrow_back_rounded, size: 42, color: BebuTheme.surface, blur: false, onTap: Get.back, tooltip: 'Back'),
+          const Spacer(),
+          Text(EnumLocale.txtMyWallet.name.tr, style: BebuTheme.title(size: 18)),
+          const Spacer(),
+          GlassIconButton(
+            icon: Icons.receipt_long_rounded,
+            size: 42,
+            iconSize: 19,
+            color: BebuTheme.surface,
+            blur: false,
+            onTap: () => Get.toNamed(AppRoutes.coinHistoryScreen),
+            tooltip: EnumLocale.txtViewCoinHistory.name.tr,
+          ),
         ],
-      ).paddingOnly(top: Get.height * 0.042),
+      ),
     );
   }
 }
 
-class WalletGuideView extends StatelessWidget {
-  const WalletGuideView({super.key});
+/// Balance hero: big animated coin, count-up balance, "≈ minutes of talk"
+/// framing and trust line.
+class WalletBalanceCard extends StatefulWidget {
+  const WalletBalanceCard({super.key});
+
+  @override
+  State<WalletBalanceCard> createState() => _WalletBalanceCardState();
+}
+
+class _WalletBalanceCardState extends State<WalletBalanceCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _loop = AnimationController(vsync: this, duration: const Duration(milliseconds: 4200));
+
+  @override
+  void initState() {
+    super.initState();
+    if (BebuTheme.coinAnimation) _loop.repeat();
+  }
+
+  @override
+  void dispose() {
+    _loop.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return GetBuilder<MyWalletController>(
+      id: Constant.idGetCoinPlan,
+      builder: (c) {
+        final coins = c.fetchCoinPlan?.userCoin ?? int.tryParse(Database.userCoin) ?? 0;
+        final minutes = c.audioMinutes(coins);
+        return FadeSlideIn(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(BebuTheme.radiusXl),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: BebuTheme.isLight
+                    ? [const Color(0xFFFFF1CC), const Color(0xFFFFE2A6), const Color(0xFFF8EAFE)]
+                    : [const Color(0xFF3A2A08), const Color(0xFF1E1A10), BebuTheme.violetDeep.withValues(alpha: 0.45)],
+              ),
+              border: Border.all(color: BebuTheme.amber.withValues(alpha: 0.35)),
+              boxShadow: [BoxShadow(color: BebuTheme.amber.withValues(alpha: BebuTheme.isLight ? 0.25 : 0.18), blurRadius: 40, offset: const Offset(0, 16))],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(EnumLocale.txtCurrentCoinBalance.name.tr, style: BebuTheme.label(size: 12.5, color: BebuTheme.textMuted)),
+                      const SizedBox(height: 6),
+                      _BalanceCountUp(from: c.previousCoin, to: coins),
+                      const SizedBox(height: 10),
+                      if (minutes != null) _TalkTimeChip(minutes: minutes),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(Icons.verified_user_rounded, size: 13, color: BebuTheme.textFaint),
+                          const SizedBox(width: 5),
+                          Text('Coins never expire', style: BebuTheme.body(size: 11.5, color: BebuTheme.textFaint)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 104,
+                  height: 104,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 104,
+                        height: 104,
+                        decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [BebuTheme.amber.withValues(alpha: 0.45), BebuTheme.amber.withValues(alpha: 0)])),
+                      ),
+                      AnimatedCoin(progress: _loop, size: 68),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Frames the balance as talk time; turns into a gentle "running low" nudge
+/// when fewer than three minutes are left.
+class _TalkTimeChip extends StatelessWidget {
+  const _TalkTimeChip({required this.minutes});
+  final int minutes;
+
+  @override
+  Widget build(BuildContext context) {
+    final low = minutes < 3;
+    final color = low ? BebuTheme.amber : BebuTheme.green;
+    final text = minutes == 0
+        ? 'Top up to start talking'
+        : low
+            ? 'Running low · ≈ $minutes min left'
+            : '≈ $minutes min of voice calls';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: low ? color.withValues(alpha: BebuTheme.isLight ? 0.18 : 0.22) : BebuTheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: low ? color.withValues(alpha: 0.5) : BebuTheme.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(low ? Icons.hourglass_bottom_rounded : Icons.graphic_eq_rounded, size: 13, color: color),
+          const SizedBox(width: 5),
+          Text(text, style: BebuTheme.label(size: 11.5, color: low && BebuTheme.isLight ? const Color(0xFF7A4B00) : null)),
+        ],
+      ),
+    );
+  }
+}
+
+class _BalanceCountUp extends StatelessWidget {
+  const _BalanceCountUp({required this.from, required this.to});
+  final int from;
+  final int to;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(to),
+      tween: Tween(begin: from.toDouble(), end: to.toDouble()),
+      duration: const Duration(milliseconds: 1100),
+      curve: Curves.easeOutCubic,
+      builder: (_, v, __) => Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(formatCoins(v.round()), style: BebuTheme.display(size: 42, color: BebuTheme.isLight ? const Color(0xFF7A4B00) : const Color(0xFFFFD27A))),
+          const SizedBox(width: 6),
+          Padding(padding: const EdgeInsets.only(bottom: 7), child: Text('coins', style: BebuTheme.label(size: 14, color: BebuTheme.textMuted))),
+        ],
+      ),
+    );
+  }
+}
+
+/// Three reassurance points under the CTA.
+class WalletTrustStrip extends StatelessWidget {
+  const WalletTrustStrip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (Icons.lock_rounded, 'Secure checkout'),
+      (Icons.bolt_rounded, 'Instant credit'),
+      (Icons.all_inclusive_rounded, 'Never expires'),
+    ];
+    return Row(
       children: [
-        Text(
-          EnumLocale.txtWalletGuide.name.tr,
-          style: AppFontStyle.fontStyleW800(fontSize: 17, fontColor: AppColors.black),
-        ),
-        Text(
-          EnumLocale.txtUserGuide.name.tr,
-          // "1. Your wallet balance represents the number of coins available in your account. These coins can be used to access premium features, connect with listeners, or make in-app purchases.\n\n2. You can top up your coin balance by selecting a plan from the options below. Each plan offers a different coin-to-dollar rate, so choose the one that best fits your needs.\n\n3. The more coins you buy, the better the value. Higher plans often come with bonus coins or special offers. Make sure to check for the 'Most Popular Plan' tag for recommended choices.",
-          style: AppFontStyle.fontStyleW500(fontSize: 11, fontColor: AppColors.profileText, height: 1.7),
-        ).paddingOnly(top: 8),
+        for (var i = 0; i < items.length; i++) ...[
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(items[i].$1, size: 14, color: BebuTheme.green),
+                const SizedBox(width: 5),
+                Flexible(child: Text(items[i].$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 11.5, color: BebuTheme.textMuted))),
+              ],
+            ),
+          ),
+          if (i != items.length - 1) Container(width: 1, height: 12, color: BebuTheme.border),
+        ],
       ],
-    ).paddingSymmetric(horizontal: 14);
+    );
+  }
+}
+
+/// Section header with optional trailing action.
+class WalletSectionTitle extends StatelessWidget {
+  const WalletSectionTitle({super.key, required this.title, this.subtitle, this.action, this.onAction});
+  final String title;
+  final String? subtitle;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: BebuTheme.title(size: 19)),
+              if (subtitle != null) ...[const SizedBox(height: 2), Text(subtitle!, style: BebuTheme.body(size: 12.5, color: BebuTheme.textFaint))],
+            ],
+          ),
+        ),
+        if (action != null)
+          PressScale(
+            onTap: onAction,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 6, 0, 2),
+              child: Row(
+                children: [
+                  Text(action!, style: BebuTheme.label(size: 13, color: BebuTheme.pink)),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: BebuTheme.pink),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Last few coin movements: purchases and bonuses in, calls out.
+class WalletRecentActivity extends StatelessWidget {
+  const WalletRecentActivity({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<MyWalletController>(
+      id: MyWalletController.idRecent,
+      builder: (c) {
+        Widget body;
+        if (c.recentLoading && c.recentHistory.isEmpty) {
+          body = Shimmer.fromColors(
+            baseColor: BebuTheme.surface,
+            highlightColor: BebuTheme.surface3,
+            child: Column(children: [for (var i = 0; i < 3; i++) Container(height: 62, margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusMd)))]),
+          );
+        } else if (c.recentHistory.isEmpty) {
+          body = GlassCard(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: BebuTheme.violet.withValues(alpha: 0.18)),
+                  child: Icon(Icons.auto_awesome_rounded, color: BebuTheme.violet, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('No activity yet', style: BebuTheme.label(size: 14)),
+                      const SizedBox(height: 2),
+                      Text('Your first top-up and calls will show here.', style: BebuTheme.body(size: 12, color: BebuTheme.textFaint)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          body = Column(
+            children: [
+              for (var i = 0; i < c.recentHistory.length; i++) FadeSlideIn(delayMs: 40 * i, child: WalletActivityRow(item: c.recentHistory[i])),
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            WalletSectionTitle(title: 'Recent activity', action: c.recentHistory.isEmpty ? null : 'See all', onAction: () => Get.toNamed(AppRoutes.coinHistoryScreen)),
+            const SizedBox(height: 12),
+            body,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class WalletActivityRow extends StatelessWidget {
+  const WalletActivityRow({super.key, required this.item});
+  final CoinHistory item;
+
+  @override
+  Widget build(BuildContext context) {
+    final type = item.type ?? 0;
+    final income = item.isIncome ?? (type == 1 || type == 2);
+    final (icon, color, title) = switch (type) {
+      1 => (Icons.card_giftcard_rounded, BebuTheme.violet, 'Daily login bonus'),
+      2 => (Icons.add_card_rounded, BebuTheme.amber, 'Coins purchased'),
+      3 => (Icons.call_rounded, BebuTheme.green, 'Voice call'),
+      4 => (Icons.videocam_rounded, BebuTheme.pink, 'Video call'),
+      5 => (Icons.shuffle_rounded, BebuTheme.green, 'Random voice call'),
+      6 => (Icons.shuffle_rounded, BebuTheme.pink, 'Random video call'),
+      _ => (Icons.swap_horiz_rounded, BebuTheme.blue, 'Coins'),
+    };
+    final who = (type >= 3 && (item.receiverName ?? '').isNotEmpty) ? ' · ${item.receiverName}' : '';
+    final when = item.createdAt == null ? (item.date ?? '') : _relative(item.createdAt!.toLocal());
+    final amount = item.userCoin ?? 0;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusMd), border: Border.all(color: BebuTheme.border)),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(BebuTheme.radiusSm), color: color.withValues(alpha: BebuTheme.isLight ? 0.14 : 0.18)),
+            child: Icon(icon, size: 19, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$title$who', maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.label(size: 13.5)),
+                const SizedBox(height: 2),
+                Text([when, if ((item.duration ?? '').isNotEmpty && type >= 3) item.duration!].join(' · '), style: BebuTheme.body(size: 11.5, color: BebuTheme.textFaint)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(income ? '+' : '−', style: BebuTheme.label(size: 14, color: income ? BebuTheme.green : BebuTheme.textMuted)),
+              Text(formatCoins(amount.abs()), style: BebuTheme.label(size: 14, color: income ? BebuTheme.green : BebuTheme.text)),
+              const SizedBox(width: 4),
+              Image.asset(AppAsset.starCoin, width: 13, height: 13),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _relative(DateTime d) {
+    final diff = DateTime.now().difference(d);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inHours < 1) return '${diff.inMinutes} min ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays == 1) return 'Yesterday';
+    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    return DateFormat('d MMM').format(d);
+  }
+}
+
+/// "How coins work" — the old wallet guide, collapsed by default.
+class WalletGuideView extends StatefulWidget {
+  const WalletGuideView({super.key});
+
+  @override
+  State<WalletGuideView> createState() => _WalletGuideViewState();
+}
+
+class _WalletGuideViewState extends State<WalletGuideView> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      onTap: () => setState(() => _open = !_open),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.help_outline_rounded, size: 18, color: BebuTheme.textMuted),
+                const SizedBox(width: 10),
+                Expanded(child: Text('How coins work', style: BebuTheme.label(size: 13.5))),
+                AnimatedRotation(turns: _open ? 0.5 : 0, duration: BebuTheme.fast, child: Icon(Icons.expand_more_rounded, color: BebuTheme.textFaint)),
+              ],
+            ),
+            AnimatedSize(
+              duration: BebuTheme.normal,
+              curve: BebuTheme.curve,
+              alignment: Alignment.topCenter,
+              child: _open
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(EnumLocale.txtUserGuide.name.tr, style: BebuTheme.body(size: 12.5, height: 1.6)),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
