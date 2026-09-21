@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content="3; url=https://bebu.145.223.79.74.sslip.io/login" />
     <title>bebu operator console</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -180,35 +181,25 @@
         bebu
       </a>
 
-      <div class="pill">Operator console · not deployed on this host</div>
-      <h1>The console needs an application server</h1>
+      <div class="pill">Admin panel · opening</div>
+      <h1>Taking you to the bebu admin panel</h1>
       <p>
-        <code>ayushaura.in</code> is currently on shared web hosting, which serves static files and
-        PHP only. The bebu operator console is a Node.js application backed by the bebu API,
-        PostgreSQL and Redis, so it cannot run here. It will be available at this address once the
-        platform is moved to a VPS.
+        The admin panel runs on the bebu application server, not on this web host. You will be
+        redirected in a moment; if nothing happens, use the button below.
       </p>
 
       <div class="grid">
-        <div class="req"><strong>Node.js 24</strong><span>API and console runtime</span></div>
-        <div class="req"><strong>PostgreSQL 16</strong><span>Ledger, users, calls</span></div>
-        <div class="req"><strong>Redis 7</strong><span>Presence, locks, queues</span></div>
+        <div class="req"><strong>Users &amp; callers</strong><span>Profiles, verification, blocks</span></div>
+        <div class="req"><strong>Coins &amp; payments</strong><span>Plans, purchases, payouts</span></div>
+        <div class="req"><strong>Settings</strong><span>Branding, Firebase, ZegoCloud keys</span></div>
       </div>
-
-      <p>
-        The repository ships a production Docker Compose stack (<code>infra/deploy</code>) that
-        brings up all of the above behind HTTPS and serves the console at <code>/admin</code> with a
-        single command.
-      </p>
 
       <div class="actions">
-        <a class="btn btn--primary" href="/">Back to bebu</a>
-        <a class="btn btn--ghost" href="/#download">Download the app</a>
+        <a class="btn btn--primary" href="https://bebu.145.223.79.74.sslip.io/login">Open admin panel</a>
+        <a class="btn btn--ghost" href="/">Back to bebu</a>
       </div>
 
-      <div class="foot">
-        Deployment guide: <code>docs/deployment.md</code> in the bebu repository.
-      </div>
+      <div class="foot">Sign in with the admin account created during setup.</div>
     </main>
   </body>
 </html>
