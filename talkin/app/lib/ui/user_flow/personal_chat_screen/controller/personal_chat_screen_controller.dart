@@ -10,7 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/socket/socket_emit.dart';
+import 'package:talk_in/socket/socket_service.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/api/personal_chat_api.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/api/send_image_audio_api.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/model/personal_chat_model.dart';
@@ -23,6 +25,10 @@ import 'package:talk_in/utils/enums.dart';
 import 'package:talk_in/utils/font_style.dart';
 import 'package:talk_in/utils/socket_params.dart';
 import 'package:talk_in/utils/utils.dart';
+
+/// Extra socket field: a client id echoed back by the server so the
+/// optimistic bubble can be matched exactly (text and audio alike).
+const String kLocalIdParam = 'localId';
 
 class PersonalChatScreenController extends GetxController {
   String? chatTopicId;
@@ -39,6 +45,7 @@ class PersonalChatScreenController extends GetxController {
   bool? availableForPrivateAudioCall;
   final TextEditingController messageController = TextEditingController();
   bool isLoading = false;
+  bool loadFailed = false;
   PersonalChatModel? personalChatModel;
   List<PersonalChat> oldChat = [];
   final ImagePicker imagePicker = ImagePicker();
@@ -56,14 +63,33 @@ class PersonalChatScreenController extends GetxController {
 
   bool isSendingAudioFile = false;
 
+  /// True while the finger has slid far enough left to cancel the recording.
+  bool recordCancelArmed = false;
+
+  /// 0..1 microphone level for the recording indicator.
+  double recordLevel = 0;
+
   String currentPlayAudioId = "";
   Timer? timer;
   int countTime = 0;
+
+  /// Whether the composer has text (drives mic ↔ send swap).
+  bool get hasText => messageController.text.trim().isNotEmpty;
+
+  static const Duration _ackTimeout = Duration(seconds: 12);
+  static const Duration _minRecording = Duration(milliseconds: 900);
+  static const int _maxRecordingSeconds = 300;
+
+  final Map<String, Timer> _ackTimers = {};
+  StreamSubscription<Amplitude>? _ampSub;
+  DateTime? _recordStartedAt;
+  String? _recordPath;
 
   @override
   void onInit() {
     super.onInit();
     scrollController.addListener(onPagination);
+    messageController.addListener(() => update([Constant.idSendMsg]));
 
     List args = Get.arguments ?? [];
 
@@ -87,19 +113,30 @@ class PersonalChatScreenController extends GetxController {
         fakeVideoUrl = [];
       }
       availableForPrivateVideoCall = args[8] is bool ? args[8] : args[8].toString().toLowerCase() == 'true';
-      availableForPrivateAudioCall = args[9] is bool ? args[9] : args[9].toString().toLowerCase() == 'true';
+      availableForPrivateAudioCall = args.length > 9 ? (args[9] is bool ? args[9] : args[9].toString().toLowerCase() == 'true') : false;
     }
-    // getOldChats();
     init();
-    Utils.showLog("Receiver ID: $receiverId");
-    Utils.showLog("name: $receiverName");
-    Utils.showLog("status label: $receiverStatusLabel");
-    Utils.showLog("image: $receiverImage");
-    Utils.showLog("chat topic id: ${personalChatModel?.chatTopicId}");
-    Utils.showLog("ratePrivateAudioCall: $ratePrivateAudioCall");
-    Utils.showLog("ratePrivateVideoCall: $ratePrivateVideoCall");
-    Utils.showLog("availableForPrivateVideoCall: $availableForPrivateVideoCall");
-    Utils.showLog("availableForPrivateAudioCall: $availableForPrivateAudioCall");
+    // A message typed the moment the screen opens must not be lost because
+    // the socket dropped while the app was in the background.
+    SocketService.ensureConnected();
+    Utils.showLog("Receiver ID: $receiverId  name: $receiverName  fake: $isFake");
+  }
+
+  @override
+  void onClose() {
+    for (final t in _ackTimers.values) {
+      t.cancel();
+    }
+    _ackTimers.clear();
+    timer?.cancel();
+    _ampSub?.cancel();
+    if (isRecordingAudio) {
+      audioRecorder.stop().then((p) {
+        if (p != null) File(p).delete().catchError((_) => File(p));
+      }).catchError((_) => null);
+    }
+    audioRecorder.dispose();
+    super.onClose();
   }
 
   Future<void> init() async {
@@ -107,6 +144,7 @@ class PersonalChatScreenController extends GetxController {
       chatRoomId = null;
 
       isLoading = true;
+      loadFailed = false;
       update([Constant.idGetOldChat]);
 
       oldChat.clear();
@@ -115,40 +153,37 @@ class PersonalChatScreenController extends GetxController {
       await getOldChats();
 
       isLoading = false;
+      loadFailed = chatTopicId == null;
       update([Constant.idGetOldChat]);
     }
   }
 
   /// get all chats
-  getOldChats() async {
-    // isLoading = true;
+  Future<void> getOldChats() async {
     update([Constant.idGetOldChat]);
 
     personalChatModel = await PersonalChatApi.callApi(
       receiverId: receiverId.toString(),
     );
-    oldChat.addAll(personalChatModel?.chat ?? []);
+    final fetched = personalChatModel?.chat ?? [];
+    // Pagination can overlap with messages that arrived live; skip dupes.
+    final known = oldChat.map((c) => c.id).whereType<String>().toSet();
+    oldChat.addAll(fetched.where((c) => c.id == null || !known.contains(c.id)));
 
-    chatTopicId = personalChatModel?.chatTopicId;
-
-    Utils.showLog(" ::::: ${jsonEncode(oldChat)}");
+    chatTopicId = personalChatModel?.chatTopicId ?? chatTopicId;
 
     update([Constant.idGetOldChat]);
 
     if (chatRoomId == null) {
       chatRoomId = personalChatModel?.chatTopicId;
       if (oldChat.isNotEmpty) {
-        // SocketEmit.onMessageSeen(messageId: oldChat.first.id ?? '', senderId: Database.fetchLoginUserProfileModel?.user?.id ?? '');
         SocketEmit.onMessageSeen({
           SocketParams.messageId: oldChat.last.id ?? '',
           SocketParams.senderId: Database.fetchLoginUserProfileModel?.user?.id ?? '',
         });
-        // socket?.onReadMessage(senderUserId: receiverUserId, messageId: SocketServices.userChats.last.id ?? "");
         onScrollDown();
       }
     }
-
-    // onScrollDown();
   }
 
   String formatTimeFromDate(String? rawDate) {
@@ -157,12 +192,14 @@ class PersonalChatScreenController extends GetxController {
       final parsedDate = DateFormat('M/d/yyyy, hh:mm:ss a').parse(rawDate);
       return DateFormat('hh:mm a').format(parsedDate);
     } catch (e) {
-      return ''; // fallback for invalid format
+      final d = DateTime.tryParse(rawDate);
+      return d == null ? '' : DateFormat('hh:mm a').format(d.toLocal());
     }
   }
 
   Future<void> onPagination() async {
-    if (scrollController.position.pixels == scrollController.position.minScrollExtent) {
+    if (!scrollController.hasClients) return;
+    if (scrollController.position.pixels == scrollController.position.minScrollExtent && !isPaginationLoading && !isLoading) {
       isPaginationLoading = true;
       update([Constant.idPagination]);
       await getOldChats();
@@ -171,78 +208,178 @@ class PersonalChatScreenController extends GetxController {
     }
   }
 
+  // ---------------------------------------------------------------- sending
+
+  String get _senderRole => Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'user' : 'listener';
+  String get _receiverRole => Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'listener' : 'user';
+  String _now() => DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now());
+
+  Map<String, dynamic> _payload({
+    required int messageType,
+    required String localId,
+    String message = '',
+    String image = '',
+    String audio = '',
+  }) =>
+      {
+        SocketParams.senderRole: _senderRole,
+        SocketParams.receiverRole: _receiverRole,
+        SocketParams.chatTopicId: chatTopicId ?? '',
+        SocketParams.senderId: Database.loginUserId,
+        SocketParams.receiverId: receiverId,
+        SocketParams.message: message,
+        SocketParams.date: _now(),
+        SocketParams.messageType: messageType,
+        if (image.isNotEmpty) SocketParams.image: image,
+        if (audio.isNotEmpty) SocketParams.audio: audio,
+        SocketParams.name: Database.fetchLoginUserProfileModel?.user?.fullName,
+        SocketParams.profilePic: Database.fetchLoginUserProfileModel?.user?.profilePic,
+        SocketParams.ratePrivateVideoCall: '',
+        SocketParams.ratePrivateAudioCall: '',
+        SocketParams.isFake: isFake,
+        SocketParams.video: fakeVideoUrl,
+        kLocalIdParam: localId,
+      };
+
+  /// Make sure we have a chat topic before emitting: without it the server
+  /// silently drops the message ("Chat topic not found").
+  Future<bool> _ensureTopic() async {
+    if (chatTopicId != null && chatTopicId!.isNotEmpty) return true;
+    PersonalChatApi.startPagination = 1;
+    oldChat.clear();
+    await getOldChats();
+    return chatTopicId != null && chatTopicId!.isNotEmpty;
+  }
+
+  void _armAck(String localId) {
+    _ackTimers[localId]?.cancel();
+    _ackTimers[localId] = Timer(_ackTimeout, () {
+      final i = oldChat.indexWhere((m) => m.localId == localId);
+      if (i != -1 && oldChat[i].pending) {
+        oldChat[i].pending = false;
+        oldChat[i].failed = true;
+        update([Constant.idGetOldChat]);
+        Sfx.deny();
+      }
+    });
+  }
+
   /// send message
-  void sendMessage() {
-    String message = messageController.text.trim(); // ✅ Can now be reassigned
+  Future<void> sendMessage() async {
+    String message = sanitizeUserInput(messageController.text);
 
-    if (message.isEmpty) {
-      // Utils.showToast(Get.context!, "Message cannot be empty.");
-      return;
-    }
-
-    if (containsDangerousScript(message)) {
-      Utils.showToast(Get.context!, "Script tags are not allowed in the message.");
-      messageController.clear();
-      return;
-    }
-
-    message = sanitizeUserInput(message); // ✅ No error
+    if (message.isEmpty) return;
 
     if (message.length > 1000) {
       Utils.showToast(Get.context!, "Message too long. Max 1000 characters.");
       return;
     }
 
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+    messageController.clear();
+    update([Constant.idSendMsg]);
 
-    /// 🔄 Insert Optimistic Message into UI
-    oldChat.insert(
-      0,
-      PersonalChat(
-        id: tempId,
-        message: message,
-        date: DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now()),
-        messageType: 1,
-        senderId: Database.loginUserId,
-      ),
+    final localId = DateTime.now().millisecondsSinceEpoch.toString();
+    final optimistic = PersonalChat(
+      id: localId,
+      localId: localId,
+      message: message,
+      date: _now(),
+      messageType: 1,
+      senderId: Database.loginUserId,
+      pending: true,
     );
-
+    oldChat.insert(0, optimistic);
     update([Constant.idGetOldChat]);
     onScrollDown();
+    Sfx.messageSent();
 
-    final messageData = {
-      SocketParams.senderRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'user' : 'listener',
-      SocketParams.receiverRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'listener' : 'user',
-      SocketParams.chatTopicId: personalChatModel?.chatTopicId ?? "",
-      SocketParams.senderId: Database.loginUserId,
-      SocketParams.receiverId: receiverId,
-      SocketParams.message: message,
-      SocketParams.date: DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now()),
-      SocketParams.messageType: 1,
-      SocketParams.name: Database.fetchLoginUserProfileModel?.user?.fullName,
-      SocketParams.profilePic: Database.fetchLoginUserProfileModel?.user?.profilePic,
-      SocketParams.ratePrivateVideoCall: '',
-      SocketParams.ratePrivateAudioCall: '',
-      SocketParams.isFake: isFake,
-      SocketParams.video: fakeVideoUrl,
-    };
+    if (!await _ensureTopic()) {
+      optimistic.pending = false;
+      optimistic.failed = true;
+      update([Constant.idGetOldChat]);
+      Utils.showToast(Get.context!, "Couldn't reach the chat server. Tap the message to retry.");
+      return;
+    }
 
-    Utils.showLog("User message  :: $messageData");
-
-    SocketEmit.sendMessage(messageData);
-
-    messageController.clear();
-    // onScrollDown();
-
-    update([Constant.idSendMsg]);
+    SocketEmit.sendMessage(_payload(messageType: 1, localId: localId, message: message));
+    _armAck(localId);
   }
 
+  /// Tap on a failed bubble: send it again with the same local id.
+  Future<void> retry(PersonalChat msg) async {
+    if (!msg.failed || msg.localId == null) return;
+    msg.failed = false;
+    msg.pending = true;
+    update([Constant.idGetOldChat]);
+    Sfx.tick();
+
+    if (!await _ensureTopic()) {
+      msg.pending = false;
+      msg.failed = true;
+      update([Constant.idGetOldChat]);
+      return;
+    }
+    switch (msg.messageType) {
+      case 2:
+        SocketEmit.sendMessage(_payload(messageType: 2, localId: msg.localId!, message: msg.message ?? '', image: msg.image ?? ''));
+      case 3:
+        SocketEmit.sendMessage(_payload(messageType: 3, localId: msg.localId!, message: msg.message ?? '', audio: msg.audio ?? ''));
+      default:
+        SocketEmit.sendMessage(_payload(messageType: 1, localId: msg.localId!, message: msg.message ?? ''));
+    }
+    _armAck(msg.localId!);
+  }
+
+  /// Called by [SocketListen] for every `messageDispatched` in this topic.
+  /// Reconciles my optimistic bubble (by `localId`, else by content) or
+  /// inserts the other person's message with a tone.
+  void onSocketMessage(Map<String, dynamic> data, String? messageId) {
+    final incoming = PersonalChat.fromJson(data);
+    incoming.id = (messageId != null && messageId.isNotEmpty) ? messageId : incoming.id;
+    final mine = incoming.senderId == Database.loginUserId;
+
+    if (mine) {
+      int i = incoming.localId == null ? -1 : oldChat.indexWhere((m) => m.localId == incoming.localId);
+      if (i == -1) {
+        i = oldChat.indexWhere((m) =>
+            m.pending &&
+            m.senderId == Database.loginUserId &&
+            m.messageType == incoming.messageType &&
+            (m.messageType == 1 ? m.message == incoming.message : true));
+      }
+      if (i != -1) {
+        final local = oldChat[i];
+        _ackTimers.remove(local.localId)?.cancel();
+        local.id = incoming.id ?? local.id;
+        local.pending = false;
+        local.failed = false;
+        local.date = incoming.date ?? local.date;
+        if (incoming.audio != null && incoming.audio!.isNotEmpty) local.audio = incoming.audio;
+        if (incoming.image != null && incoming.image!.isNotEmpty) local.image = incoming.image;
+        isLoadingAudio = false;
+        update([Constant.idGetOldChat]);
+        return;
+      }
+      // Sent from another device / already reconciled: avoid duplicates.
+      if (incoming.id != null && oldChat.any((m) => m.id == incoming.id)) return;
+      oldChat.insert(0, incoming);
+      update([Constant.idGetOldChat]);
+      return;
+    }
+
+    if (incoming.id != null && oldChat.any((m) => m.id == incoming.id)) return;
+    oldChat.insert(0, incoming);
+    update([Constant.idGetOldChat]);
+    onScrollDown();
+    Sfx.messageReceived();
+  }
+
+  /// Keep every language and emoji; only drop tags and control characters.
   String sanitizeUserInput(String input) {
-    // Remove basic script-like or HTML characters
-    input = input.replaceAll(RegExp(r'[<>\"\"&]'), '');
-    input = input.replaceAll(RegExp(r'[^\x20-\x7E]'), ''); // printable only
-    input = input.replaceAll(RegExp(r'<[^>]*>'), '');
-    return input;
+    var out = input.replaceAll(RegExp(r'<[^>]*>'), '');
+    out = out.replaceAll(RegExp(r'[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]'), '');
+    out = out.replaceAll(RegExp(r'[<>]'), '');
+    return out.trim();
   }
 
   /// script validation
@@ -251,70 +388,78 @@ class PersonalChatScreenController extends GetxController {
     return scriptTagRegex.hasMatch(input);
   }
 
+  // ---------------------------------------------------------------- image
+
   /// send image event
   Future<void> sendImageMessage() async {
     if (pickedImage == null || receiverId == null) {
       Utils.showToast(Get.context!, "No image selected or receiver ID is missing");
       return;
     }
+    if (!await _ensureTopic()) {
+      Utils.showToast(Get.context!, "Couldn't reach the chat server. Please try again.");
+      return;
+    }
+
+    final localId = DateTime.now().millisecondsSinceEpoch.toString();
+    final optimistic = PersonalChat(
+      id: localId,
+      localId: localId,
+      messageType: 2,
+      message: "📸 Image",
+      image: pickedImage!.path,
+      date: _now(),
+      senderId: Database.loginUserId,
+      pending: true,
+    );
+    oldChat.insert(0, optimistic);
+    isLoadingImage = true;
+    update([Constant.idGetOldChat]);
+    onScrollDown();
+    Sfx.lightTap();
 
     try {
-      Utils.showLog("Sending image to API...");
-
-      final hostSendImageAudioModel = await SendImageAudioApi.callApi(
-        messageType: 2, //  2 = image
+      final res = await SendImageAudioApi.callApi(
+        messageType: 2,
         chatTopicId: chatTopicId ?? '',
         receiverId: receiverId ?? '',
-        imagePath: pickedImage!.path, //  Correct: use file path
+        imagePath: pickedImage!.path,
       );
+      pickedImage = null;
+      isLoadingImage = false;
 
-      if (hostSendImageAudioModel != null && hostSendImageAudioModel.chat != null) {
-        final messageData = {
-          SocketParams.senderRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'user' : 'listener',
-          SocketParams.receiverRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'listener' : 'user',
-          SocketParams.chatTopicId: chatTopicId ?? '',
-          SocketParams.senderId: Database.loginUserId,
-          SocketParams.receiverId: receiverId,
-          SocketParams.message: hostSendImageAudioModel.chat?.message ?? '',
-          SocketParams.messageType: 2,
-          SocketParams.date: DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now()),
-          SocketParams.image: hostSendImageAudioModel.chat?.image ?? '',
-          SocketParams.name: Database.fetchLoginUserProfileModel?.user?.fullName,
-          SocketParams.profilePic: Database.fetchLoginUserProfileModel?.user?.profilePic,
-          SocketParams.ratePrivateVideoCall: '',
-          SocketParams.ratePrivateAudioCall: '',
-          SocketParams.isFake: isFake,
-          SocketParams.video: fakeVideoUrl,
-        };
-
-        Utils.showLog("Image message socket emit :: $messageData");
-
-        SocketEmit.sendMessage(messageData);
-
-        pickedImage = null;
-        onScrollDown();
-
-        update();
-        onScrollDown();
+      if (res != null && res.chat != null && res.status == true) {
+        optimistic.image = res.chat?.image ?? optimistic.image;
+        optimistic.message = res.chat?.message ?? optimistic.message;
+        SocketEmit.sendMessage(_payload(messageType: 2, localId: localId, message: optimistic.message ?? '', image: optimistic.image ?? ''));
+        _armAck(localId);
+        Sfx.messageSent();
+        update([Constant.idGetOldChat]);
       } else {
-        Utils.showToast(Get.context!, "Failed to send image.");
+        optimistic.pending = false;
+        optimistic.failed = true;
+        update([Constant.idGetOldChat]);
+        Utils.showToast(Get.context!, res?.message ?? "Failed to send image.");
       }
     } catch (e) {
-      Utils.showToast(Get.context!, "Error sending image: $e");
+      isLoadingImage = false;
+      optimistic.pending = false;
+      optimistic.failed = true;
+      update([Constant.idGetOldChat]);
       log("Error in sendImageMessage: $e");
     }
   }
 
   /// pick image camera
   Future<bool> pickImageFromCamera() async {
-    pickedImage = await imagePicker.pickImage(source: ImageSource.camera, imageQuality: 100);
+    pickedImage = await imagePicker.pickImage(source: ImageSource.camera, imageQuality: 85);
     update();
     return pickedImage != null;
   }
 
   /// pick image gallery
   Future<bool> pickImageFromGallery() async {
-    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     update();
     return pickedImage != null;
   }
@@ -392,149 +537,217 @@ class PersonalChatScreenController extends GetxController {
     );
   }
 
-  /// audio playing and sending
-  Future<void> onStartAudioRecording() async {
-    Utils.showLog("Audio Recording Start");
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDocDir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.mp4";
+  // ---------------------------------------------------------------- voice
 
-    await audioRecorder.start(const RecordConfig(), path: filePath);
+  /// Long-press began on the mic. Asks for the permission if needed and
+  /// starts recording as soon as it is granted (the old flow only asked and
+  /// never started, so the first attempt always did nothing).
+  Future<void> onLongPressStartMic() async {
+    if (isRecordingAudio || isSendingAudioFile) return;
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    isRecordingAudio = true;
-    update([Constant.idChangeAudioRecordingEvent]);
-
-    onChangeTimer();
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      status = await Permission.microphone.request();
+    }
+    if (status.isPermanentlyDenied) {
+      Utils.showToast(Get.context!, "Microphone is blocked. Enable it in Settings to send voice notes.");
+      Sfx.deny();
+      await openAppSettings();
+      return;
+    }
+    if (!status.isGranted) {
+      Utils.showToast(Get.context!, EnumLocale.txtPleaseAllowPermission.name.tr);
+      Sfx.deny();
+      return;
+    }
+    if (!await audioRecorder.hasPermission()) {
+      Utils.showToast(Get.context!, EnumLocale.txtPleaseAllowPermission.name.tr);
+      return;
+    }
+    await onStartAudioRecording();
   }
 
-  Future<void> onLongPressStartMic() async {
-    FocusManager.instance.primaryFocus?.unfocus();
-    PermissionStatus status = await Permission.microphone.status;
+  Future<void> onStartAudioRecording() async {
+    try {
+      Utils.showLog("Audio Recording Start");
+      final dir = await getTemporaryDirectory();
+      _recordPath = "${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a";
 
-    if (status.isDenied) {
-      PermissionStatus request = await Permission.microphone.request();
+      await audioRecorder.start(
+        const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 64000, sampleRate: 44100, numChannels: 1),
+        path: _recordPath!,
+      );
 
-      if (request == PermissionStatus.denied) {
-        Utils.showToast(Get.context!, EnumLocale.txtPleaseAllowPermission.name.tr);
-      }
-    } else {
-      Utils.showLog("Audio Recording Started...");
-      onStartAudioRecording();
+      _recordStartedAt = DateTime.now();
+      isRecordingAudio = true;
+      recordCancelArmed = false;
+      recordLevel = 0;
+      countTime = 0;
+      update([Constant.idChangeAudioRecordingEvent]);
+      Sfx.recordStart();
+
+      _ampSub?.cancel();
+      _ampSub = audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 90)).listen((a) {
+        // dBFS roughly -60..0 → 0..1
+        final v = ((a.current + 50) / 50).clamp(0.0, 1.0);
+        recordLevel = recordLevel * 0.55 + v * 0.45;
+        update([Constant.idRecordLevel]);
+      });
+
+      onChangeTimer();
+    } catch (e) {
+      isRecordingAudio = false;
+      update([Constant.idChangeAudioRecordingEvent]);
+      Utils.showLog("Audio Recording Start Failed => $e");
+      Utils.showToast(Get.context!, "Couldn't start recording.");
+    }
+  }
+
+  /// Finger moved while holding: sliding left past the threshold arms cancel.
+  void onLongPressMove(Offset offsetFromOrigin) {
+    if (!isRecordingAudio) return;
+    final armed = offsetFromOrigin.dx < -90;
+    if (armed != recordCancelArmed) {
+      recordCancelArmed = armed;
+      Sfx.tick();
+      update([Constant.idChangeAudioRecordingEvent]);
     }
   }
 
   Future<void> onLongPressEndMic() async {
-    PermissionStatus status = await Permission.microphone.status;
-
-    if (isRecordingAudio && status.isGranted) {
-      onStopAudioRecording();
+    if (!isRecordingAudio) return;
+    if (recordCancelArmed) {
+      await cancelRecording();
+      return;
     }
+    final held = DateTime.now().difference(_recordStartedAt ?? DateTime.now());
+    if (held < _minRecording) {
+      await cancelRecording(tooShort: true);
+      return;
+    }
+    await onStopAudioRecording();
+  }
+
+  Future<void> cancelRecording({bool tooShort = false}) async {
+    try {
+      final p = await audioRecorder.stop();
+      if (p != null) File(p).delete().catchError((_) => File(p));
+    } catch (_) {}
+    _ampSub?.cancel();
+    isRecordingAudio = false;
+    recordCancelArmed = false;
+    recordLevel = 0;
+    onChangeTimer();
+    update([Constant.idChangeAudioRecordingEvent]);
+    Sfx.recordCancel();
+    if (tooShort) Utils.showToast(Get.context!, "Hold to record, release to send.");
   }
 
   Future<void> onStopAudioRecording() async {
+    String? audioPath;
     try {
       Utils.showLog("Audio Recording Stop");
-
-      isLoadingAudio = true;
       isSendingAudioFile = true;
+      _ampSub?.cancel();
 
-      final audioPath = await audioRecorder.stop();
+      audioPath = await audioRecorder.stop();
 
       isRecordingAudio = false;
+      recordCancelArmed = false;
+      recordLevel = 0;
       update([Constant.idChangeAudioRecordingEvent]);
       onChangeTimer();
 
       Utils.showLog("Recording Audio Path => $audioPath");
-      final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+      if (audioPath == null || !File(audioPath).existsSync()) {
+        isSendingAudioFile = false;
+        updateAudioUI();
+        Utils.showToast(Get.context!, "Recording failed. Please try again.");
+        return;
+      }
+      if (!await _ensureTopic()) {
+        isSendingAudioFile = false;
+        updateAudioUI();
+        Utils.showToast(Get.context!, "Couldn't reach the chat server. Please try again.");
+        return;
+      }
 
-      if (audioPath != null) {
-        // Show audio in chat immediately
-        oldChat.insert(
-          0,
-          PersonalChat(
-            id: tempId,
-            messageType: 3,
-            createdAt: DateTime.now(),
-            senderId: Database.loginUserId,
-            audio: audioPath,
-          ),
-        );
-        isLoadingAudio = true;
+      final localId = DateTime.now().millisecondsSinceEpoch.toString();
+      final optimistic = PersonalChat(
+        id: localId,
+        localId: localId,
+        messageType: 3,
+        message: "🎤 Audio",
+        date: _now(),
+        createdAt: DateTime.now(),
+        senderId: Database.loginUserId,
+        audio: audioPath,
+        pending: true,
+      );
+      oldChat.insert(0, optimistic);
+      isLoadingAudio = true;
+      update([Constant.idGetOldChat]);
+      onScrollDown();
+      Sfx.recordSent();
+
+      sendImageAudioModel = await SendImageAudioApi.callApi(
+        chatTopicId: chatTopicId ?? '',
+        receiverId: receiverId.toString(),
+        messageType: 3,
+        filePath: audioPath,
+      );
+
+      final serverAudio = sendImageAudioModel?.chat?.audio;
+      if (sendImageAudioModel?.status == true && serverAudio != null && serverAudio.isNotEmpty) {
+        optimistic.audio = serverAudio;
+        optimistic.message = sendImageAudioModel?.chat?.message ?? optimistic.message;
         update([Constant.idGetOldChat]);
-        onScrollDown();
-
-        // Upload actual audio
-        sendImageAudioModel = await SendImageAudioApi.callApi(
-          chatTopicId: personalChatModel?.chatTopicId ?? '',
-          receiverId: receiverId.toString(),
-          messageType: 3,
-          filePath: audioPath,
-        );
-
-        // Replace optimistic with real audio
-        final index = oldChat.indexWhere((c) => c.id == tempId);
-        if (index != -1 && sendImageAudioModel?.chat?.audio != null) {
-          oldChat[index] = PersonalChat(
-            id: sendImageAudioModel?.chat?.id,
-            audio: sendImageAudioModel?.chat?.audio,
-            date: formatTime(),
-            messageType: 3,
-            senderId: Database.loginUserId,
-          );
-          update([Constant.idGetOldChat]);
-
-          final messageData = {
-            SocketParams.senderRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'user' : 'listener',
-            SocketParams.receiverRole: Database.fetchLoginUserProfileModel?.user?.isListener == false ? 'listener' : 'user',
-            SocketParams.chatTopicId: chatTopicId ?? '',
-            SocketParams.senderId: Database.loginUserId,
-            SocketParams.receiverId: receiverId,
-            SocketParams.message: sendImageAudioModel?.chat?.message ?? '',
-            SocketParams.messageType: 3,
-            SocketParams.date: DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now()),
-            SocketParams.audio: sendImageAudioModel?.chat?.audio ?? '',
-            SocketParams.name: Database.fetchLoginUserProfileModel?.user?.fullName,
-            SocketParams.profilePic: Database.fetchLoginUserProfileModel?.user?.profilePic,
-            SocketParams.ratePrivateVideoCall: '',
-            SocketParams.ratePrivateAudioCall: '',
-            SocketParams.isFake: isFake,
-            SocketParams.video: fakeVideoUrl,
-          };
-
-          Utils.showLog("Image message socket emit :: $messageData");
-
-          SocketEmit.sendMessage(messageData);
-        }
+        SocketEmit.sendMessage(_payload(messageType: 3, localId: localId, message: optimistic.message ?? '', audio: serverAudio));
+        _armAck(localId);
+      } else {
+        optimistic.pending = false;
+        optimistic.failed = true;
+        isLoadingAudio = false;
+        update([Constant.idGetOldChat]);
+        Utils.showToast(Get.context!, sendImageAudioModel?.message ?? "Couldn't upload the voice note.");
       }
       isSendingAudioFile = false;
       updateAudioUI();
     } catch (e) {
       isSendingAudioFile = false;
+      isRecordingAudio = false;
+      isLoadingAudio = false;
+      update([Constant.idChangeAudioRecordingEvent, Constant.idGetOldChat]);
       Utils.showLog("Audio Recording Stop Failed => $e");
     }
   }
 
   Future<void> updateAudioUI() async {
-    await Future.delayed(const Duration(milliseconds: 100)); // Small delay
+    await Future.delayed(const Duration(milliseconds: 100));
     update([Constant.idChangeAudioRecordingEvent]);
   }
 
   Future<void> onChangeTimer() async {
-    if (isRecordingAudio && countTime == 0) {
+    timer?.cancel();
+    if (isRecordingAudio) {
+      countTime = 0;
       timer = Timer.periodic(
         const Duration(seconds: 1),
-        (timer) async {
+        (t) {
+          if (!isRecordingAudio) {
+            countTime = 0;
+            t.cancel();
+            update([Constant.idChangeAudioRecordingEvent]);
+            return;
+          }
           countTime++;
           update([Constant.idChangeAudioRecordingEvent]);
-          if (isRecordingAudio == false) {
-            countTime = 0;
-            this.timer?.cancel();
-            update([Constant.idChangeAudioRecordingEvent]);
-          }
+          if (countTime >= _maxRecordingSeconds) onStopAudioRecording();
         },
       );
     } else {
       countTime = 0;
-      timer?.cancel();
       update([Constant.idChangeAudioRecordingEvent]);
     }
   }
@@ -542,15 +755,17 @@ class PersonalChatScreenController extends GetxController {
   Future<void> onScrollDown() async {
     try {
       await 10.milliseconds.delay();
+      if (!scrollController.hasClients) return;
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
-        duration: Duration(seconds: 1),
+        duration: const Duration(milliseconds: 450),
         curve: Curves.fastOutSlowIn,
       );
-      await 10.milliseconds.delay();
+      await 220.milliseconds.delay();
+      if (!scrollController.hasClients) return;
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
-        duration: Duration(seconds: 1),
+        duration: const Duration(milliseconds: 350),
         curve: Curves.fastOutSlowIn,
       );
     } catch (e) {
@@ -560,9 +775,7 @@ class PersonalChatScreenController extends GetxController {
 
   String formatTime() {
     try {
-      String formattedTime;
-      formattedTime = DateFormat('hh:mm a').format(DateTime.now());
-      return formattedTime;
+      return DateFormat('hh:mm a').format(DateTime.now());
     } catch (e) {
       Utils.showLog("Error in format time :: $e");
       return "";

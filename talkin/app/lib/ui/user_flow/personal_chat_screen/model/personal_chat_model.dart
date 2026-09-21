@@ -52,6 +52,16 @@ class PersonalChat {
   DateTime? createdAt;
   DateTime? updatedAt;
 
+  /// Local-only delivery state for my own messages (never serialised).
+  /// `pending` = optimistic, waiting for the server echo; `failed` = no echo
+  /// within the timeout, tap to retry.
+  bool pending;
+  bool failed;
+
+  /// Client-side id kept across the optimistic → server swap so the bubble
+  /// keeps its widget identity (no flicker) and the echo can be matched.
+  String? localId;
+
   PersonalChat({
     this.id,
     this.chatTopicId,
@@ -67,6 +77,9 @@ class PersonalChat {
     this.callType,
     this.createdAt,
     this.updatedAt,
+    this.pending = false,
+    this.failed = false,
+    this.localId,
   });
 
   factory PersonalChat.fromJson(Map<String, dynamic> json) => PersonalChat(
@@ -79,11 +92,12 @@ class PersonalChat {
         isRead: json["isRead"],
         callId: json["callId"],
         callDuration: json["callDuration"],
-        date: json["date"],
-        messageType: json["messageType"],
-        callType: json["callType"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        date: json["date"]?.toString(),
+        messageType: json["messageType"] is int ? json["messageType"] : int.tryParse(json["messageType"]?.toString() ?? ''),
+        callType: json["callType"] is int ? json["callType"] : int.tryParse(json["callType"]?.toString() ?? ''),
+        createdAt: json["createdAt"] == null ? null : DateTime.tryParse(json["createdAt"].toString()),
+        updatedAt: json["updatedAt"] == null ? null : DateTime.tryParse(json["updatedAt"].toString()),
+        localId: json["localId"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {

@@ -15,7 +15,6 @@ import 'package:talk_in/ui/user_flow/call_cut_screen/controller/call_cut_control
 import 'package:talk_in/ui/user_flow/home_screen/api/user_coin_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/user_coin_model.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/controller/personal_chat_screen_controller.dart';
-import 'package:talk_in/ui/user_flow/personal_chat_screen/model/personal_chat_model.dart';
 import 'package:talk_in/ui/user_flow/video_call_screen/controller/video_call_controller.dart';
 import 'package:talk_in/ui/user_flow/voice_call_screen/controller/voice_call_controller.dart';
 import 'package:talk_in/utils/constant.dart';
@@ -28,38 +27,51 @@ class SocketListen {
   static final Map<String, String> _latestMessageIdPerChat = {};
   static Timer? _seenEmitTimer;
 
+  /// Binds every app-level handler to the current socket. Safe to call any
+  /// number of times: each event is unbound first, so a re-created bottom bar
+  /// (login, role switch, returning from a call) never doubles messages.
   static void registerListeners() {
     if (socket == null) return;
+    _bindAll();
+    // Re-bind after `socketConnect()` builds a new socket instance.
+    SocketService.onConnected(_bindAll);
+  }
 
-    socket?.once("connect", (_) {
-      Utils.showLog("Socket connected, registering listeners...");
+  static void _bindAll() {
+    final s = socket;
+    if (s == null) return;
+    Utils.showLog("Socket: binding listeners on ${s.id ?? 'pending'}");
 
-      socket?.on(SocketEvents.sendMessage, handleSendMessage);
-      socket?.on(SocketEvents.markMessageSeen, handleMarkMessageSeen);
+    void bind(String event, dynamic Function(dynamic) handler) {
+      s.off(event);
+      s.on(event, handler);
+    }
 
-      socket?.on(SocketEvents.callOutgoingRinging, handleCallOutgoingRinging);
-      socket?.on(SocketEvents.outGoingCall, handleOutGoingCall);
-      socket?.on(SocketEvents.incomingCall, handleIncomingCall);
+    bind(SocketEvents.sendMessage, handleSendMessage);
+    bind(SocketEvents.markMessageSeen, handleMarkMessageSeen);
 
-      socket!.on(SocketEvents.callResponseProcessed, handleCallResponseProcessed);
-      socket!.on(SocketEvents.callDeclined, handleCallDeclined);
-      socket!.on(SocketEvents.callAnswered, handleCallAnswered);
-      socket!.on(SocketEvents.callTimedOut, handleCallTimedOut);
-      socket!.on(SocketEvents.callEnded, handleCallEnded);
-      socket!.on(SocketEvents.callerCallCut, handleCallRejected);
-      socket!.on(SocketEvents.callTerminated, handleCallTerminated);
-      socket?.on(SocketEvents.randomCallRinging, handleRandomCallRinging);
-      socket?.on(SocketEvents.notEnoughCoins, handleNotEnoughCoins);
-      socket?.on(SocketEvents.callCoinsDeducted, handleCallCoinsDeducted);
-      socket?.on(SocketEvents.callCutData, handleCallCutData);
-    });
+    bind(SocketEvents.callOutgoingRinging, handleCallOutgoingRinging);
+    bind(SocketEvents.outGoingCall, handleOutGoingCall);
+    bind(SocketEvents.incomingCall, handleIncomingCall);
+
+    bind(SocketEvents.callResponseProcessed, handleCallResponseProcessed);
+    bind(SocketEvents.callDeclined, handleCallDeclined);
+    bind(SocketEvents.callAnswered, handleCallAnswered);
+    bind(SocketEvents.callTimedOut, handleCallTimedOut);
+    bind(SocketEvents.callEnded, handleCallEnded);
+    bind(SocketEvents.callerCallCut, handleCallRejected);
+    bind(SocketEvents.callTerminated, handleCallTerminated);
+    bind(SocketEvents.randomCallRinging, handleRandomCallRinging);
+    bind(SocketEvents.notEnoughCoins, handleNotEnoughCoins);
+    bind(SocketEvents.callCoinsDeducted, handleCallCoinsDeducted);
+    bind(SocketEvents.callCutData, handleCallCutData);
   }
 
   static void handleSendMessage(dynamic message) {
     Utils.showLog("Received messageDispatched: $message");
 
     try {
-      final Map<String, dynamic> data = message['data'];
+      final Map<String, dynamic> data = Map<String, dynamic>.from(message['data'] as Map);
       final String chatTopicId = data['chatTopicId'] ?? '';
 
       if (Get.isRegistered<HostPersonalChatScreenController>()) {
@@ -90,7 +102,7 @@ class SocketListen {
           hostController.update([Constant.idGetOldChat]);
 
           if (Get.currentRoute == AppRoutes.hostPersonalChatScreen || Get.currentRoute == AppRoutes.personalChatScreen) {
-            final String messageId = message['messageId']; // ✅ Extract messageId
+            final String messageId = message['messageId']?.toString() ?? '';
 
             if (data["senderId"] != Database.fetchListenerProfileModel?.data?.id &&
                 data['receiverId'] == Database.fetchListenerProfileModel?.data?.id) {
@@ -132,33 +144,10 @@ class SocketListen {
       if (Get.isRegistered<PersonalChatScreenController>()) {
         final userController = Get.find<PersonalChatScreenController>();
         if (chatTopicId == userController.chatTopicId) {
-          final newMsg = PersonalChat.fromJson(data);
-
-          if (data["senderId"] == Database.loginUserId && data['messageType'] == 3) {
-            userController.oldChat.removeAt(0);
-          }
-
-          userController.isLoadingAudio = false;
-          userController.update([Constant.idGetOldChat]);
-
-          // userController.oldChat.insert(0, newMsg);
-
-          // Try to find and replace the optimistic message
-          final index = userController.oldChat.indexWhere(
-              (msg) => msg.senderId == Database.loginUserId && msg.message == newMsg.message && msg.id?.length == 13 // temporary ID is a timestamp
-              );
-
-          if (index != -1) {
-            userController.oldChat[index] = newMsg;
-          } else {
-            userController.oldChat.insert(0, newMsg);
-          }
-
-          userController.onScrollDown();
-          userController.update([Constant.idGetOldChat]);
+          userController.onSocketMessage(data, message['messageId']?.toString());
 
           if (Get.currentRoute == AppRoutes.hostPersonalChatScreen || Get.currentRoute == AppRoutes.personalChatScreen) {
-            final String messageId = message['messageId']; // ✅ Extract messageId
+            final String messageId = message['messageId']?.toString() ?? '';
 
             if (data["senderId"] != Database.fetchLoginUserProfileModel?.user?.id &&
                 data['receiverId'] == Database.fetchLoginUserProfileModel?.user?.id) {

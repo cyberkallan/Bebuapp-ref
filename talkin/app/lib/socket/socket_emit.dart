@@ -9,13 +9,13 @@ import 'package:talk_in/utils/socket_params.dart';
 import 'package:talk_in/utils/utils.dart';
 
 class SocketEmit {
-  static void sendMessage(Map<String, dynamic> message) {
-    if (socket != null && socket?.connected == true) {
-      socket?.emit(SocketEvents.sendMessage, message);
-      Utils.showLog("Emitting message: $message");
-    } else {
-      Utils.showLog("Socket Not Connected!!");
-    }
+  /// Chat messages are never dropped: if the socket is down they are queued
+  /// in [SocketService] and flushed on reconnect. Returns true when the
+  /// message went out immediately.
+  static bool sendMessage(Map<String, dynamic> message) {
+    final sent = SocketService.emit(SocketEvents.sendMessage, message);
+    Utils.showLog(sent ? "Emitting message: $message" : "Queued message (socket offline): $message");
+    return sent;
   }
 
   static void onMessageSeen(Map<String, dynamic> data) async {
@@ -24,11 +24,8 @@ class SocketEmit {
     //   SocketParams.senderId: senderId,
     // });
 
-    if (socket != null && socket?.connected == true) {
-      socket?.emit(SocketEvents.markMessageSeen, data);
+    if (SocketService.emit(SocketEvents.markMessageSeen, data)) {
       Utils.showLog("Socket Emit => Message Seen: $data");
-    } else {
-      Utils.showLog("Socket Not Connected!!");
     }
   }
 

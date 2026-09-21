@@ -319,17 +319,22 @@ class HostPersonalChatScreenController extends GetxController {
   Future<void> onLongPressStartMic() async {
     FocusManager.instance.primaryFocus?.unfocus();
     PermissionStatus status = await Permission.microphone.status;
-
-    if (status.isDenied) {
-      PermissionStatus request = await Permission.microphone.request();
-
-      if (request == PermissionStatus.denied) {
-        Utils.showToast(Get.context!, EnumLocale.txtPleaseAllowPermission.name.tr);
-      }
-    } else {
-      Utils.showLog("Audio Recording Started...");
-      onStartAudioRecording();
+    if (!status.isGranted) {
+      // Ask, then start right away if granted (the old flow only asked, so
+      // the first long-press never recorded).
+      status = await Permission.microphone.request();
     }
+    if (status.isPermanentlyDenied) {
+      Utils.showToast(Get.context!, "Microphone is blocked. Enable it in Settings to send voice notes.");
+      await openAppSettings();
+      return;
+    }
+    if (!status.isGranted) {
+      Utils.showToast(Get.context!, EnumLocale.txtPleaseAllowPermission.name.tr);
+      return;
+    }
+    Utils.showLog("Audio Recording Started...");
+    onStartAudioRecording();
   }
 
   /// audio recording stop

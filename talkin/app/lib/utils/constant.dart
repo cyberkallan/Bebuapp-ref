@@ -21,6 +21,7 @@ class Constant {
   static var idPaginationListener = 'idPaginationListener';
   static var idCallingHistory = 'idCallingHistory';
   static var idChangeAudioRecordingEvent = 'onChangeAudioRecordingEvent';
+  static var idRecordLevel = 'idRecordLevel';
   static var idVideoTurn = 'idVideoTurn';
   static var idCameraTurn = 'idCameraTurn';
   static var idTabChange = 'idTabChange';

@@ -24,49 +24,41 @@ class PersonalChatScreen extends StatelessWidget {
       body: AuroraBackground(
         intensity: 0.8,
         child: SafeArea(
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              GetBuilder<PersonalChatScreenController>(
-                id: Constant.idGetOldChat,
-                builder: (controller) {
-                  return Column(
-                    children: [
-                      const DarkChatHeader(),
-                      GetBuilder<PersonalChatScreenController>(
-                        id: Constant.idPagination,
-                        builder: (c) => AnimatedSize(
-                          duration: BebuTheme.fast,
-                          child: c.isPaginationLoading
-                              ? const LinearProgressIndicator(minHeight: 2, color: BebuTheme.violet, backgroundColor: Colors.transparent)
-                              : const SizedBox(height: 2),
-                        ),
-                      ),
-                      Expanded(
-                        child: controller.isLoading
-                            ? const _ChatShimmer()
-                            : controller.oldChat.isEmpty
-                                ? _EmptyConversation(name: controller.receiverName ?? '')
-                                : SingleChildScrollView(
-                                    controller: controller.scrollController,
-                                    child: ListView.builder(
-                                      reverse: true,
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-                                      itemCount: controller.oldChat.length,
-                                      itemBuilder: (context, index) => _messageAt(controller, index),
-                                    ),
-                                  ),
-                      ),
-                      const CallPermissionCard(),
-                      const DarkChatComposer(),
-                    ],
-                  );
-                },
-              ),
-              const Positioned(bottom: 84, child: RecordingIndicator()),
-            ],
+          child: GetBuilder<PersonalChatScreenController>(
+            id: Constant.idGetOldChat,
+            builder: (controller) {
+              return Column(
+                children: [
+                  const DarkChatHeader(),
+                  GetBuilder<PersonalChatScreenController>(
+                    id: Constant.idPagination,
+                    builder: (c) => AnimatedSize(
+                      duration: BebuTheme.fast,
+                      child: c.isPaginationLoading ? const LinearProgressIndicator(minHeight: 2, color: BebuTheme.violet, backgroundColor: Colors.transparent) : const SizedBox(height: 2),
+                    ),
+                  ),
+                  Expanded(
+                    child: controller.isLoading
+                        ? const _ChatShimmer()
+                        : controller.oldChat.isEmpty
+                            ? _EmptyConversation(name: controller.receiverName ?? '')
+                            : SingleChildScrollView(
+                                controller: controller.scrollController,
+                                child: ListView.builder(
+                                  reverse: true,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+                                  itemCount: controller.oldChat.length,
+                                  itemBuilder: (context, index) => _messageAt(controller, index),
+                                ),
+                              ),
+                  ),
+                  const CallPermissionCard(),
+                  const DarkChatComposer(),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -93,7 +85,7 @@ class PersonalChatScreen extends StatelessWidget {
   Widget _bubble(PersonalChatScreenController controller, PersonalChat msg, {required bool isLastMessage, required bool showAvatar}) {
     switch (msg.messageType) {
       case 1:
-        return DarkTextBubble(msg: msg, controller: controller, isRead: msg.isRead ?? false, showAvatar: showAvatar);
+        return DarkTextBubble(key: ValueKey(msg.localId ?? msg.id), msg: msg, controller: controller, isRead: msg.isRead ?? false, showAvatar: showAvatar);
       case 4:
         return DarkCallBubble(msg: msg, controller: controller, isVideo: false);
       case 5:
@@ -101,13 +93,7 @@ class PersonalChatScreen extends StatelessWidget {
       case 2:
         return _aligned(msg, ChatImageWidget(msg: msg, controller: controller, isRead: msg.isRead ?? false));
       case 3:
-        final mine = msg.senderId == Database.loginUserId;
-        return _aligned(
-          msg,
-          mine
-              ? SenderAudioMessageWidget(audioUrl: msg.audio ?? "", time: msg.date ?? "", id: msg.id ?? "", chat: msg, isLastMessage: isLastMessage)
-              : ReceiverAudioMessageWidget(audioUrl: msg.audio ?? "", time: msg.date ?? "", id: msg.id ?? "", chat: msg),
-        );
+        return DarkVoiceBubble(key: ValueKey(msg.localId ?? msg.id ?? msg.audio), msg: msg, controller: controller, isRead: msg.isRead ?? false, showAvatar: showAvatar);
       default:
         return const SizedBox.shrink();
     }
