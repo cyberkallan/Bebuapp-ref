@@ -50,7 +50,7 @@ class ProfileHeroCard extends StatelessWidget {
                           data.age == null ? (data.name ?? '') : '${data.name}, ${data.age}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: BebuTheme.display(size: 30),
+                          style: BebuTheme.display(size: 30, color: BebuTheme.onPhoto),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -107,7 +107,7 @@ class ProfileMediaStrip extends StatelessWidget {
             children: [
               ListenerPhoto(image: data.image, scrim: false),
               Container(color: const Color(0x66000000)),
-              const Center(child: Icon(Icons.play_arrow_rounded, color: BebuTheme.text, size: 30)),
+              const Center(child: Icon(Icons.play_arrow_rounded, color: BebuTheme.onPhoto, size: 30)),
             ],
           ),
         ),
@@ -377,7 +377,7 @@ class ProfileReviews extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (i != reviews.take(3).length - 1) const Divider(color: BebuTheme.border, height: 24),
+                if (i != reviews.take(3).length - 1) Divider(color: BebuTheme.border, height: 24),
               ],
             ],
           ),
@@ -454,7 +454,7 @@ class ProfileActionBar extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: BebuTheme.text),
+                                Icon(Icons.chat_bubble_outline_rounded, size: 18, color: BebuTheme.text),
                                 const SizedBox(width: 8),
                                 Text(EnumLocale.txtChatNow.name.tr, style: BebuTheme.label(size: 14)),
                               ],
@@ -478,7 +478,7 @@ class ProfileActionBar extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.call_rounded, size: 18, color: BebuTheme.text),
+                                  const Icon(Icons.call_rounded, size: 18, color: BebuTheme.onPhoto),
                                   const SizedBox(width: 8),
                                   Text('Talk now', style: BebuTheme.label(size: 15, weight: FontWeight.w700)),
                                 ],
@@ -504,10 +504,10 @@ class ProfileDarkShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget box(double h, {double r = BebuTheme.radiusLg}) => Shimmer.fromColors(
+    Widget box(double h, {double? r}) => Shimmer.fromColors(
           baseColor: BebuTheme.surface,
           highlightColor: BebuTheme.surface3,
-          child: Container(height: h, decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(r))),
+          child: Container(height: h, decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(r ?? BebuTheme.radiusLg))),
         );
     return Column(
       children: [

@@ -8,8 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:clipboard/clipboard.dart';
 
 import 'app_color.dart';
+import 'app_theme.dart';
 
 class Utils {
+  /// Shown on the profile page; keep in sync with pubspec.yaml.
+  static const String appVersion = '1.4.0';
+
   static const sandboxVerifyReceiptUrl = false;
 
   static RxBool isAppOpen = false.obs;
@@ -104,12 +108,15 @@ class Utils {
     int? delay,
   }) {
     showLog("Change Status Bar => Brightness => $brightness => $delay");
+    // Themed screens ask for light icons (dark background). When the light
+    // theme is active their background is bright, so flip to dark icons.
+    final effective = brightness == Brightness.light && BebuTheme.isLight ? Brightness.dark : brightness;
     Future.delayed(
       Duration(milliseconds: delay ?? 0),
       () => SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
           statusBarColor: AppColors.transparent,
-          statusBarIconBrightness: brightness,
+          statusBarIconBrightness: effective,
         ),
       ),
     );

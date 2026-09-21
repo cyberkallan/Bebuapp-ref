@@ -91,8 +91,8 @@ class ChatScreen extends StatelessWidget {
                           builder: (c) => AnimatedSize(
                             duration: BebuTheme.normal,
                             child: c.isPaginationLoading
-                                ? const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 20),
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 20),
                                     child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: BebuTheme.pink))),
                                   )
                                 : const SizedBox.shrink(),
@@ -152,10 +152,10 @@ class _SearchField extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, size: 20, color: BebuTheme.textFaint),
+            Icon(Icons.search_rounded, size: 20, color: BebuTheme.textFaint),
             const SizedBox(width: 10),
             Expanded(child: Text('Search chats', style: BebuTheme.body(size: 14, color: BebuTheme.textFaint))),
-            const Icon(Icons.tune_rounded, size: 18, color: BebuTheme.textFaint),
+            Icon(Icons.tune_rounded, size: 18, color: BebuTheme.textFaint),
           ],
         ),
       ),
@@ -298,7 +298,7 @@ class _ChatEmpty extends StatelessWidget {
               width: 84,
               height: 84,
               decoration: const BoxDecoration(gradient: BebuTheme.violetGradient, shape: BoxShape.circle),
-              child: const Icon(Icons.chat_bubble_outline_rounded, size: 36, color: BebuTheme.text),
+              child: Icon(Icons.chat_bubble_outline_rounded, size: 36, color: BebuTheme.text),
             ),
             const SizedBox(height: 22),
             Text('No conversations yet', textAlign: TextAlign.center, style: BebuTheme.title(size: 22)),

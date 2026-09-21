@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/custom/dialog/exit_app_dialog.dart';
+import 'package:talk_in/custom/theme_picker.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/on_boarding_screen/controller/on_boarding_controller.dart';
 import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/app_theme.dart';
+import 'package:talk_in/utils/appearance.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
@@ -41,7 +43,7 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
             child: GetBuilder<OnBoardingController>(
               id: Constant.idOnBoarding,
               builder: (logic) {
-                final last = logic.currentPage == logic.title.length - 1;
+                final last = logic.currentPage == logic.pageCount - 1;
                 return Column(
                   children: [
                     Padding(
@@ -65,21 +67,23 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
                       child: PageView.builder(
                         controller: logic.pageController,
                         onPageChanged: (page) => logic.onPageChanged(page: page),
-                        itemCount: logic.title.length,
-                        itemBuilder: (context, index) => _OnboardingPage(
-                          controller: logic.pageController,
-                          index: index,
-                          image: logic.image[index].toString(),
-                          title: logic.title[index].toString(),
-                          subtitle: logic.subTitle[index].toString(),
-                        ),
+                        itemCount: logic.pageCount,
+                        itemBuilder: (context, index) => logic.isThemeStep(index)
+                            ? _ThemeStep(controller: logic.pageController, index: index)
+                            : _OnboardingPage(
+                                controller: logic.pageController,
+                                index: index,
+                                image: logic.image[index].toString(),
+                                title: logic.title[index].toString(),
+                                subtitle: logic.subTitle[index].toString(),
+                              ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                       child: Column(
                         children: [
-                          _Dots(count: logic.title.length, index: logic.currentPage),
+                          _Dots(count: logic.pageCount, index: logic.currentPage),
                           const SizedBox(height: 22),
                           GradientButton(
                             label: last ? 'Get started' : EnumLocale.txtNext.name.tr,
@@ -172,6 +176,66 @@ class _OnboardingPage extends StatelessWidget {
               ),
               const Spacer(flex: 1),
             ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Final onboarding step: choose System / Dark / Light. Applies instantly.
+class _ThemeStep extends StatelessWidget {
+  const _ThemeStep({required this.controller, required this.index});
+  final PageController controller;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        double offset = 0;
+        if (controller.hasClients && controller.position.haveDimensions) {
+          offset = (controller.page ?? index.toDouble()) - index;
+        }
+        final mode = Appearance.mode;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: Opacity(
+            opacity: (1 - offset.abs()).clamp(0.0, 1.0),
+            child: Transform.translate(
+              offset: Offset(offset * -40, 0),
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: BebuTheme.pinkGradient,
+                      boxShadow: [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.4), blurRadius: 34, offset: const Offset(0, 12))],
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: BebuTheme.normal,
+                      transitionBuilder: (c, a) => ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: c)),
+                      child: Icon(mode.icon, key: ValueKey(mode), size: 40, color: BebuTheme.onPhoto),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  Text('Pick your look', textAlign: TextAlign.center, style: BebuTheme.display(size: 32)),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Dark is easy on the eyes at night, light is crisp by day. System follows your phone. Change it anytime from your profile.',
+                    textAlign: TextAlign.center,
+                    style: BebuTheme.body(size: 15, height: 1.5),
+                  ),
+                  const SizedBox(height: 28),
+                  const ThemePicker(),
+                  const Spacer(flex: 3),
+                ],
+              ),
+            ),
           ),
         );
       },

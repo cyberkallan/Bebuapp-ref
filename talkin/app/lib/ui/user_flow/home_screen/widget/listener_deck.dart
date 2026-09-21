@@ -241,8 +241,8 @@ class _ListenerCard extends StatelessWidget {
                         spacing: 6,
                         runSpacing: 6,
                         children: [
-                          for (final t in topics) BebuChip(label: t, dense: true, background: const Color(0x33FFFFFF)),
-                          for (final lang in languages) BebuChip(label: lang, dense: true, icon: Icons.translate_rounded, background: const Color(0x33FFFFFF)),
+                          for (final t in topics) BebuChip(label: t, dense: true, background: const Color(0x33FFFFFF), foreground: BebuTheme.onPhoto),
+                          for (final lang in languages) BebuChip(label: lang, dense: true, icon: Icons.translate_rounded, background: const Color(0x33FFFFFF), foreground: BebuTheme.onPhoto),
                           if ((l.ratePrivateAudioCall ?? 0) > 0) _RateTag(icon: Icons.call_rounded, rate: l.ratePrivateAudioCall!),
                           if ((l.ratePrivateVideoCall ?? 0) > 0) _RateTag(icon: Icons.videocam_rounded, rate: l.ratePrivateVideoCall!),
                         ],
@@ -255,7 +255,7 @@ class _ListenerCard extends StatelessWidget {
                             l.age == null ? (l.name ?? '') : '${l.name}, ${l.age}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: BebuTheme.display(size: 30),
+                            style: BebuTheme.display(size: 30, color: BebuTheme.onPhoto),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -303,7 +303,7 @@ class _RateTag extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: BebuTheme.amber),
           const SizedBox(width: 4),
-          Text('$rate/min', style: BebuTheme.label(size: 11.5)),
+          Text('$rate/min', style: BebuTheme.label(size: 11.5, color: BebuTheme.onPhoto)),
         ],
       ),
     );
@@ -397,7 +397,7 @@ class _DeckShimmer extends StatelessWidget {
                 child: Shimmer.fromColors(
                   baseColor: BebuTheme.surface,
                   highlightColor: BebuTheme.surface3,
-                  child: Container(width: s, height: s, decoration: const BoxDecoration(color: BebuTheme.surface, shape: BoxShape.circle)),
+                  child: Container(width: s, height: s, decoration: BoxDecoration(color: BebuTheme.surface, shape: BoxShape.circle)),
                 ),
               ),
           ],
@@ -447,7 +447,7 @@ class _DeckEmpty extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
                 decoration: BoxDecoration(color: BebuTheme.text, borderRadius: BorderRadius.circular(999)),
                 child: loading
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: BebuTheme.bg))
+                    ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: BebuTheme.bg))
                     : Text('Start over', style: BebuTheme.label(size: 14, color: BebuTheme.bg)),
               ),
             ),

@@ -11,11 +11,12 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:talk_in/localization/locale_constant.dart';
 import 'package:talk_in/routes/app_pages.dart';
 import 'package:talk_in/routes/app_routes.dart';
-import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/services/notification_service/notification_services.dart';
 import 'localization/localizations_delegate.dart';
 import 'utils/utils.dart';
+import 'package:talk_in/utils/appearance.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 
 AppLifecycleState? currentAppLifecycleState;
@@ -25,6 +26,7 @@ void main() async {
 
   await Firebase.initializeApp();
   await GetStorage.init();
+  Appearance.init();
 
   final identity = (await MobileDeviceIdentifier().getDeviceId())!;
   final fcmToken = await FirebaseMessaging.instance.getToken();
@@ -99,7 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: Container(
-            color: AppColors.white,
+            color: BebuTheme.bg,
             child: SafeArea(
               bottom: true,
               top: false,

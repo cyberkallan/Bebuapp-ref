@@ -52,6 +52,7 @@ class Data {
   final bool? isDemoContentEnabled;
   final bool? isApplicationLive;
   final bool? allowBecomeHostOption;
+  final Map<String, dynamic>? appearance;
   final int? adminCommissionPercent;
   final int? minimumCoinsForConversion;
   final int? minimumCoinsForPayout;
@@ -89,6 +90,7 @@ class Data {
     this.isDemoContentEnabled,
     this.isApplicationLive,
     this.allowBecomeHostOption,
+    this.appearance,
     this.adminCommissionPercent,
     this.minimumCoinsForConversion,
     this.minimumCoinsForPayout,
@@ -127,6 +129,7 @@ class Data {
         isDemoContentEnabled: json["isDemoContentEnabled"],
         isApplicationLive: json["isApplicationLive"],
         allowBecomeHostOption: json["allowBecomeHostOption"],
+        appearance: json["appearance"] is Map ? Map<String, dynamic>.from(json["appearance"]) : null,
         adminCommissionPercent: json["adminCommissionPercent"],
         minimumCoinsForConversion: json["minimumCoinsForConversion"],
         minimumCoinsForPayout: json["minimumCoinsForPayout"],
@@ -165,6 +168,7 @@ class Data {
         "isDemoContentEnabled": isDemoContentEnabled,
         "isApplicationLive": isApplicationLive,
         "allowBecomeHostOption": allowBecomeHostOption,
+        "appearance": appearance,
         "adminCommissionPercent": adminCommissionPercent,
         "minimumCoinsForConversion": minimumCoinsForConversion,
         "minimumCoinsForPayout": minimumCoinsForPayout,

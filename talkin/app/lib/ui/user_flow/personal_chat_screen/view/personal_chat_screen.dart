@@ -165,7 +165,7 @@ class _EmptyConversation extends StatelessWidget {
                 width: 72,
                 height: 72,
                 decoration: const BoxDecoration(gradient: BebuTheme.violetGradient, shape: BoxShape.circle),
-                child: const Icon(Icons.waving_hand_rounded, size: 32, color: BebuTheme.text),
+                child: Icon(Icons.waving_hand_rounded, size: 32, color: BebuTheme.text),
               ),
               const SizedBox(height: 18),
               Text('Say hi to ${name.isEmpty ? 'them' : name}', textAlign: TextAlign.center, style: BebuTheme.title(size: 20)),

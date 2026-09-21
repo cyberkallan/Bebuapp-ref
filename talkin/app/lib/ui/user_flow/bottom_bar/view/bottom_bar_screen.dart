@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/ui/user_flow/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:talk_in/ui/user_flow/bottom_bar/widget/bottom_bar_widget.dart';
-import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/utils.dart';
@@ -10,20 +9,16 @@ import 'package:talk_in/utils/utils.dart';
 class BottomBarScreen extends StatelessWidget {
   const BottomBarScreen({super.key});
 
-  /// Tabs that were redesigned on the dark theme and draw their own bottom
-  /// padding; the nav bar floats over them. Legacy tabs keep a reserved slot.
-  static const _darkTabs = {0, 1, 2, 3};
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BottomBarController>(
       id: Constant.idBottomBar,
       builder: (logic) {
-        final dark = _darkTabs.contains(logic.selectIndex);
-        Utils.onChangeStatusBar(brightness: dark ? Brightness.light : Brightness.dark);
+        // Every tab is themed and draws its own bottom padding; the nav bar floats over them.
+        Utils.onChangeStatusBar(brightness: Brightness.light);
         return Scaffold(
-          backgroundColor: dark ? BebuTheme.bg : AppColors.white,
-          extendBody: dark,
+          backgroundColor: BebuTheme.bg,
+          extendBody: true,
           bottomNavigationBar: const BottomBarView(),
           body: AnimatedSwitcher(
             duration: BebuTheme.normal,

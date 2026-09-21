@@ -18,7 +18,7 @@ class RingingCallButton extends StatefulWidget {
     this.color,
     this.ringColor,
     this.gradient,
-    this.iconColor = BebuTheme.text,
+    this.iconColor,
     this.glow,
     this.semanticLabel,
   });
@@ -31,7 +31,7 @@ class RingingCallButton extends StatefulWidget {
   final Color? color;
   final Color? ringColor;
   final Gradient? gradient;
-  final Color iconColor;
+  final Color? iconColor;
   final Color? glow;
   final String? semanticLabel;
 
@@ -52,16 +52,24 @@ class _RingingCallButtonState extends State<RingingCallButton> with SingleTicker
   @override
   void didUpdateWidget(covariant RingingCallButton old) {
     super.didUpdateWidget(old);
-    if (old.ringing != widget.ringing) _sync();
+    if (old.ringing != widget.ringing || _c.isAnimating != _active) _sync();
   }
 
+  bool get _active => widget.ringing && BebuTheme.liveRings;
+
   void _sync() {
-    if (widget.ringing) {
+    if (_active) {
       if (!_c.isAnimating) _c.repeat();
     } else {
       _c.stop();
       _c.value = 0;
     }
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    _sync();
   }
 
   @override
@@ -83,7 +91,7 @@ class _RingingCallButtonState extends State<RingingCallButton> with SingleTicker
         border: widget.gradient == null ? Border.all(color: Colors.white.withValues(alpha: 0.18)) : null,
         boxShadow: widget.glow == null ? null : [BoxShadow(color: widget.glow!.withValues(alpha: 0.45), blurRadius: 24, offset: const Offset(0, 8))],
       ),
-      child: Center(child: Icon(widget.icon, size: widget.iconSize, color: widget.iconColor)),
+      child: Center(child: Icon(widget.icon, size: widget.iconSize, color: widget.iconColor ?? (widget.gradient != null ? BebuTheme.onPhoto : BebuTheme.text))),
     );
 
     return Semantics(
@@ -96,7 +104,7 @@ class _RingingCallButtonState extends State<RingingCallButton> with SingleTicker
           child: SizedBox(
             width: widget.size,
             height: widget.size,
-            child: widget.ringing
+            child: _active
                 ? AnimatedBuilder(
                     animation: _c,
                     builder: (context, child) {

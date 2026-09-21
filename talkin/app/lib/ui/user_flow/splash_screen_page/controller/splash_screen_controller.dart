@@ -15,6 +15,7 @@ import 'package:talk_in/ui/user_flow/splash_screen_page/model/fetch_login_user_p
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/ip_api_response_model.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/setting_api_model.dart';
 import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/appearance.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
 import 'package:talk_in/utils/utils.dart';
@@ -81,6 +82,7 @@ class SplashScreenController extends GetxController {
     await splashScreen();
     settingApiModel = await SettingApi.callApi();
     Database.settingApiModel = settingApiModel;
+    Appearance.applyServer(settingApiModel?.data?.appearance);
   }
 }
 

@@ -3,41 +3,89 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Dark design system for the redesigned user flow (home, explore, profile).
+/// Design tokens for the redesigned user flow (home, explore, profile, ...).
+///
+/// Surfaces and text colours come from the active [BebuPalette] (dark or
+/// light) and the brand accent from the admin-configurable [BebuAccent]; both
+/// are switched by [Appearance]. Widgets read the getters at build time, so a
+/// switch only needs a full rebuild (`Get.forceAppUpdate`).
 ///
 /// Everything here is additive: legacy screens keep using [AppColors] and
 /// [AppFontStyle]; the redesigned screens use these tokens.
 class BebuTheme {
   BebuTheme._();
 
+  static BebuPalette _p = BebuPalette.dark;
+  static BebuAccent _a = BebuAccent.pink;
+  static double _radiusScale = 1;
+  static bool _reducedMotion = false;
+  static bool _ambientGlow = true;
+  static bool _liveRings = true;
+  static bool _coinAnimation = true;
+
+  /// Called by [Appearance] whenever the effective look changes.
+  static void configure({
+    required BebuPalette palette,
+    required BebuAccent accent,
+    double radiusScale = 1,
+    bool reducedMotion = false,
+    bool ambientGlow = true,
+    bool liveRings = true,
+    bool coinAnimation = true,
+  }) {
+    _p = palette;
+    _a = accent;
+    _radiusScale = radiusScale;
+    _reducedMotion = reducedMotion;
+    _ambientGlow = ambientGlow;
+    _liveRings = liveRings;
+    _coinAnimation = coinAnimation;
+  }
+
+  static bool get isLight => _p.isLight;
+  static bool get isDark => !_p.isLight;
+  static bool get reducedMotion => _reducedMotion;
+  static bool get ambientGlow => _ambientGlow;
+  static bool get liveRings => _liveRings && !_reducedMotion;
+  static bool get coinAnimation => _coinAnimation && !_reducedMotion;
+  static BebuAccent get accent => _a;
+
+  /// Status-bar icon brightness that reads well on [bg].
+  static Brightness get statusBarIcons => _p.isLight ? Brightness.dark : Brightness.light;
+
   // Surfaces
-  static const Color bg = Color(0xFF0E0E10);
-  static const Color surface = Color(0xFF1A1A1E);
-  static const Color surface2 = Color(0xFF242429);
-  static const Color surface3 = Color(0xFF2E2E34);
-  static const Color border = Color(0x1FFFFFFF);
-  static const Color borderStrong = Color(0x33FFFFFF);
+  static Color get bg => _p.bg;
+  static Color get surface => _p.surface;
+  static Color get surface2 => _p.surface2;
+  static Color get surface3 => _p.surface3;
+  static Color get border => _p.border;
+  static Color get borderStrong => _p.borderStrong;
 
   // Text
-  static const Color text = Color(0xFFF7F7F8);
-  static const Color textMuted = Color(0xB3F7F7F8);
-  static const Color textFaint = Color(0x73F7F7F8);
+  static Color get text => _p.text;
+  static Color get textMuted => _p.textMuted;
+  static Color get textFaint => _p.textFaint;
+
+  // Text drawn over photos and gradients is always light, whatever the theme.
+  static const Color onPhoto = Color(0xFFF7F7F8);
+  static const Color onPhotoMuted = Color(0xB3F7F7F8);
+  static const Color onPhotoFaint = Color(0x73F7F7F8);
 
   // Accents
   static const Color violet = Color(0xFF8B5CF6);
   static const Color violetDeep = Color(0xFF6D28D9);
-  static const Color pink = Color(0xFFFF3D8A);
-  static const Color pinkDeep = Color(0xFFE11D74);
+  static Color get pink => _a.primary;
+  static Color get pinkDeep => _a.deep;
   static const Color amber = Color(0xFFFFB020);
   static const Color green = Color(0xFF34D399);
   static const Color red = Color(0xFFFF5A5F);
   static const Color blue = Color(0xFF38BDF8);
 
-  static const LinearGradient pinkGradient = LinearGradient(
-    colors: [Color(0xFFFF5FA2), Color(0xFFE11D74)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static LinearGradient get pinkGradient => LinearGradient(
+        colors: [_a.light, _a.deep],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
 
   static const LinearGradient violetGradient = LinearGradient(
     colors: [Color(0xFFA78BFA), Color(0xFF6D28D9)],
@@ -53,26 +101,27 @@ class BebuTheme {
     colors: [Color(0x55000000), Color(0x00000000), Color(0x99000000), Color(0xE6000000)],
   );
 
-  static const double radiusXl = 32;
-  static const double radiusLg = 24;
-  static const double radiusMd = 18;
-  static const double radiusSm = 12;
+  static double get radiusXl => 32 * _radiusScale;
+  static double get radiusLg => 24 * _radiusScale;
+  static double get radiusMd => 18 * _radiusScale;
+  static double get radiusSm => 12 * _radiusScale;
 
-  static const Duration fast = Duration(milliseconds: 180);
-  static const Duration normal = Duration(milliseconds: 320);
+  static Duration get fast => _reducedMotion ? const Duration(milliseconds: 1) : const Duration(milliseconds: 180);
+  static Duration get normal => _reducedMotion ? const Duration(milliseconds: 1) : const Duration(milliseconds: 320);
   static const Curve curve = Curves.easeOutCubic;
 
   // Typography — Inter with tight display tracking, like the reference.
-  static TextStyle display({double size = 32, Color color = text, FontWeight weight = FontWeight.w800}) =>
-      GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, letterSpacing: -0.9, height: 1.05);
+  static TextStyle display({double size = 32, Color? color, FontWeight weight = FontWeight.w800}) =>
+      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: -0.9, height: 1.05);
 
-  static TextStyle title({double size = 20, Color color = text, FontWeight weight = FontWeight.w700}) =>
-      GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, letterSpacing: -0.4, height: 1.2);
+  static TextStyle title({double size = 20, Color? color, FontWeight weight = FontWeight.w700}) =>
+      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: -0.4, height: 1.2);
 
-  static TextStyle body({double size = 14, Color color = textMuted, FontWeight weight = FontWeight.w400, double? height}) =>
-      GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, height: height ?? 1.45);
+  static TextStyle body({double size = 14, Color? color, FontWeight weight = FontWeight.w400, double? height}) =>
+      GoogleFonts.inter(fontSize: size, color: color ?? textMuted, fontWeight: weight, height: height ?? 1.45);
 
-  static TextStyle label({double size = 12, Color color = text, FontWeight weight = FontWeight.w600}) => GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, letterSpacing: 0.1);
+  static TextStyle label({double size = 12, Color? color, FontWeight weight = FontWeight.w600}) =>
+      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: 0.1);
 
   static Color statusColor(String? status) {
     switch (status) {
@@ -97,6 +146,81 @@ class BebuTheme {
   }
 }
 
+/// Surface and text colours for one theme.
+class BebuPalette {
+  const BebuPalette({
+    required this.isLight,
+    required this.bg,
+    required this.surface,
+    required this.surface2,
+    required this.surface3,
+    required this.border,
+    required this.borderStrong,
+    required this.text,
+    required this.textMuted,
+    required this.textFaint,
+  });
+
+  final bool isLight;
+  final Color bg;
+  final Color surface;
+  final Color surface2;
+  final Color surface3;
+  final Color border;
+  final Color borderStrong;
+  final Color text;
+  final Color textMuted;
+  final Color textFaint;
+
+  static const dark = BebuPalette(
+    isLight: false,
+    bg: Color(0xFF0E0E10),
+    surface: Color(0xFF1A1A1E),
+    surface2: Color(0xFF242429),
+    surface3: Color(0xFF2E2E34),
+    border: Color(0x1FFFFFFF),
+    borderStrong: Color(0x33FFFFFF),
+    text: Color(0xFFF7F7F8),
+    textMuted: Color(0xB3F7F7F8),
+    textFaint: Color(0x73F7F7F8),
+  );
+
+  static const light = BebuPalette(
+    isLight: true,
+    bg: Color(0xFFF6F5FA),
+    surface: Color(0xFFFFFFFF),
+    surface2: Color(0xFFF0EEF6),
+    surface3: Color(0xFFE5E2EE),
+    border: Color(0x14000000),
+    borderStrong: Color(0x24000000),
+    text: Color(0xFF17151E),
+    textMuted: Color(0xB317151E),
+    textFaint: Color(0x7317151E),
+  );
+}
+
+/// Brand accent (primary buttons, live indicators, gradients).
+class BebuAccent {
+  const BebuAccent(this.id, this.label, this.primary, this.deep, this.light);
+
+  final String id;
+  final String label;
+  final Color primary;
+  final Color deep;
+  final Color light;
+
+  static const pink = BebuAccent('pink', 'Bebu pink', Color(0xFFFF3D8A), Color(0xFFE11D74), Color(0xFFFF5FA2));
+  static const violet = BebuAccent('violet', 'Violet', Color(0xFF8B5CF6), Color(0xFF6D28D9), Color(0xFFA78BFA));
+  static const coral = BebuAccent('coral', 'Coral', Color(0xFFFF6B4A), Color(0xFFE2452B), Color(0xFFFF8F73));
+  static const ocean = BebuAccent('ocean', 'Ocean', Color(0xFF38BDF8), Color(0xFF0284C7), Color(0xFF7DD3FC));
+  static const mint = BebuAccent('mint', 'Mint', Color(0xFF34D399), Color(0xFF059669), Color(0xFF6EE7B7));
+  static const sunset = BebuAccent('sunset', 'Sunset', Color(0xFFFB923C), Color(0xFFEA580C), Color(0xFFFDBA74));
+
+  static const all = [pink, violet, coral, ocean, mint, sunset];
+
+  static BebuAccent byId(String? id) => all.firstWhere((a) => a.id == id, orElse: () => pink);
+}
+
 /// Frosted circular icon button used on top of photos and in headers.
 class GlassIconButton extends StatelessWidget {
   const GlassIconButton({
@@ -106,7 +230,7 @@ class GlassIconButton extends StatelessWidget {
     this.size = 44,
     this.iconSize = 20,
     this.color,
-    this.iconColor = BebuTheme.text,
+    this.iconColor,
     this.tooltip,
     this.child,
     this.blur = true,
@@ -117,7 +241,7 @@ class GlassIconButton extends StatelessWidget {
   final double size;
   final double iconSize;
   final Color? color;
-  final Color iconColor;
+  final Color? iconColor;
   final String? tooltip;
   final Widget? child;
 
@@ -134,7 +258,7 @@ class GlassIconButton extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: Center(child: child ?? Icon(icon, size: iconSize, color: iconColor)),
+          child: Center(child: child ?? Icon(icon, size: iconSize, color: iconColor ?? (color == null ? BebuTheme.onPhoto : BebuTheme.text))),
         ),
       ),
     );
@@ -153,7 +277,7 @@ class BebuChip extends StatelessWidget {
     this.icon,
     this.dotColor,
     this.background,
-    this.foreground = BebuTheme.text,
+    this.foreground,
     this.selected = false,
     this.onTap,
     this.onRemove,
@@ -164,7 +288,7 @@ class BebuChip extends StatelessWidget {
   final IconData? icon;
   final Color? dotColor;
   final Color? background;
-  final Color foreground;
+  final Color? foreground;
   final bool selected;
   final VoidCallback? onTap;
   final VoidCallback? onRemove;
@@ -173,7 +297,7 @@ class BebuChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = selected ? BebuTheme.text : (background ?? BebuTheme.surface2);
-    final fg = selected ? BebuTheme.bg : foreground;
+    final fg = selected ? BebuTheme.bg : (foreground ?? BebuTheme.text);
     final chip = AnimatedContainer(
       duration: BebuTheme.fast,
       padding: EdgeInsets.symmetric(horizontal: dense ? 10 : 12, vertical: dense ? 6 : 8),
@@ -259,7 +383,7 @@ class _StatusPillState extends State<StatusPill> with SingleTickerProviderStateM
             },
           ),
           const SizedBox(width: 6),
-          Text(BebuTheme.statusText(widget.status), style: BebuTheme.label(size: widget.dense ? 11 : 12)),
+          Text(BebuTheme.statusText(widget.status), style: BebuTheme.label(size: widget.dense ? 11 : 12, color: BebuTheme.onPhoto)),
         ],
       ),
     );
@@ -441,16 +565,17 @@ class AuroraBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        const ColoredBox(color: BebuTheme.bg),
-        IgnorePointer(
-          child: Stack(
-            children: [
-              Positioned(top: -160, left: -60, child: _blob(BebuTheme.violet.withValues(alpha: 0.30 * intensity), 380)),
-              Positioned(top: 120, right: -160, child: _blob(BebuTheme.violetDeep.withValues(alpha: 0.28 * intensity), 360)),
-              Positioned(bottom: -140, left: -40, child: _blob(BebuTheme.pink.withValues(alpha: 0.16 * intensity), 340)),
-            ],
+        ColoredBox(color: BebuTheme.bg),
+        if (BebuTheme.ambientGlow)
+          IgnorePointer(
+            child: Stack(
+              children: [
+                Positioned(top: -160, left: -60, child: _blob(BebuTheme.violet.withValues(alpha: (BebuTheme.isLight ? 0.18 : 0.30) * intensity), 380)),
+                Positioned(top: 120, right: -160, child: _blob(BebuTheme.violetDeep.withValues(alpha: (BebuTheme.isLight ? 0.14 : 0.28) * intensity), 360)),
+                Positioned(bottom: -140, left: -40, child: _blob(BebuTheme.pink.withValues(alpha: (BebuTheme.isLight ? 0.12 : 0.16) * intensity), 340)),
+              ],
+            ),
           ),
-        ),
         if (child != null) child!,
       ],
     );
@@ -492,14 +617,14 @@ class GradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final content = loading
-        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: BebuTheme.text))
+        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: BebuTheme.onPhoto))
         : FittedBox(
             fit: BoxFit.scaleDown,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (icon != null) ...[Icon(icon, size: 20, color: BebuTheme.text), const SizedBox(width: 8)],
-                Text(label, style: BebuTheme.label(size: 16, weight: FontWeight.w700)),
+                if (icon != null) ...[Icon(icon, size: 20, color: BebuTheme.onPhoto), const SizedBox(width: 8)],
+                Text(label, style: BebuTheme.label(size: 16, weight: FontWeight.w700, color: BebuTheme.onPhoto)),
               ],
             ),
           );
@@ -566,11 +691,11 @@ class GhostButton extends StatelessWidget {
 
 /// Frosted card with a subtle violet tint, used for list rows and panels.
 class GlassCard extends StatelessWidget {
-  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(14), this.radius = BebuTheme.radiusMd, this.onTap, this.tint});
+  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(14), this.radius, this.onTap, this.tint});
 
   final Widget child;
   final EdgeInsets padding;
-  final double radius;
+  final double? radius;
   final VoidCallback? onTap;
   final Color? tint;
 
@@ -580,7 +705,7 @@ class GlassCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: tint ?? BebuTheme.surface.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(radius),
+        borderRadius: BorderRadius.circular(radius ?? BebuTheme.radiusMd),
         border: Border.all(color: BebuTheme.border),
       ),
       child: child,

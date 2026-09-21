@@ -293,8 +293,8 @@ class _Core extends StatelessWidget {
       ),
       child: Center(
         child: searching
-            ? const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: BebuTheme.text))
-            : const Icon(Icons.all_inclusive_rounded, color: BebuTheme.text, size: 38),
+            ? const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: BebuTheme.onPhoto))
+            : const Icon(Icons.all_inclusive_rounded, color: BebuTheme.onPhoto, size: 38),
       ),
     );
   }

@@ -39,7 +39,7 @@ class HomeScreen extends GetView<HomeScreenController> {
         backgroundColor: BebuTheme.bg,
         body: Stack(
           children: [
-            const Positioned.fill(child: _AmbientGlow()),
+            if (BebuTheme.ambientGlow) const Positioned.fill(child: _AmbientGlow()),
             SafeArea(
               bottom: false,
               child: RefreshIndicator(
@@ -114,9 +114,9 @@ class _HomeHeader extends StatelessWidget {
                 height: _HomeHeader.controlHeight,
                 index: controller.feedIndex,
                 onChanged: controller.setFeed,
-                segments: const [
+                segments: [
                   SegmentItem('For You', Icons.local_fire_department_rounded, activeColor: BebuTheme.pink),
-                  SegmentItem('Live', Icons.podcasts_rounded, activeColor: BebuTheme.green),
+                  const SegmentItem('Live', Icons.podcasts_rounded, activeColor: BebuTheme.green),
                 ],
               ),
             ),

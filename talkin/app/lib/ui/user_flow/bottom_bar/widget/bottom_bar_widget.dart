@@ -45,7 +45,7 @@ class BottomBarView extends StatelessWidget {
                     color: BebuTheme.surface.withValues(alpha: 0.82),
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(color: BebuTheme.border),
-                    boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 30, offset: Offset(0, 12))],
+                    boxShadow: [BoxShadow(color: Color(BebuTheme.isLight ? 0x22000000 : 0x66000000), blurRadius: 30, offset: const Offset(0, 12))],
                   ),
                   child: LayoutBuilder(
                     builder: (context, c) {
@@ -63,10 +63,10 @@ class BottomBarView extends StatelessWidget {
                               child: Container(
                                 width: 52,
                                 height: 52,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: BebuTheme.text,
                                   shape: BoxShape.circle,
-                                  boxShadow: [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 18)],
+                                  boxShadow: [BoxShadow(color: BebuTheme.text.withValues(alpha: 0.25), blurRadius: 18)],
                                 ),
                               ),
                             ),

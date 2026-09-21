@@ -1,448 +1,529 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:talk_in/custom/custom_profile/custom_profile_image.dart';
+import 'package:talk_in/custom/listeners/listener_photo_card.dart';
+import 'package:talk_in/custom/motion/coin_pill.dart';
+import 'package:talk_in/custom/theme_picker.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/controller/edit_profile_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/controller/my_profile_screen_controller.dart';
-import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/app_theme.dart';
+import 'package:talk_in/utils/appearance.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
-import 'package:talk_in/utils/font_style.dart';
+import 'package:talk_in/utils/utils.dart';
 
-class MyProfileTopView extends StatelessWidget {
-  const MyProfileTopView({super.key});
+/// Back button, title and edit action.
+class ProfileHeaderBar extends StatelessWidget {
+  const ProfileHeaderBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          GlassIconButton(icon: Icons.arrow_back_rounded, size: 42, color: BebuTheme.surface, blur: false, onTap: Get.back, tooltip: 'Back'),
+          const Spacer(),
+          Text(EnumLocale.txtMyProfile.name.tr, style: BebuTheme.title(size: 18)),
+          const Spacer(),
+          GlassIconButton(
+            icon: Icons.edit_rounded,
+            size: 42,
+            iconSize: 18,
+            color: BebuTheme.surface,
+            blur: false,
+            onTap: () => Get.toNamed(AppRoutes.editProfileScreen),
+            tooltip: EnumLocale.txtEditProfile.name.tr,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Avatar with gradient ring, name, contact line and edit CTA.
+class ProfileHero extends StatelessWidget {
+  const ProfileHero({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<EditProfileController>(
-        id: Constant.idProfile,
-        builder: (context) {
-          return Container(
-            // padding: EdgeInsets.only(left: 16),
-            decoration: BoxDecoration(color: AppColors.appColor),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      color: AppColors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Get.back();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 22, top: 22, left: 20, right: 6),
-                          child: Image.asset(
-                            height: 16,
-                            AppAsset.backArrowIcon,
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ),
+      id: Constant.idProfile,
+      builder: (_) {
+        final user = Database.fetchLoginUserProfileModel?.user;
+        final contact = Database.loginType == 2 ? Database.loginUserNickName : Database.loginUserEmail;
+        final uniqueId = user?.uniqueId?.toString() ?? '';
+        return FadeSlideIn(
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.bottomCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 118,
+                    height: 118,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: BebuTheme.pinkGradient,
+                      boxShadow: [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.35), blurRadius: 30, offset: const Offset(0, 12))],
                     ),
-                    Spacer(),
-                    Text(
-                      EnumLocale.txtMyProfile.name.tr,
-                      style: AppFontStyle.fontStyleW600(fontSize: 20, fontColor: AppColors.white),
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: BebuTheme.bg),
+                      child: ClipOval(child: ListenerPhoto(image: Database.loginUserProfilePic, scrim: false, cacheWidth: 400)),
                     ),
-                    Spacer(),
-                  ],
-                ).paddingOnly(bottom: 10, right: 16),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.white),
-                        shape: BoxShape.circle,
-                      ),
+                  ),
+                  Positioned(
+                    bottom: -6,
+                    child: PressScale(
+                      onTap: () => Get.toNamed(AppRoutes.editProfileScreen),
                       child: Container(
-                        // clipBehavior: Clip.hardEdge,
-                        height: 54,
-                        width: 54,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.appColor),
-                          color: AppColors.lightGrey,
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          // child: Image.network(
-                          //   Database.loginUserProfilePic,
-                          //   // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCIyTZVXyb90oYHRiiX6YkNUc0CnzGwWjI3Q&s",
-                          //   fit: BoxFit.cover,
-                          // ),
-                          child: CustomProfileImage(
-                            image: Database.loginUserProfilePic,
-                          ),
-                        ),
-                      ).paddingAll(1),
-                    ).paddingOnly(right: 12, left: 16),
-                    SizedBox(
-                      width: Get.width * 0.4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            Database.loginUserName,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppFontStyle.fontStyleW700(fontSize: 19, fontColor: AppColors.white),
-                          ),
-                          Database.loginType == 2
-                              ? Text(
-                                  Database.loginUserNickName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppFontStyle.fontStyleW500(fontSize: 15, fontColor: AppColors.profileMail),
-                                )
-                              : Text(
-                                  Database.loginUserEmail,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppFontStyle.fontStyleW500(fontSize: 15, fontColor: AppColors.profileMail),
-                                ),
-                        ],
-                      ).paddingOnly(top: 5),
-                    ),
-                    Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(AppRoutes.editProfileScreen);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          color: BebuTheme.surface,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: BebuTheme.borderStrong),
+                          boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))],
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset(
-                              AppAsset.editIcon,
-                              height: 17,
-                              width: 17,
-                            ),
-                            SizedBox(
-                              width: Get.width * 0.2,
-                              child: Text(
-                                EnumLocale.txtEditProfile.name.tr,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppFontStyle.fontStyleW700(fontSize: 12, fontColor: AppColors.appColor),
-                              ).paddingOnly(left: 6, right: 2),
-                            )
+                            Icon(Icons.photo_camera_rounded, size: 13, color: BebuTheme.text),
+                            const SizedBox(width: 5),
+                            Text('Edit', style: BebuTheme.label(size: 11.5)),
                           ],
                         ),
-                      ).paddingOnly(right: 14),
-                    ).paddingOnly(top: 3),
-                  ],
-                ).paddingOnly(bottom: 24),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                Database.loginUserName.isEmpty ? 'bebu user' : Database.loginUserName,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: BebuTheme.display(size: 26),
+              ),
+              if (contact.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(contact, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 13.5)),
               ],
-            ).paddingOnly(top: Get.height * 0.042),
-          );
-        });
+              if (uniqueId.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                BebuChip(label: 'ID  $uniqueId', icon: Icons.tag_rounded, dense: true, background: BebuTheme.surface2),
+              ],
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
-class ProfileOptionsView extends StatelessWidget {
-  const ProfileOptionsView({super.key});
+/// Coin balance with recharge and history shortcuts.
+class ProfileWalletCard extends StatelessWidget {
+  const ProfileWalletCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: GetBuilder<MyProfileScreenController>(builder: (controller) {
-        return Column(
+    final user = Database.fetchLoginUserProfileModel?.user;
+    final coins = int.tryParse(Database.userCoin) ?? (user?.coins ?? 0).toInt();
+    final spent = (user?.coinsSpent ?? 0).toInt();
+    final recharged = (user?.coinsRecharged ?? 0).toInt();
+    return FadeSlideIn(
+      delayMs: 60,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(BebuTheme.radiusLg),
+          gradient: LinearGradient(
+            colors: [BebuTheme.amber.withValues(alpha: BebuTheme.isLight ? 0.18 : 0.22), BebuTheme.surface],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: BebuTheme.amber.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top 3 Boxes (Wallet, Help Center, Settings)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                TopItem(
-                  icon: AppAsset.wallet,
-                  title: EnumLocale.txtMyWallet.name.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.myWalletScreen);
-                  },
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Coin balance', style: BebuTheme.body(size: 12.5, color: BebuTheme.textFaint)),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          CoinPill(coins: coins, height: 40, onTap: () => Get.toNamed(AppRoutes.myWalletScreen)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                TopItem(
-                  icon: AppAsset.helpCenter,
-                  title: EnumLocale.txtHelpCenter.name.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.helpCenterScreen);
-                  },
-                ),
-                TopItem(
-                  icon: AppAsset.setting,
-                  title: EnumLocale.txtSettings.name.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.settingScreen);
-                  },
+                GradientButton(
+                  label: 'Recharge',
+                  icon: Icons.add_rounded,
+                  expanded: false,
+                  height: 44,
+                  gradient: const LinearGradient(colors: [Color(0xFFFFC44D), Color(0xFFF08A00)]),
+                  glow: BebuTheme.amber,
+                  onTap: () => Get.toNamed(AppRoutes.myWalletScreen),
                 ),
               ],
-            ).paddingOnly(top: 16, bottom: 24, left: 9, right: 9),
-
-            // Host Center Box
-            Database.settingApiModel?.data?.allowBecomeHostOption == true
-                ? CenterOption(
-                    onTap: () {
-                      Get.toNamed(AppRoutes.becomeHostScreen);
-                    },
-                    icon: AppAsset.hostCenter,
-                    title: EnumLocale.txtListenersCenter.name.tr,
-                    subtitle: EnumLocale.txtHostCenterDescription.name.tr,
-                    badgeText: EnumLocale.txtBecomeListener.name.tr,
-                  )
-                : SizedBox(),
-            // Privacy Center Box
-            CenterOption(
-              onTap: () async {
-                controller.onClickPrivacyPolicy();
-              },
-              icon: AppAsset.privacyCenter,
-              title: EnumLocale.txtPrivacyCenter.name.tr,
-              subtitle: EnumLocale.txtDataPrivacy.name.tr,
             ),
-
-            // Share App Box
-            CenterOption(
-              onTap: () {
-                controller.onClickShare();
-                // Get.toNamed(AppRoutes.shareAppScreen);
-              },
-              icon: AppAsset.shareApp,
-              title: EnumLocale.txtShareApp.name.tr,
-              subtitle: EnumLocale.txtShareAppDes.name.tr,
-            ),
-            CenterOption(
-              onTap: () async {
-                controller.onClickAboutUs();
-              },
-              icon: AppAsset.aboutUs,
-              title: EnumLocale.txtAboutUs.name.tr,
-              subtitle: EnumLocale.txtAboutUsDes.name.tr,
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                _MiniStat(label: 'Recharged', value: recharged, icon: Icons.south_west_rounded, color: BebuTheme.green),
+                const SizedBox(width: 10),
+                _MiniStat(label: 'Spent', value: spent, icon: Icons.north_east_rounded, color: BebuTheme.pink),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: PressScale(
+                    onTap: () => Get.toNamed(AppRoutes.coinHistoryScreen),
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(color: BebuTheme.surface2, borderRadius: BorderRadius.circular(BebuTheme.radiusSm), border: Border.all(color: BebuTheme.border)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.receipt_long_rounded, size: 16, color: BebuTheme.text),
+                          const SizedBox(width: 6),
+                          Text('History', style: BebuTheme.label(size: 12.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
-        );
-      }),
-    );
-  }
-
-/*
-  Widget _buildTopItem(String icon, String title, VoidCallback onTap) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.only(bottom: 10, top: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.borderColor.withValues(alpha: 0.6)),
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                icon,
-                height: 60,
-                width: 60,
-              ).paddingSymmetric(horizontal: 25),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: AppFontStyle.fontStyleW600(fontSize: 14, fontColor: AppColors.black),
-              ).paddingOnly(top: 8),
-            ],
-          ),
-        ).paddingSymmetric(horizontal: 6),
+        ),
       ),
     );
   }
-*/
-
-/*  Widget _buildCenterOption({
-    required String icon,
-    required String title,
-    required String subtitle,
-    String? badgeText,
-    Function()? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-        decoration: BoxDecoration(
-          color: AppColors.profileOption.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Image.asset(
-                icon,
-                height: 68,
-                width: 68,
-              ).paddingOnly(right: 12),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        title,
-                        style: AppFontStyle.fontStyleW800(fontSize: 18, fontColor: AppColors.black),
-                      ),
-                      if (badgeText != null)
-                        Container(
-                          width: Get.width * 0.25,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.appColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            overflow: TextOverflow.ellipsis,
-                            badgeText,
-                            style: AppFontStyle.fontStyleW700(fontSize: 10, fontColor: AppColors.white),
-                          ),
-                        ).paddingOnly(left: 5),
-                    ],
-                  ),
-                  Text(
-                    subtitle,
-                    style: AppFontStyle.fontStyleW500(fontSize: 10, fontColor: AppColors.profileText, height: 2),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ).paddingOnly(left: 16, right: 16, bottom: 18),
-    );
-  }*/
 }
 
-class CenterOption extends StatelessWidget {
-  final String icon;
-  final String title;
-  final String subtitle;
-  final String? badgeText;
-  final Function()? onTap;
-
-  const CenterOption({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.badgeText,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-        decoration: BoxDecoration(
-          color: AppColors.profileOption.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Image.asset(
-                icon,
-                height: 68,
-                width: 68,
-              ).paddingOnly(right: 12),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        title,
-                        softWrap: true,
-                        style: AppFontStyle.fontStyleW800(fontSize: 18, fontColor: AppColors.black),
-                      ),
-                      if (badgeText != null)
-                        Container(
-                          width: Get.width * 0.25,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.appColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            overflow: TextOverflow.ellipsis,
-                            badgeText!,
-                            style: AppFontStyle.fontStyleW700(fontSize: 10, fontColor: AppColors.white),
-                          ),
-                        ).paddingOnly(left: 5),
-                    ],
-                  ),
-                  Text(
-                    subtitle,
-                    style: AppFontStyle.fontStyleW500(fontSize: 10, fontColor: AppColors.profileText, height: 2),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ).paddingOnly(left: 16, right: 16, bottom: 18),
-    );
-  }
-}
-
-class TopItem extends StatelessWidget {
-  final String icon;
-  final String title;
-  final VoidCallback onTap;
-
-  const TopItem({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
+class _MiniStat extends StatelessWidget {
+  const _MiniStat({required this.label, required this.value, required this.icon, required this.color});
+  final String label;
+  final int value;
+  final IconData icon;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(color: BebuTheme.surface2, borderRadius: BorderRadius.circular(BebuTheme.radiusSm), border: Border.all(color: BebuTheme.border)),
+        child: Row(
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_short(value), style: BebuTheme.label(size: 13)),
+                  Text(label, style: BebuTheme.body(size: 9.5, color: BebuTheme.textFaint, height: 1.1)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _short(int n) {
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 10000) return '${(n / 1000).toStringAsFixed(0)}K';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return n.toString();
+  }
+}
+
+/// System / Dark / Light picker. Hidden when the admin locked the theme.
+class ProfileAppearanceSection extends StatelessWidget {
+  const ProfileAppearanceSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Appearance.canChoose) return const SizedBox.shrink();
+    return FadeSlideIn(
+      delayMs: 100,
+      child: ProfileSection(
+        title: 'Appearance',
+        trailing: Text(Appearance.mode.label, style: BebuTheme.label(size: 12, color: BebuTheme.pink)),
+        child: const ThemePicker(compact: true),
+      ),
+    );
+  }
+}
+
+/// Pops back to the tab bar and selects the Calls tab.
+void _openCallsTab() {
+  Get.until((r) => r.settings.name == AppRoutes.bottomBar || r.isFirst);
+  if (Get.isRegistered<BottomBarController>()) Get.find<BottomBarController>().onClick(4);
+}
+
+/// Four quick shortcuts in a row.
+class ProfileQuickActions extends StatelessWidget {
+  const ProfileQuickActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      (Icons.account_balance_wallet_rounded, EnumLocale.txtMyWallet.name.tr, BebuTheme.amber, () => Get.toNamed(AppRoutes.myWalletScreen)),
+      (Icons.call_rounded, 'Calls', BebuTheme.green, _openCallsTab),
+      (Icons.support_agent_rounded, EnumLocale.txtHelpCenter.name.tr, BebuTheme.blue, () => Get.toNamed(AppRoutes.helpCenterScreen)),
+      (Icons.settings_rounded, EnumLocale.txtSettings.name.tr, BebuTheme.violet, () => Get.toNamed(AppRoutes.settingScreen)),
+    ];
+    return FadeSlideIn(
+      delayMs: 140,
+      child: Row(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            Expanded(
+              child: PressScale(
+                onTap: items[i].$4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: BebuTheme.surface,
+                    borderRadius: BorderRadius.circular(BebuTheme.radiusMd),
+                    border: Border.all(color: BebuTheme.border),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: items[i].$3.withValues(alpha: BebuTheme.isLight ? 0.16 : 0.2)),
+                        child: Icon(items[i].$1, size: 20, color: items[i].$3),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(items[i].$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.label(size: 11.5)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (i != items.length - 1) const SizedBox(width: 10),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Become-a-host promo, shown when the admin enables it.
+class ProfileHostBanner extends StatelessWidget {
+  const ProfileHostBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (Database.settingApiModel?.data?.allowBecomeHostOption != true) return const SizedBox.shrink();
+    return FadeSlideIn(
+      delayMs: 180,
+      child: PressScale(
+        onTap: () => Get.toNamed(AppRoutes.becomeHostScreen),
         child: Container(
-          padding: const EdgeInsets.only(bottom: 10, top: 15),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.borderColor.withValues(alpha: 0.6)),
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(BebuTheme.radiusLg),
+            gradient: BebuTheme.violetGradient,
+            boxShadow: [BoxShadow(color: BebuTheme.violet.withValues(alpha: 0.35), blurRadius: 26, offset: const Offset(0, 10))],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              Image.asset(
-                icon,
-                height: 60,
-                width: 60,
-              ).paddingSymmetric(horizontal: 25),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: AppFontStyle.fontStyleW600(fontSize: 14, fontColor: AppColors.black),
-              ).paddingOnly(top: 8),
+              Container(
+                width: 46,
+                height: 46,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x33FFFFFF)),
+                child: const Icon(Icons.headset_mic_rounded, color: BebuTheme.onPhoto),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(EnumLocale.txtListenersCenter.name.tr, style: BebuTheme.title(size: 16, color: BebuTheme.onPhoto)),
+                    const SizedBox(height: 3),
+                    Text(EnumLocale.txtHostCenterDescription.name.tr, maxLines: 2, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 12, color: BebuTheme.onPhotoMuted)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(color: BebuTheme.onPhoto, borderRadius: BorderRadius.circular(999)),
+                child: Text(EnumLocale.txtBecomeListener.name.tr, style: BebuTheme.label(size: 11, color: BebuTheme.violetDeep)),
+              ),
             ],
           ),
-        ).paddingSymmetric(horizontal: 6),
+        ),
+      ),
+    );
+  }
+}
+
+/// Grouped rows: privacy, share, about, notifications, language.
+class ProfileLinks extends StatelessWidget {
+  const ProfileLinks({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<MyProfileScreenController>(
+      builder: (controller) => FadeSlideIn(
+        delayMs: 220,
+        child: ProfileSection(
+          title: 'More',
+          child: Column(
+            children: [
+              ProfileRow(
+                icon: Icons.notifications_none_rounded,
+                color: BebuTheme.pink,
+                title: EnumLocale.txtNotification.name.tr,
+                subtitle: 'Alerts from callers and bebu',
+                onTap: () => Get.toNamed(AppRoutes.userNotificationView),
+              ),
+              ProfileRow(
+                icon: Icons.translate_rounded,
+                color: BebuTheme.blue,
+                title: EnumLocale.txtLanguage.name.tr,
+                subtitle: 'App language',
+                onTap: () => Get.toNamed(AppRoutes.appLanguageScreen),
+              ),
+              ProfileRow(
+                icon: Icons.shield_outlined,
+                color: BebuTheme.green,
+                title: EnumLocale.txtPrivacyCenter.name.tr,
+                subtitle: EnumLocale.txtDataPrivacy.name.tr,
+                onTap: controller.onClickPrivacyPolicy,
+              ),
+              ProfileRow(
+                icon: Icons.ios_share_rounded,
+                color: BebuTheme.violet,
+                title: EnumLocale.txtShareApp.name.tr,
+                subtitle: EnumLocale.txtShareAppDes.name.tr,
+                onTap: controller.onClickShare,
+              ),
+              ProfileRow(
+                icon: Icons.info_outline_rounded,
+                color: BebuTheme.amber,
+                title: EnumLocale.txtAboutUs.name.tr,
+                subtitle: EnumLocale.txtAboutUsDes.name.tr,
+                onTap: controller.onClickAboutUs,
+                last: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProfileSection extends StatelessWidget {
+  const ProfileSection({super.key, required this.title, required this.child, this.trailing});
+  final String title;
+  final Widget child;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
+          child: Row(
+            children: [
+              Text(title, style: BebuTheme.label(size: 12, color: BebuTheme.textFaint)),
+              const Spacer(),
+              if (trailing != null) trailing!,
+            ],
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+}
+
+class ProfileRow extends StatelessWidget {
+  const ProfileRow({super.key, required this.icon, required this.color, required this.title, required this.onTap, this.subtitle, this.last = false});
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final bool last;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressScale(
+      scale: 0.985,
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: last ? 0 : 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusMd), border: Border.all(color: BebuTheme.border)),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(BebuTheme.radiusSm), color: color.withValues(alpha: BebuTheme.isLight ? 0.14 : 0.18)),
+              child: Icon(icon, size: 19, color: color),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.label(size: 14)),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 11.5, color: BebuTheme.textFaint)),
+                  ],
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: BebuTheme.textFaint),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Version footer.
+class ProfileFooter extends StatelessWidget {
+  const ProfileFooter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        children: [
+          Text('bebu', style: BebuTheme.title(size: 15, color: BebuTheme.textFaint)),
+          const SizedBox(height: 2),
+          Text('Version ${Utils.appVersion}', style: BebuTheme.body(size: 11.5, color: BebuTheme.textFaint)),
+        ],
       ),
     );
   }

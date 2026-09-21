@@ -25,17 +25,40 @@ class CoinPill extends StatefulWidget {
 class _CoinPillState extends State<CoinPill> with SingleTickerProviderStateMixin {
   static const _period = Duration(milliseconds: 4200);
 
-  late final AnimationController _loop = AnimationController(vsync: this, duration: _period)..repeat();
+  late final AnimationController _loop = AnimationController(vsync: this, duration: _period);
+
+  @override
+  void initState() {
+    super.initState();
+    _syncLoop();
+  }
+
+  void _syncLoop() {
+    if (BebuTheme.coinAnimation) {
+      if (!_loop.isAnimating) _loop.repeat();
+    } else if (_loop.isAnimating) {
+      _loop.stop();
+      _loop.value = 0;
+    }
+  }
   late int _from = widget.coins;
   late int _to = widget.coins;
 
   @override
   void didUpdateWidget(covariant CoinPill old) {
     super.didUpdateWidget(old);
+    _syncLoop();
     if (old.coins != widget.coins) {
       _from = old.coins;
       _to = widget.coins;
     }
+  }
+
+  // Get.forceAppUpdate() reassembles the tree after an admin toggle.
+  @override
+  void reassemble() {
+    super.reassemble();
+    _syncLoop();
   }
 
   @override

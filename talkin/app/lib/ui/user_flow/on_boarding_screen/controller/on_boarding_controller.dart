@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/utils/app_asset.dart';
+import 'package:talk_in/utils/appearance.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
@@ -40,8 +41,13 @@ class OnBoardingController extends GetxController {
     AppAsset.onBoarding3,
   ];
 
+  /// Extra "Pick your look" step when the admin allows theme choice.
+  bool get hasThemeStep => Appearance.askOnOnboarding;
+  int get pageCount => title.length + (hasThemeStep ? 1 : 0);
+  bool isThemeStep(int index) => hasThemeStep && index == pageCount - 1;
+
   onPageScroll({required int currentPage}) {
-    if (currentPage < 2) {
+    if (currentPage < pageCount - 1) {
       pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,

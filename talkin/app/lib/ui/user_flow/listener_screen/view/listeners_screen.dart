@@ -109,8 +109,8 @@ class ListenersScreen extends StatelessWidget {
                         builder: (c) => AnimatedSize(
                           duration: BebuTheme.normal,
                           child: c.isPaginationLoading
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 22),
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 22),
                                   child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: BebuTheme.pink))),
                                 )
                               : const SizedBox.shrink(),
@@ -272,7 +272,7 @@ class _ExploreEmpty extends StatelessWidget {
               width: 84,
               height: 84,
               decoration: const BoxDecoration(gradient: BebuTheme.violetGradient, shape: BoxShape.circle),
-              child: const Icon(Icons.travel_explore_rounded, size: 38, color: BebuTheme.text),
+              child: Icon(Icons.travel_explore_rounded, size: 38, color: BebuTheme.text),
             ),
             const SizedBox(height: 22),
             Text(hasFilters ? 'No one matches these filters' : 'No callers yet', textAlign: TextAlign.center, style: BebuTheme.title(size: 22)),
