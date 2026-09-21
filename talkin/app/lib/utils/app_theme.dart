@@ -72,8 +72,7 @@ class BebuTheme {
   static TextStyle body({double size = 14, Color color = textMuted, FontWeight weight = FontWeight.w400, double? height}) =>
       GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, height: height ?? 1.45);
 
-  static TextStyle label({double size = 12, Color color = text, FontWeight weight = FontWeight.w600}) =>
-      GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, letterSpacing: 0.1);
+  static TextStyle label({double size = 12, Color color = text, FontWeight weight = FontWeight.w600}) => GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight, letterSpacing: 0.1);
 
   static Color statusColor(String? status) {
     switch (status) {
@@ -110,6 +109,7 @@ class GlassIconButton extends StatelessWidget {
     this.iconColor = BebuTheme.text,
     this.tooltip,
     this.child,
+    this.blur = true,
   });
 
   final IconData icon;
@@ -121,23 +121,25 @@ class GlassIconButton extends StatelessWidget {
   final String? tooltip;
   final Widget? child;
 
+  /// Backdrop blur costs a saveLayer per button; turn it off inside lists and
+  /// grids where many buttons sit over photos.
+  final bool blur;
+
   @override
   Widget build(BuildContext context) {
-    final button = ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Material(
-          color: color ?? const Color(0x33FFFFFF),
-          child: InkWell(
-            onTap: onTap,
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Center(child: child ?? Icon(icon, size: iconSize, color: iconColor)),
-            ),
-          ),
+    final surface = Material(
+      color: color ?? const Color(0x33FFFFFF),
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Center(child: child ?? Icon(icon, size: iconSize, color: iconColor)),
         ),
       ),
+    );
+    final button = ClipOval(
+      child: blur ? BackdropFilter(filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14), child: surface) : surface,
     );
     return tooltip == null ? button : Tooltip(message: tooltip!, child: button);
   }
@@ -219,8 +221,7 @@ class StatusPill extends StatefulWidget {
 }
 
 class _StatusPillState extends State<StatusPill> with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
-    ..repeat(reverse: true);
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
 
   @override
   void dispose() {
@@ -334,16 +335,21 @@ class _PressScaleState extends State<PressScale> {
 
 /// Segmented pill control ("For You | Online").
 class SegmentedPill extends StatelessWidget {
-  const SegmentedPill({super.key, required this.segments, required this.index, required this.onChanged});
+  const SegmentedPill({super.key, required this.segments, required this.index, required this.onChanged, this.height = 44});
 
   final List<SegmentItem> segments;
   final int index;
   final ValueChanged<int> onChanged;
 
+  /// Outer height including the 3px inset around the thumb.
+  final double height;
+
   @override
   Widget build(BuildContext context) {
+    const inset = 3.0;
     return Container(
-      padding: const EdgeInsets.all(4),
+      height: height,
+      padding: const EdgeInsets.all(inset),
       decoration: BoxDecoration(
         color: BebuTheme.surface,
         borderRadius: BorderRadius.circular(999),
@@ -353,7 +359,7 @@ class SegmentedPill extends StatelessWidget {
         builder: (context, c) {
           final w = c.maxWidth / segments.length;
           return SizedBox(
-            height: 38,
+            height: height - inset * 2 - 2,
             child: Stack(
               children: [
                 AnimatedPositioned(
@@ -364,7 +370,12 @@ class SegmentedPill extends StatelessWidget {
                   bottom: 0,
                   width: w,
                   child: Container(
-                    decoration: BoxDecoration(color: BebuTheme.surface3, borderRadius: BorderRadius.circular(999)),
+                    decoration: BoxDecoration(
+                      color: BebuTheme.surface3,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: BebuTheme.border),
+                      boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 6, offset: Offset(0, 2))],
+                    ),
                   ),
                 ),
                 Row(
@@ -382,11 +393,11 @@ class SegmentedPill extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(segments[i].icon, size: 15, color: i == index ? BebuTheme.text : BebuTheme.textFaint),
-                                    const SizedBox(width: 6),
+                                    Icon(segments[i].icon, size: 14, color: i == index ? (segments[i].activeColor ?? BebuTheme.text) : BebuTheme.textFaint),
+                                    const SizedBox(width: 5),
                                     Text(
                                       segments[i].label,
-                                      style: BebuTheme.label(size: 13, color: i == index ? BebuTheme.text : BebuTheme.textFaint),
+                                      style: BebuTheme.label(size: 12.5, color: i == index ? BebuTheme.text : BebuTheme.textFaint),
                                     ),
                                   ],
                                 ),
@@ -407,9 +418,12 @@ class SegmentedPill extends StatelessWidget {
 }
 
 class SegmentItem {
-  const SegmentItem(this.label, this.icon);
+  const SegmentItem(this.label, this.icon, {this.activeColor});
   final String label;
   final IconData icon;
+
+  /// Icon tint when this segment is selected (e.g. green for "Live").
+  final Color? activeColor;
 }
 
 /// Full-screen dark backdrop with soft violet/pink glows.

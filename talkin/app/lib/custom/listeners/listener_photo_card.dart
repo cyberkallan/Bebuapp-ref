@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:talk_in/utils/api.dart';
+import 'package:talk_in/custom/motion/ringing_call_button.dart';
 import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_theme.dart';
 
@@ -14,11 +15,15 @@ String listenerImageUrl(String? image) {
 
 /// Full-bleed photo with the shared dark scrim; falls back to a placeholder.
 class ListenerPhoto extends StatelessWidget {
-  const ListenerPhoto({super.key, required this.image, this.fit = BoxFit.cover, this.scrim = true});
+  const ListenerPhoto({super.key, required this.image, this.fit = BoxFit.cover, this.scrim = true, this.cacheWidth});
 
   final String? image;
   final BoxFit fit;
   final bool scrim;
+
+  /// Decode width in physical pixels. Grid thumbnails pass a small value so
+  /// a 3000px upload is not decoded at full size for a 180px tile.
+  final int? cacheWidth;
 
   /// Lets widget tests substitute local images for network ones.
   @visibleForTesting
@@ -33,16 +38,17 @@ class ListenerPhoto extends StatelessWidget {
         : override != null
             ? Image(image: override(url), fit: fit)
             : CachedNetworkImage(
-            imageUrl: url,
-            fit: fit,
-            fadeInDuration: const Duration(milliseconds: 260),
-            placeholder: (_, __) => Shimmer.fromColors(
-              baseColor: BebuTheme.surface2,
-              highlightColor: BebuTheme.surface3,
-              child: Container(color: BebuTheme.surface2),
-            ),
-            errorWidget: (_, __, ___) => Image.asset(AppAsset.listenerPlaceHolder, fit: fit),
-          );
+                imageUrl: url,
+                fit: fit,
+                memCacheWidth: cacheWidth,
+                fadeInDuration: const Duration(milliseconds: 260),
+                placeholder: (_, __) => Shimmer.fromColors(
+                  baseColor: BebuTheme.surface2,
+                  highlightColor: BebuTheme.surface3,
+                  child: Container(color: BebuTheme.surface2),
+                ),
+                errorWidget: (_, __, ___) => Image.asset(AppAsset.listenerPlaceHolder, fit: fit),
+              );
     if (!scrim) return photo;
     return Stack(
       fit: StackFit.expand,
@@ -82,7 +88,8 @@ class ListenerGridCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final live = statusLabel == 'Available';
-    Widget photo = ListenerPhoto(image: image);
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    Widget photo = ListenerPhoto(image: image, cacheWidth: (220 * dpr).round());
     if (heroTag != null) photo = Hero(tag: heroTag!, child: photo);
 
     return PressScale(
@@ -133,12 +140,14 @@ class ListenerGridCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  GlassIconButton(
+                  RingingCallButton(
                     icon: actionIcon,
                     size: 40,
                     iconSize: 18,
-                    color: const Color(0x40FFFFFF),
+                    ringing: live && actionIcon == Icons.call_rounded,
+                    color: live ? BebuTheme.green.withValues(alpha: 0.28) : const Color(0x40FFFFFF),
                     onTap: onAction,
+                    semanticLabel: actionIcon == Icons.call_rounded ? 'Call $name' : 'Message $name',
                   ),
                 ],
               ),

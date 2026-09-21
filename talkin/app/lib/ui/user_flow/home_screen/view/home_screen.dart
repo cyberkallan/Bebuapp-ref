@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:talk_in/custom/dialog/exit_app_dialog.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
+import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/controller/edit_profile_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/controller/home_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/widget/listener_deck.dart';
-import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
@@ -60,8 +59,8 @@ class HomeScreen extends GetView<HomeScreenController> {
                             const _HomeHeader(),
                             Expanded(
                               child: Padding(
-                                // leave room for the floating nav bar
-                                padding: EdgeInsets.fromLTRB(20, 6, 20, 96 + bottomInset),
+                                // top: room for the two peeking back cards; bottom: floating nav bar
+                                padding: EdgeInsets.fromLTRB(20, 30, 20, 96 + bottomInset),
                                 child: const ListenerDeck(),
                               ),
                             ),
@@ -83,12 +82,15 @@ class HomeScreen extends GetView<HomeScreenController> {
 class _HomeHeader extends StatelessWidget {
   const _HomeHeader();
 
+  /// Every control in the header shares this height so they line up.
+  static const double controlHeight = 42;
+
   @override
   Widget build(BuildContext context) {
     // The legacy header registers this controller; profile edits refresh it.
     Get.put(EditProfileController());
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
       child: Row(
         children: [
           GetBuilder<EditProfileController>(
@@ -96,8 +98,8 @@ class _HomeHeader extends StatelessWidget {
             builder: (_) => PressScale(
               onTap: () => Get.toNamed(AppRoutes.myProfileScreen)?.then((_) => Utils.onChangeStatusBar(brightness: Brightness.light)),
               child: Container(
-                width: 44,
-                height: 44,
+                width: _HomeHeader.controlHeight,
+                height: _HomeHeader.controlHeight,
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: BebuTheme.borderStrong)),
                 child: ClipOval(child: ListenerPhoto(image: Database.loginUserProfilePic, scrim: false)),
@@ -109,11 +111,12 @@ class _HomeHeader extends StatelessWidget {
             child: GetBuilder<HomeScreenController>(
               id: Constant.idGetListener,
               builder: (controller) => SegmentedPill(
+                height: _HomeHeader.controlHeight,
                 index: controller.feedIndex,
                 onChanged: controller.setFeed,
                 segments: const [
-                  SegmentItem('For You', Icons.local_fire_department_rounded),
-                  SegmentItem('Live', Icons.podcasts_rounded),
+                  SegmentItem('For You', Icons.local_fire_department_rounded, activeColor: BebuTheme.pink),
+                  SegmentItem('Live', Icons.podcasts_rounded, activeColor: BebuTheme.green),
                 ],
               ),
             ),
@@ -123,7 +126,9 @@ class _HomeHeader extends StatelessWidget {
           const SizedBox(width: 8),
           GlassIconButton(
             icon: Icons.notifications_none_rounded,
+            size: _HomeHeader.controlHeight,
             color: BebuTheme.surface,
+            blur: false,
             onTap: () => Get.toNamed(AppRoutes.userNotificationView),
             tooltip: 'Notifications',
           ),
@@ -140,35 +145,12 @@ class _CoinPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<HomeScreenController>(
       id: Constant.idCoinUpdate,
-      builder: (controller) {
-        final coins = Database.userCoin.toString();
-        return PressScale(
-          onTap: () => Get.toNamed(AppRoutes.myWalletScreen),
-          child: Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: BebuTheme.surface,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: BebuTheme.border),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(AppAsset.starCoin, height: 20, width: 20),
-                const SizedBox(width: 6),
-                controller.isCoinLoading
-                    ? Shimmer.fromColors(
-                        baseColor: BebuTheme.surface3,
-                        highlightColor: BebuTheme.textFaint,
-                        child: Container(width: 28, height: 12, decoration: BoxDecoration(color: BebuTheme.surface3, borderRadius: BorderRadius.circular(6))),
-                      )
-                    : Text(coins, style: BebuTheme.label(size: 14, color: BebuTheme.amber, weight: FontWeight.w700)),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (controller) => CoinPill(
+        coins: int.tryParse(Database.userCoin) ?? 0,
+        loading: controller.isCoinLoading,
+        height: _HomeHeader.controlHeight,
+        onTap: () => Get.toNamed(AppRoutes.myWalletScreen),
+      ),
     );
   }
 }

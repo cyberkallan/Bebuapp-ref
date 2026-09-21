@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:talk_in/custom/listeners/listener_actions.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
+import 'package:talk_in/custom/motion/ringing_call_button.dart';
 import 'package:talk_in/ui/user_flow/home_screen/controller/home_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/top_listeners_model.dart';
 import 'package:talk_in/utils/app_theme.dart';
@@ -104,10 +105,7 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
                         clipBehavior: Clip.none,
                         children: [
                           for (var i = visible.length - 1; i >= 0; i--)
-                            if (i == 0)
-                              _frontCard(visible[0], drag, c)
-                            else
-                              _backCard(visible[i], i, progress, c),
+                            if (i == 0) _frontCard(visible[0], drag, c) else _backCard(visible[i], i, progress, c),
                         ],
                       ),
                     ),
@@ -117,6 +115,7 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
                       onCall: () => _flyOut(visible[0], 1),
                       onChat: () => ListenerActions.openChatFor(visible[0]),
                       canCall: ListenerActions.canCall(visible[0]),
+                      live: visible[0].statusLabel == 'Available',
                     ),
                   ],
                 );
@@ -128,19 +127,24 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
     );
   }
 
+  /// How far each back card peeks above the one in front of it.
+  static const double _peek = 12;
+
   Widget _backCard(TopListeners l, int depth, double progress, BoxConstraints c) {
     // depth 1 sits just behind the front card, depth 2 behind that.
     final t = depth - progress; // eases towards the front as the top card leaves
-    final scale = 1 - 0.04 * t;
-    final dy = -22.0 * t;
+    final scale = 1 - 0.045 * t;
+    // Scale from the top edge so the peek is exactly [_peek] per depth and
+    // never creeps up into the header; the shrink happens behind the front card.
     return Positioned.fill(
       child: Transform.translate(
-        offset: Offset(0, dy),
+        offset: Offset(0, -_peek * t),
         child: Transform.scale(
           scale: scale,
+          alignment: Alignment.topCenter,
           child: Opacity(
-            opacity: (1 - 0.25 * t).clamp(0.0, 1.0),
-            child: _ListenerCard(listener: l, showDetails: false),
+            opacity: (1 - 0.3 * t).clamp(0.0, 1.0),
+            child: RepaintBoundary(child: _ListenerCard(listener: l, showDetails: false)),
           ),
         ),
       ),
@@ -200,7 +204,7 @@ class _ListenerCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            ListenerPhoto(image: l.image),
+            ListenerPhoto(image: l.image, cacheWidth: (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round()),
             if (showDetails) ...[
               Positioned(
                 top: 16,
@@ -238,8 +242,7 @@ class _ListenerCard extends StatelessWidget {
                         runSpacing: 6,
                         children: [
                           for (final t in topics) BebuChip(label: t, dense: true, background: const Color(0x33FFFFFF)),
-                          for (final lang in languages)
-                            BebuChip(label: lang, dense: true, icon: Icons.translate_rounded, background: const Color(0x33FFFFFF)),
+                          for (final lang in languages) BebuChip(label: lang, dense: true, icon: Icons.translate_rounded, background: const Color(0x33FFFFFF)),
                           if ((l.ratePrivateAudioCall ?? 0) > 0) _RateTag(icon: Icons.call_rounded, rate: l.ratePrivateAudioCall!),
                           if ((l.ratePrivateVideoCall ?? 0) > 0) _RateTag(icon: Icons.videocam_rounded, rate: l.ratePrivateVideoCall!),
                         ],
@@ -338,11 +341,12 @@ class _SwipeStamp extends StatelessWidget {
 }
 
 class _DeckActions extends StatelessWidget {
-  const _DeckActions({required this.onSkip, required this.onCall, required this.onChat, required this.canCall});
+  const _DeckActions({required this.onSkip, required this.onCall, required this.onChat, required this.canCall, required this.live});
   final VoidCallback onSkip;
   final VoidCallback onCall;
   final VoidCallback onChat;
   final bool canCall;
+  final bool live;
 
   @override
   Widget build(BuildContext context) {
@@ -351,13 +355,15 @@ class _DeckActions extends StatelessWidget {
       children: [
         ActionOrb(icon: Icons.close_rounded, onTap: onSkip, size: 56, iconColor: BebuTheme.textMuted, semanticLabel: 'Skip'),
         const SizedBox(width: 18),
-        ActionOrb(
-          icon: canCall ? Icons.favorite_rounded : Icons.chat_bubble_rounded,
+        RingingCallButton(
+          icon: canCall ? Icons.call_rounded : Icons.chat_bubble_rounded,
           onTap: canCall ? onCall : onChat,
+          ringing: canCall && live,
           size: 72,
           iconSize: 30,
           gradient: BebuTheme.pinkGradient,
           glow: BebuTheme.pink,
+          ringColor: BebuTheme.pink,
           semanticLabel: canCall ? 'Call' : 'Message',
         ),
         const SizedBox(width: 18),

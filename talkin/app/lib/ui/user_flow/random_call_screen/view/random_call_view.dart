@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/custom/dialog/exit_app_dialog.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
+import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/home_screen/api/user_coin_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/top_listeners_model.dart';
 import 'package:talk_in/ui/user_flow/random_call_screen/controller/random_call_controller.dart';
-import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
@@ -106,20 +106,10 @@ class _RandomHeader extends StatelessWidget {
           ),
           GetBuilder<RandomCallController>(
             id: Constant.idCoinUpdate,
-            builder: (_) => PressScale(
+            builder: (_) => CoinPill(
+              coins: int.tryParse(Database.userCoin) ?? 0,
+              height: 40,
               onTap: () => Get.toNamed(AppRoutes.myWalletScreen)?.then((_) => Utils.onChangeStatusBar(brightness: Brightness.light)),
-              child: Container(
-                height: 40,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(999), border: Border.all(color: BebuTheme.border)),
-                child: Row(
-                  children: [
-                    Image.asset(AppAsset.starCoin, height: 18, width: 18),
-                    const SizedBox(width: 6),
-                    Text(Database.userCoin.toString(), style: BebuTheme.label(size: 13.5, color: BebuTheme.amber, weight: FontWeight.w700)),
-                  ],
-                ),
-              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -212,8 +202,7 @@ class _RadarState extends State<_Radar> with TickerProviderStateMixin {
                       painter: _RadarPainter(pulse: _pulse.value, sweep: widget.searching ? _sweep.value : null, radii: radii),
                     ),
                     _Core(searching: widget.searching),
-                    for (var i = 0; i < math.min(widget.listeners.length, slots.length); i++)
-                      _orbiting(i, slots[i], radii, size),
+                    for (var i = 0; i < math.min(widget.listeners.length, slots.length); i++) _orbiting(i, slots[i], radii, size),
                   ],
                 );
               },

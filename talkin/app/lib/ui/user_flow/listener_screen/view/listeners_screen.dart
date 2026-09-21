@@ -85,16 +85,18 @@ class ListenersScreen extends StatelessWidget {
                               final topic = (l.talkTopics ?? []).isNotEmpty ? l.talkTopics!.first : (l.language ?? []).firstOrNull;
                               return FadeSlideIn(
                                 delayMs: (index % 6) * 40,
-                                child: ListenerGridCard(
-                                  heroTag: 'listener-photo-${l.id}',
-                                  name: l.name ?? '',
-                                  age: l.age,
-                                  image: l.image,
-                                  statusLabel: l.statusLabel,
-                                  subtitle: topic,
-                                  actionIcon: ListenerActions.canCall(l) ? Icons.call_rounded : Icons.chat_bubble_rounded,
-                                  onTap: () => ListenerActions.openProfile(l),
-                                  onAction: () => ListenerActions.canCall(l) ? ListenerActions.openTalkNowFor(l) : ListenerActions.openChatFor(l),
+                                child: RepaintBoundary(
+                                  child: ListenerGridCard(
+                                    heroTag: 'listener-photo-${l.id}',
+                                    name: l.name ?? '',
+                                    age: l.age,
+                                    image: l.image,
+                                    statusLabel: l.statusLabel,
+                                    subtitle: topic,
+                                    actionIcon: ListenerActions.canCall(l) ? Icons.call_rounded : Icons.chat_bubble_rounded,
+                                    onTap: () => ListenerActions.openProfile(l),
+                                    onAction: () => ListenerActions.canCall(l) ? ListenerActions.openTalkNowFor(l) : ListenerActions.openChatFor(l),
+                                  ),
                                 ),
                               );
                             },
@@ -189,7 +191,11 @@ class _FilterRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           BebuChip(
-            label: languages.isEmpty ? 'Language' : languages.length == 1 ? languages.first : '${languages.length} languages',
+            label: languages.isEmpty
+                ? 'Language'
+                : languages.length == 1
+                    ? languages.first
+                    : '${languages.length} languages',
             icon: Icons.translate_rounded,
             selected: languages.isNotEmpty,
             onTap: () => Get.bottomSheet(AppLanguageBottomSheet(), isScrollControlled: true, backgroundColor: Colors.transparent),
@@ -202,7 +208,11 @@ class _FilterRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           BebuChip(
-            label: topics.isEmpty ? 'Topics' : topics.length == 1 ? topics.first : '${topics.length} topics',
+            label: topics.isEmpty
+                ? 'Topics'
+                : topics.length == 1
+                    ? topics.first
+                    : '${topics.length} topics',
             icon: Icons.forum_outlined,
             selected: topics.isNotEmpty,
             onTap: () => Get.bottomSheet(TalkAboutBottomSheet(), isScrollControlled: true, backgroundColor: Colors.transparent),
