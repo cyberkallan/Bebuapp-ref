@@ -22,7 +22,9 @@ class ListenerActions {
     Get.toNamed(AppRoutes.profileDetailScreenView, arguments: l.id);
   }
 
-  static void openChat({
+  /// [video] may be a `List<String>` or the JSON string some APIs return; the
+  /// chat controller accepts both.
+  static Future<dynamic>? openChat({
     required String? id,
     required String? name,
     required String? statusLabel,
@@ -30,11 +32,11 @@ class ListenerActions {
     required int? ratePrivateAudioCall,
     required int? ratePrivateVideoCall,
     required bool? isFake,
-    required List<String>? video,
+    required dynamic video,
     required bool? isAvailableForPrivateVideoCall,
     required bool? isAvailableForPrivateAudioCall,
   }) {
-    Get.toNamed(
+    return Get.toNamed(
       AppRoutes.personalChatScreen,
       arguments: [
         id,
@@ -51,7 +53,7 @@ class ListenerActions {
     );
   }
 
-  static void openChatFor(TopListeners l) => openChat(
+  static Future<dynamic>? openChatFor(TopListeners l) => openChat(
         id: l.id,
         name: l.name,
         statusLabel: l.statusLabel,

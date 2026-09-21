@@ -12,7 +12,7 @@ class BottomBarScreen extends StatelessWidget {
 
   /// Tabs that were redesigned on the dark theme and draw their own bottom
   /// padding; the nav bar floats over them. Legacy tabs keep a reserved slot.
-  static const _darkTabs = {0, 1};
+  static const _darkTabs = {0, 1, 2, 3};
 
   @override
   Widget build(BuildContext context) {

@@ -411,3 +411,214 @@ class SegmentItem {
   final String label;
   final IconData icon;
 }
+
+/// Full-screen dark backdrop with soft violet/pink glows.
+///
+/// [intensity] scales the glow alpha; the random-match and onboarding screens
+/// use a stronger version, lists a subtler one.
+class AuroraBackground extends StatelessWidget {
+  const AuroraBackground({super.key, this.intensity = 1, this.child});
+
+  final double intensity;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: BebuTheme.bg),
+        IgnorePointer(
+          child: Stack(
+            children: [
+              Positioned(top: -160, left: -60, child: _blob(BebuTheme.violet.withValues(alpha: 0.30 * intensity), 380)),
+              Positioned(top: 120, right: -160, child: _blob(BebuTheme.violetDeep.withValues(alpha: 0.28 * intensity), 360)),
+              Positioned(bottom: -140, left: -40, child: _blob(BebuTheme.pink.withValues(alpha: 0.16 * intensity), 340)),
+            ],
+          ),
+        ),
+        if (child != null) child!,
+      ],
+    );
+  }
+
+  static Widget _blob(Color color, double size) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)]),
+        ),
+      );
+}
+
+/// Pill-shaped primary button with gradient fill, glow and loading state.
+class GradientButton extends StatelessWidget {
+  const GradientButton({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.icon,
+    this.gradient = BebuTheme.violetGradient,
+    this.glow = BebuTheme.violet,
+    this.loading = false,
+    this.height = 56,
+    this.expanded = true,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+  final IconData? icon;
+  final Gradient gradient;
+  final Color glow;
+  final bool loading;
+  final double height;
+  final bool expanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = loading
+        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: BebuTheme.text))
+        : FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) ...[Icon(icon, size: 20, color: BebuTheme.text), const SizedBox(width: 8)],
+                Text(label, style: BebuTheme.label(size: 16, weight: FontWeight.w700)),
+              ],
+            ),
+          );
+    return PressScale(
+      onTap: loading ? null : onTap,
+      child: AnimatedOpacity(
+        duration: BebuTheme.fast,
+        opacity: onTap == null && !loading ? 0.5 : 1,
+        child: Container(
+          height: height,
+          width: expanded ? double.infinity : null,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: [BoxShadow(color: glow.withValues(alpha: 0.45), blurRadius: 26, offset: const Offset(0, 10))],
+          ),
+          child: Center(child: content),
+        ),
+      ),
+    );
+  }
+}
+
+/// Quiet secondary pill button.
+class GhostButton extends StatelessWidget {
+  const GhostButton({super.key, required this.label, required this.onTap, this.icon, this.height = 56, this.expanded = true});
+
+  final String label;
+  final VoidCallback? onTap;
+  final IconData? icon;
+  final double height;
+  final bool expanded;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressScale(
+      onTap: onTap,
+      child: Container(
+        height: height,
+        width: expanded ? double.infinity : null,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        decoration: BoxDecoration(
+          color: BebuTheme.surface2,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: BebuTheme.borderStrong),
+        ),
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) ...[Icon(icon, size: 19, color: BebuTheme.text), const SizedBox(width: 8)],
+                Text(label, style: BebuTheme.label(size: 15)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Frosted card with a subtle violet tint, used for list rows and panels.
+class GlassCard extends StatelessWidget {
+  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(14), this.radius = BebuTheme.radiusMd, this.onTap, this.tint});
+
+  final Widget child;
+  final EdgeInsets padding;
+  final double radius;
+  final VoidCallback? onTap;
+  final Color? tint;
+
+  @override
+  Widget build(BuildContext context) {
+    final card = Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: tint ?? BebuTheme.surface.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: BebuTheme.border),
+      ),
+      child: child,
+    );
+    if (onTap == null) return card;
+    return PressScale(scale: 0.985, onTap: onTap, child: card);
+  }
+}
+
+/// Circular avatar with an optional online ring/dot.
+class BebuAvatar extends StatelessWidget {
+  const BebuAvatar({super.key, required this.child, this.size = 52, this.online, this.ring = false});
+
+  final Widget child;
+  final double size;
+  final bool? online;
+  final bool ring;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: size,
+            height: size,
+            padding: EdgeInsets.all(ring ? 2 : 0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: ring ? BebuTheme.violetGradient : null,
+            ),
+            child: ClipOval(child: child),
+          ),
+          if (online != null)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: (size * 0.26).clamp(10.0, 18.0),
+                height: (size * 0.26).clamp(10.0, 18.0),
+                decoration: BoxDecoration(
+                  color: online! ? BebuTheme.green : BebuTheme.textFaint,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: BebuTheme.bg, width: 2),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

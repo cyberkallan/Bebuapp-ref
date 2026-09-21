@@ -2,12 +2,12 @@ import 'package:talk_in/utils/enums.dart';
 
 final Map<String, String> enUS = {
   EnumLocale.txtAppName.name: "bebu",
-  EnumLocale.txtRegisterTitle1.name: "FIND",
-  EnumLocale.txtRegisterTitle2.name: "CHAT",
-  EnumLocale.txtRegisterTitle3.name: "VIDEO CALL",
-  EnumLocale.txtRegisterSubTitle1.name: "You can connect with the people around\nthe world for doing chat, messages and\nmake connections with them.",
-  EnumLocale.txtRegisterSubTitle2.name: 'Chat with the strangers to know each\nother better and have a nice\ncompatibility.',
-  EnumLocale.txtRegisterSubTitle3.name: "You can share your videos and photos\nwith your friend and connections.",
+  EnumLocale.txtRegisterTitle1.name: "Find your person",
+  EnumLocale.txtRegisterTitle2.name: "Chat before you call",
+  EnumLocale.txtRegisterTitle3.name: "Voice & video, your way",
+  EnumLocale.txtRegisterSubTitle1.name: "Browse real callers by language and topic. See who is live right now and start talking in seconds.",
+  EnumLocale.txtRegisterSubTitle2.name: 'Break the ice over text or a voice note, then move to a call whenever it feels right.',
+  EnumLocale.txtRegisterSubTitle3.name: "Crystal-clear calls billed per minute with coins, so you stay in control of every second.",
   EnumLocale.txtEnterYourMail.name: "Enter Your Email Id",
   EnumLocale.txtEnterPassword.name: "Enter Your Password",
   EnumLocale.txtCoinRechargeSuccess.name: "Coin recharge success",
