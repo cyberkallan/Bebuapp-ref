@@ -266,29 +266,34 @@ const ListenerListTable = () => {
               enableSorting: false,
               cell: ({ row }) => {
                 const p = row.original.aiProfile
-                const on = aiConfig?.enabled && (!p || p.enabled !== false)
+                const hostOn = !p || p.enabled !== false
+                const on = aiConfig?.enabled && hostOn
                 const lang = p?.language || aiConfig?.defaultLanguage || ''
+                const hint = !hostOn ? 'AI replies are off for this host' : !aiConfig?.enabled ? 'AI chat is switched off globally (Settings → AI Chat)' : 'Replying with AI'
 
                 return (
-                  <div
-                    className='flex items-center gap-2 cursor-pointer'
-                    onClick={() => setAiListener(row.original)}
-                    role='button'
-                    tabIndex={0}
-                  >
-                    <Chip
-                      size='small'
-                      variant='tonal'
-                      color={on ? 'success' : 'default'}
-                      icon={<SmartToyOutlinedIcon fontSize='small' />}
-                      label={on ? languageLabel(lang) : 'Off'}
-                    />
-                    {p?.replies > 0 && (
-                      <Typography variant='caption' color='text.secondary'>
-                        {p.replies} replies
-                      </Typography>
-                    )}
-                  </div>
+                  <Tooltip title={hint}>
+                    <div
+                      className='flex items-center gap-2 cursor-pointer'
+                      data-ai-chip
+                      onClick={() => setAiListener(row.original)}
+                      role='button'
+                      tabIndex={0}
+                    >
+                      <Chip
+                        size='small'
+                        variant='tonal'
+                        color={on ? 'success' : hostOn ? 'warning' : 'default'}
+                        icon={<SmartToyOutlinedIcon fontSize='small' />}
+                        label={hostOn ? languageLabel(lang) : 'Off'}
+                      />
+                      {p?.replies > 0 && (
+                        <Typography variant='caption' color='text.secondary'>
+                          {p.replies} replies
+                        </Typography>
+                      )}
+                    </div>
+                  </Tooltip>
                 )
               }
             })
