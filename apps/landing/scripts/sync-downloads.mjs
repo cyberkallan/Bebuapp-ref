@@ -55,8 +55,19 @@ for (const name of readdirSync(releasesDir)
   });
 }
 
+// Optional release notes shown on /download (see releases/notes.json).
+let notes = null;
+const notesFile = path.join(releasesDir, 'notes.json');
+if (existsSync(notesFile)) {
+  try {
+    notes = JSON.parse(readFileSync(notesFile, 'utf8'));
+  } catch (error) {
+    console.warn(`[landing] ignoring invalid ${notesFile}: ${error.message}`);
+  }
+}
+
 writeFileSync(
   path.join(outDir, 'manifest.json'),
-  JSON.stringify({ version: builds[0]?.version ?? null, builds }, null, 2),
+  JSON.stringify({ version: builds[0]?.version ?? null, builds, notes }, null, 2),
 );
 console.log(`[landing] synced ${builds.length} APK(s) to public/downloads`);

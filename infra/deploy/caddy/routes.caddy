@@ -60,10 +60,10 @@
 		@immutable path /assets/*
 		header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-		@nocache path / /index.html /downloads/manifest.json
+		@nocache path / /index.html /download /download.html /downloads/manifest.json
 		header @nocache Cache-Control "no-cache"
 
-		try_files {path} {path}/index.html
+		try_files {path} {path}.html {path}/index.html
 		file_server
 	}
 

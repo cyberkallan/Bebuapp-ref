@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en" class="dl-page">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download bebu for Android — signed APK, ready in under a minute</title>
+    <meta
+      name="description"
+      content="Get the latest bebu Android app. Signed APK with SHA-256 checksums, automatic device detection, QR download and step-by-step install guide."
+    />
+    <meta name="theme-color" content="#0b0716" />
+    <meta property="og:title" content="Download bebu for Android" />
+    <meta
+      property="og:description"
+      content="Signed APK, SHA-256 verified. Install bebu in under a minute."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og.png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/download.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="dl-bg" aria-hidden="true">
+      <div class="dl-bg__aurora dl-bg__aurora--a"></div>
+      <div class="dl-bg__aurora dl-bg__aurora--b"></div>
+      <div class="dl-bg__aurora dl-bg__aurora--c"></div>
+      <div class="dl-bg__grid"></div>
+      <div class="dl-bg__noise"></div>
+    </div>
+
+    <header class="site-header dl-header" data-header>
+      <div class="container nav">
+        <a class="brand" href="/" aria-label="bebu home">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path
+                d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
+              />
+            </svg>
+          </span>
+          <span class="brand__name">bebu</span>
+        </a>
+
+        <nav class="nav__links" id="nav-links" aria-label="Primary">
+          <a href="#builds">Builds</a>
+          <a href="#install">Install guide</a>
+          <a href="#whats-new">What's new</a>
+          <a href="#verify">Verify</a>
+          <a href="/#faq">FAQ</a>
+        </nav>
+
+        <div class="nav__actions">
+          <a class="btn btn--primary btn--sm" href="#get" data-download-primary data-track="nav">
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            <span data-nav-label>Download</span>
+          </a>
+          <button
+            class="nav__toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-links"
+            data-nav-toggle
+          >
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav__toggle-bar"></span>
+            <span class="nav__toggle-bar"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero / primary download -->
+      <section class="dl-hero" id="get">
+        <div class="container dl-hero__grid">
+          <div class="dl-hero__copy">
+            <p class="dl-eyebrow">
+              <span class="dl-eyebrow__pulse"></span>
+              <span>Android</span>
+              <i></i>
+              <span>Version <b data-version>—</b></span>
+              <i></i>
+              <span data-primary-size>—</span>
+            </p>
+
+            <h1 class="dl-title">
+              Install bebu<br />
+              <span class="dl-title__accent">in under a minute.</span>
+            </h1>
+
+            <p class="dl-lead">
+              A signed Android build, straight from us. Download, tap install, and you're talking to
+              real people over voice and video. No Play Store account needed.
+            </p>
+
+            <div class="dl-cta">
+              <a
+                class="dl-mega"
+                href="#"
+                data-download-primary
+                data-track="hero"
+                aria-describedby="dl-mega-meta"
+              >
+                <span class="dl-mega__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.637.637 0 0 0-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67a.643.643 0 0 0-.87-.2c-.28.18-.37.54-.22.83L6.4 9.48A10.81 10.81 0 0 0 1 18h22a10.81 10.81 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"
+                    />
+                  </svg>
+                </span>
+                <span class="dl-mega__text">
+                  <span class="dl-mega__label">Download for Android</span>
+                  <span class="dl-mega__meta" id="dl-mega-meta" data-primary-meta
+                    >Detecting the best build for your device…</span
+                  >
+                </span>
+                <span class="dl-mega__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <path d="M12 4v13m0 0 5-5m-5 5-5-5" />
+                    <path d="M5 20h14" />
+                  </svg>
+                </span>
+                <span class="dl-mega__shine" aria-hidden="true"></span>
+              </a>
+
+              <a class="btn btn--ghost-dark btn--lg" href="#builds">All builds</a>
+            </div>
+
+            <div class="dl-empty" data-download-empty hidden>
+              <strong>The Android build is being prepared.</strong>
+              <span>Check back in a few minutes — this page updates automatically.</span>
+            </div>
+
+            <ul class="dl-trust" aria-label="Trust signals">
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <span>Signed release build</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 7h16M4 12h10M4 17h16" />
+                </svg>
+                <span>SHA-256 published</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="3" />
+                  <path d="M11 18h2" />
+                </svg>
+                <span>Android 6.0+</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <span>Under 1 minute</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dl-hero__visual">
+            <div class="dl-qr" data-qr-card>
+              <div class="dl-qr__code" data-qr aria-label="QR code linking to the download"></div>
+              <div class="dl-qr__text">
+                <strong>On a computer?</strong>
+                <span>Scan with your phone's camera to download directly.</span>
+              </div>
+            </div>
+
+            <div class="dl-stage" data-tilt>
+              <div class="dl-phone">
+                <div class="dl-phone__frame">
+                  <div class="dl-phone__island"></div>
+                  <div class="dl-phone__screen">
+                    <div class="app">
+                      <div class="app__bar">
+                        <div>
+                          <span class="app__hello">Good evening</span>
+                          <strong class="app__name">Rahul</strong>
+                        </div>
+                        <span class="app__coins"><i></i>1,240</span>
+                      </div>
+                      <div class="app__search">Search callers, languages, topics</div>
+                      <div class="app__chips">
+                        <span class="is-on">Online</span><span>Hindi</span><span>English</span
+                        ><span>Malayalam</span>
+                      </div>
+                      <div class="app__list">
+                        <div class="app__row">
+                          <span class="app__avatar" style="--h: 268">A</span>
+                          <div class="app__who">
+                            <strong>Ananya <em>4.9 ★</em></strong>
+                            <span>Hindi · English · 20 coins/min</span>
+                          </div>
+                          <span class="app__call app__call--video"></span>
+                          <span class="app__call"></span>
+                        </div>
+                        <div class="app__row">
+                          <span class="app__avatar" style="--h: 320">M</span>
+                          <div class="app__who">
+                            <strong>Meera <em>4.8 ★</em></strong>
+                            <span>Malayalam · 15 coins/min</span>
+                          </div>
+                          <span class="app__call app__call--video"></span>
+                          <span class="app__call"></span>
+                        </div>
+                        <div class="app__row app__row--dim">
+                          <span class="app__avatar" style="--h: 200">S</span>
+                          <div class="app__who">
+                            <strong>Sana <em>5.0 ★</em></strong>
+                            <span>Tamil · English · 25 coins/min</span>
+                          </div>
+                          <span class="app__call app__call--video"></span>
+                          <span class="app__call"></span>
+                        </div>
+                        <div class="app__row app__row--dim">
+                          <span class="app__avatar" style="--h: 30">P</span>
+                          <div class="app__who">
+                            <strong>Priya <em>4.7 ★</em></strong>
+                            <span>Telugu · 18 coins/min</span>
+                          </div>
+                          <span class="app__call app__call--video"></span>
+                          <span class="app__call"></span>
+                        </div>
+                      </div>
+                      <div class="app__tabs">
+                        <span class="is-on"></span><span></span><span></span><span></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dl-phone__glow"></div>
+              </div>
+
+              <div class="dl-float dl-float--call">
+                <span class="dl-float__avatar">A</span>
+                <div>
+                  <strong>Ananya is calling…</strong>
+                  <small>Video · 20 coins/min</small>
+                </div>
+                <span class="dl-float__accept"></span>
+              </div>
+
+              <div class="dl-float dl-float--bonus">
+                <span class="dl-float__coin"></span>
+                <div>
+                  <strong>+20 coins</strong>
+                  <small>Daily login bonus</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Builds -->
+      <section class="dl-section" id="builds">
+        <div class="container">
+          <div class="dl-section__head">
+            <p class="dl-kicker">Choose your build</p>
+            <h2>One tap for most phones. Options for the rest.</h2>
+            <p>
+              We publish a build per processor type so the download stays small. We pick one for you
+              automatically — the others are here if you need them.
+            </p>
+          </div>
+
+          <div class="dl-builds" data-builds-grid></div>
+
+          <p class="dl-hint" data-device-hint hidden></p>
+        </div>
+      </section>
+
+      <!-- Install guide -->
+      <section class="dl-section" id="install">
+        <div class="container">
+          <div class="dl-section__head">
+            <p class="dl-kicker">Install guide</p>
+            <h2>Three taps. Nothing to configure.</h2>
+          </div>
+
+          <ol class="dl-steps">
+            <li class="dl-step">
+              <span class="dl-step__num">1</span>
+              <div class="dl-step__art dl-step__art--download" aria-hidden="true">
+                <span class="dl-step__bar"><i></i></span>
+                <span class="dl-step__file">bebu-<b data-version>—</b>.apk</span>
+              </div>
+              <h3>Download the APK</h3>
+              <p>
+                Tap the button above on your phone. Chrome may ask to confirm the download — tap
+                <b>Download anyway</b>.
+              </p>
+            </li>
+            <li class="dl-step">
+              <span class="dl-step__num">2</span>
+              <div class="dl-step__art dl-step__art--allow" aria-hidden="true">
+                <span class="dl-step__sheet">
+                  <span>Allow from this source</span>
+                  <span class="dl-step__switch"><i></i></span>
+                </span>
+              </div>
+              <h3>Allow the install</h3>
+              <p>
+                Open the file. Android asks once to allow installs from your browser or file manager
+                — switch it on and go back.
+              </p>
+            </li>
+            <li class="dl-step">
+              <span class="dl-step__num">3</span>
+              <div class="dl-step__art dl-step__art--open" aria-hidden="true">
+                <span class="dl-step__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path
+                      d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
+                    />
+                  </svg>
+                </span>
+                <span class="dl-step__label">bebu</span>
+              </div>
+              <h3>Open bebu and sign in</h3>
+              <p>
+                Quick login gets you in immediately. You start with a coin bonus, so your first
+                conversation is on us.
+              </p>
+            </li>
+          </ol>
+
+          <div class="dl-callout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M12 9v4m0 4h.01M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+              />
+            </svg>
+            <p>
+              Seeing “App not installed”? Uninstall any earlier test build of bebu first, then
+              install again. Different test keys can't update each other.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- What's new -->
+      <section class="dl-section" id="whats-new">
+        <div class="container dl-notes">
+          <div class="dl-section__head dl-section__head--left">
+            <p class="dl-kicker">What's new</p>
+            <h2>Release <span data-version>—</span></h2>
+            <p data-notes-date class="dl-notes__date"></p>
+          </div>
+          <ul class="dl-notes__list" data-notes-list>
+            <li class="dl-notes__empty">Release notes will appear here with the next build.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Verify -->
+      <section class="dl-section" id="verify">
+        <div class="container">
+          <div class="dl-section__head">
+            <p class="dl-kicker">Verify your download</p>
+            <h2>Trust, but check.</h2>
+            <p>
+              Every build's SHA-256 fingerprint is published here. If the hash of your file matches,
+              it's exactly what we shipped.
+            </p>
+          </div>
+
+          <div class="dl-verify">
+            <ul class="dl-sums" data-checksums></ul>
+
+            <div class="dl-howto">
+              <div class="dl-howto__tabs" role="tablist" aria-label="Operating system">
+                <button role="tab" aria-selected="true" data-os-tab="android">Android</button>
+                <button role="tab" aria-selected="false" data-os-tab="mac">macOS / Linux</button>
+                <button role="tab" aria-selected="false" data-os-tab="win">Windows</button>
+              </div>
+              <div class="dl-howto__panel" data-os-panel="android">
+                <p>
+                  Open the APK in a file manager and choose <b>Properties</b> or <b>Details</b> →
+                  <b>SHA-256</b>, or use a checksum app from the Play Store.
+                </p>
+              </div>
+              <div class="dl-howto__panel" data-os-panel="mac" hidden>
+                <pre><code>shasum -a 256 <span data-primary-file>bebu.apk</span></code></pre>
+              </div>
+              <div class="dl-howto__panel" data-os-panel="win" hidden>
+                <pre><code>certutil -hashfile <span data-primary-file>bebu.apk</span> SHA256</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Permissions -->
+      <section class="dl-section dl-section--tight">
+        <div class="container">
+          <div class="dl-section__head">
+            <p class="dl-kicker">Permissions</p>
+            <h2>What bebu asks for, and why.</h2>
+          </div>
+          <ul class="dl-perms">
+            <li>
+              <span class="dl-perms__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="3" width="6" height="12" rx="3" />
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                </svg>
+              </span>
+              <div><strong>Microphone</strong><span>Voice and video calls.</span></div>
+            </li>
+            <li>
+              <span class="dl-perms__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+                  <circle cx="12" cy="13" r="3.5" />
+                </svg>
+              </span>
+              <div>
+                <strong>Camera</strong><span>Video calls and profile photos. Off by default.</span>
+              </div>
+            </li>
+            <li>
+              <span class="dl-perms__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 8a6 6 0 0 1 12 0v5l2 3H4l2-3z" />
+                  <path d="M10 20a2 2 0 0 0 4 0" />
+                </svg>
+              </span>
+              <div>
+                <strong>Notifications</strong
+                ><span>Incoming calls and messages, even when closed.</span>
+              </div>
+            </li>
+            <li>
+              <span class="dl-perms__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 6h16v12H4z" />
+                  <path d="M4 10h16" />
+                </svg>
+              </span>
+              <div>
+                <strong>Photos &amp; media</strong
+                ><span>Only when you attach a picture in chat.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="dl-final">
+        <div class="container dl-final__inner">
+          <div>
+            <h2>Ready when you are.</h2>
+            <p>
+              Version <span data-version>—</span> · <span data-primary-size>—</span> · Android 6.0+
+            </p>
+          </div>
+          <a class="btn btn--light btn--lg" href="#" data-download-primary data-track="footer">
+            Download for Android
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer dl-footer">
+      <div class="container site-footer__grid">
+        <div>
+          <a class="brand" href="/" aria-label="bebu home">
+            <span class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path
+                  d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
+                />
+              </svg>
+            </span>
+            <span class="brand__name">bebu</span>
+          </a>
+          <p class="site-footer__tagline">Real conversations, one tap away.</p>
+        </div>
+        <nav aria-label="Product">
+          <h4>Product</h4>
+          <a href="/#features">Features</a>
+          <a href="/#how">How it works</a>
+          <a href="/#callers">For callers</a>
+        </nav>
+        <nav aria-label="Download">
+          <h4>Download</h4>
+          <a href="#builds">All builds</a>
+          <a href="#install">Install guide</a>
+          <a href="#verify">Checksums</a>
+        </nav>
+        <nav aria-label="Company">
+          <h4>Company</h4>
+          <a href="mailto:hello@bebuapp.in">Contact</a>
+          <a href="/#faq">FAQ</a>
+        </nav>
+      </div>
+      <div class="container site-footer__bottom">
+        <span>© <span data-year></span> bebu. All rights reserved.</span>
+        <span>Made in India</span>
+      </div>
+    </footer>
+
+    <!-- Sticky mobile CTA -->
+    <div class="dl-sticky" data-sticky hidden>
+      <div>
+        <strong>bebu <span data-version>—</span></strong>
+        <span data-primary-size>—</span>
+      </div>
+      <a class="btn btn--primary" href="#" data-download-primary data-track="sticky">Download</a>
+    </div>
+
+    <script type="module" src="/src/download.ts"></script>
+  </body>
+</html>

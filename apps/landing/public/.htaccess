@@ -13,6 +13,9 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 # Serve the operator console status page at /admin (trailing-slash safe)
 RewriteRule ^admin$ /admin/ [R=301,L]
 
+# Clean URL for the download page
+RewriteRule ^download/?$ /download.html [L]
+
 # Android packages must be served with the correct MIME type so browsers
 # download them instead of displaying garbage.
 AddType application/vnd.android.package-archive .apk

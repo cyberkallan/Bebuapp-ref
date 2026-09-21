@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-21",
+  "items": [
+    {
+      "type": "new",
+      "title": "Full app, rebuilt on the proven Talkin engine",
+      "body": "Quick login, caller discovery, voice and video calls, chat, coins and purchases are all in this build."
+    },
+    {
+      "type": "new",
+      "title": "bebu branding",
+      "body": "New icon, name and splash. Same violet look across the app, the website and the console."
+    },
+    {
+      "type": "improved",
+      "title": "Live on a dedicated server",
+      "body": "The app talks to bebu's own backend over HTTPS, so calls and payments run against real infrastructure."
+    },
+    {
+      "type": "improved",
+      "title": "Signed release build",
+      "body": "Signed with a release key instead of the debug key, so future updates install over this one."
+    }
+  ]
+}
