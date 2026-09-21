@@ -50,6 +50,20 @@ const settingSchema = new mongoose.Schema(
     videoCallRateRandom: { type: Number, default: 0 },
     audioCallRateRandom: { type: Number, default: 0 },
 
+    // App look & feel, controlled from the admin panel and applied by the
+    // mobile app at launch (see docs/appearance.md).
+    appearance: {
+      defaultTheme: { type: String, default: "dark" }, // dark | light | system
+      allowUserThemeChoice: { type: Boolean, default: true },
+      askThemeOnOnboarding: { type: Boolean, default: true },
+      accent: { type: String, default: "pink" }, // pink | violet | coral | ocean | mint | sunset
+      ambientGlow: { type: Boolean, default: true },
+      motion: { type: String, default: "full" }, // full | reduced
+      cornerStyle: { type: String, default: "rounded" }, // rounded | soft | sharp
+      liveRings: { type: Boolean, default: true },
+      coinAnimation: { type: Boolean, default: true },
+    },
+
     // AI auto-replies for fake hosts. Provider API keys live here and are
     // stripped from every app-facing settings response.
     aiChat: {

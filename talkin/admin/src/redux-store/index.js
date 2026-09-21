@@ -41,6 +41,7 @@ import gameHistoryReducer from '@/redux-store/slices/gameHistory'
 import paymentOptionsReducer from '@/redux-store/slices/paymentOptions'
 import listenerReducer from '@/redux-store/slices/listener'
 import aiChatReducer from '@/redux-store/slices/aiChat'
+import appearanceReducer from '@/redux-store/slices/appearance'
 
 export const store = configureStore({
   reducer: {
@@ -65,6 +66,7 @@ export const store = configureStore({
     // reportReasons: reportReasonsReducer,
     settings: settingsReducer,
     aiChat: aiChatReducer,
+    appearance: appearanceReducer,
 
     // posts: postsReducer,
     faqs: faqsReducer,
