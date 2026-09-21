@@ -2,6 +2,31 @@
   "date": "2026-09-21",
   "items": [
     {
+      "type": "fixed",
+      "title": "Messages reach the host now",
+      "body": "Texts typed while the connection was still waking up looked sent but never left your phone. Messages are now queued and delivered the moment the connection is back, with a clock while pending, one tick when the server has it and blue ticks when read. If something really can't be sent you see Not sent · tap to retry."
+    },
+    {
+      "type": "fixed",
+      "title": "Malayalam, Tamil, Hindi and emoji messages",
+      "body": "Anything that wasn't plain English used to be silently emptied before sending. Every language and emoji now goes through as typed."
+    },
+    {
+      "type": "fixed",
+      "title": "Voice notes record on the first hold",
+      "body": "The first long-press only asked for the microphone and then did nothing. Recording now starts as soon as you allow it; if the mic is blocked we take you to the phone settings."
+    },
+    {
+      "type": "new",
+      "title": "WhatsApp-style recording",
+      "body": "Hold the mic to record with a live level meter and timer, slide left to cancel, release to send. Voice notes get a proper waveform bubble with play, pause and seek."
+    },
+    {
+      "type": "new",
+      "title": "Chat tones and haptics",
+      "body": "Soft tones for sent and received messages and for recording, plus light vibration on every action. Turn tones off in Settings → Conversation tones; the admin can switch tones and haptics off app-wide."
+    },
+    {
       "type": "new",
       "title": "Avatar Studio",
       "body": "Build a 3D look instead of a photo: pick an avatar, then a scene, a pet, a ride, a home, something in the sky and a worn accessory. The stage tilts when you drag it and everything on it idles gently. Free items are yours right away; premium ones unlock with coins from your wallet, with a burst, sound and haptics when they do. Nothing changes until you tap Save my look."

@@ -12,7 +12,7 @@ import 'app_theme.dart';
 
 class Utils {
   /// Shown on the profile page; keep in sync with pubspec.yaml.
-  static const String appVersion = '1.6.0';
+  static const String appVersion = '1.6.1';
 
   static const sandboxVerifyReceiptUrl = false;
 

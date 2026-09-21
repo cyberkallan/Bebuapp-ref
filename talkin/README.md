@@ -198,6 +198,45 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Chat that delivers, voice notes, chat tones (`1.6.1`)
+
+- Why messages were lost: the app emitted `messageDispatched` only when
+  `socket.connected` was already true and otherwise logged *Socket Not
+  Connected* and kept the optimistic bubble, so anything typed while the
+  socket was reconnecting (app resume, screen open right after login) looked
+  sent but never reached the server; and `sanitizeUserInput` stripped every
+  non-ASCII character, so Malayalam / emoji messages went out empty.
+  `socket/socket_service.dart` now builds a fresh socket per account
+  (`forceNew`, reconnection with back-off), queues emits while offline and
+  flushes them on connect (`SocketService.emit`), and exposes
+  `ensureConnected()` which the chat screen calls on open.
+  `SocketListen.registerListeners()` binds with `off` + `on` and re-binds on
+  every connect, so a re-created bottom bar never doubles handlers.
+- `PersonalChatScreenController` — every outgoing message carries a `localId`
+  the server echoes back; `onSocketMessage` reconciles the optimistic bubble
+  by that id (`pending` → sent), marks it `failed` after 12 s without an echo
+  (*Not sent · tap to retry*), fetches the chat topic first if the history
+  call had failed, and plays the received tone for the other side's messages.
+  Sanitiser now only removes tags and control characters.
+- Voice notes: the first long-press only *asked* for the microphone and never
+  started recording; it now starts as soon as permission is granted, sends
+  the user to app settings when it is permanently blocked, records AAC
+  `.m4a` (64 kbps mono), discards presses shorter than 0.9 s, and supports
+  WhatsApp-style **slide left to cancel** with a live level meter
+  (`Recorder.onAmplitudeChanged`). Same permission fix on the host side.
+- UI — composer swaps mic ↔ send with the text, the recording bar replaces the
+  input (blinking dot, timer, level bars, slide hint → *Release to cancel*),
+  `DeliveryTicks` (clock / tick / blue double tick / red), and `DarkVoiceBubble`
+  on the design system (play/pause, seekable waveform, duration) replaces the
+  legacy purple audio widgets.
+- `Sfx` — `messageSent`, `messageReceived`, `recordStart`, `recordCancel`
+  (`assets/audio/msg_sent.mp3`, `msg_in.mp3`, `rec_start.mp3`, `rec_cancel.mp3`,
+  generated with ffmpeg), on a second player so tones do not cut each other.
+  Haptics go through one gate. Admin *Settings → Appearance → Effects* gets
+  **Chat tones** and **Haptic feedback**; users get *Settings → Conversation
+  tones*. Also fixes the iOS `AudioContext` assertion (`ambient` cannot mix
+  with others) that would throw in debug builds.
+
 ### Avatar Studio, profile rebuild, edit-profile fixes (`1.6.0`)
 
 - `tools/build_avatar_assets.py` — builds the asset pack from Microsoft

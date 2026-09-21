@@ -5,13 +5,21 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.6.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
-| `bebu-1.6.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
+| `bebu-1.6.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
+| `bebu-1.6.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.6.1` fixes chat: messages typed while the socket was reconnecting were
+shown as sent but never left the phone, Malayalam / emoji text was stripped to
+nothing, and the first long-press on the mic only asked for permission and
+never recorded. Messages are now queued and delivered, show clock → tick → blue
+ticks (or *Not sent · tap to retry*), voice notes record on the first hold with
+slide-to-cancel and a live level meter, and there are WhatsApp-style tones and
+haptics (admin can turn both off; users can mute tones). Installs over `1.6.0`.
 
 `1.6.0` adds Avatar Studio: a 3D look (avatar, scene, pet, ride, home, sky,
 accessory) built on a tilting diorama stage, with free items equipped
