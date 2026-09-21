@@ -1,0 +1,781 @@
+{
+  "source": "Microsoft Fluent Emoji 3D (MIT) \u2014 https://github.com/microsoft/fluentui-emoji",
+  "presets": {
+    "male": [
+      "m_classic",
+      "m_light",
+      "m_deep"
+    ],
+    "female": [
+      "f_classic",
+      "f_light",
+      "f_deep"
+    ]
+  },
+  "items": [
+    {
+      "key": "m_classic",
+      "category": "avatar",
+      "name": "Classic",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "male",
+      "sortOrder": 1
+    },
+    {
+      "key": "m_light",
+      "category": "avatar",
+      "name": "Fair",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "male",
+      "sortOrder": 2
+    },
+    {
+      "key": "m_deep",
+      "category": "avatar",
+      "name": "Deep",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "male",
+      "sortOrder": 3
+    },
+    {
+      "key": "m_beard",
+      "category": "avatar",
+      "name": "Beard",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 4
+    },
+    {
+      "key": "m_curly",
+      "category": "avatar",
+      "name": "Curls",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 5
+    },
+    {
+      "key": "m_red",
+      "category": "avatar",
+      "name": "Ginger",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 6
+    },
+    {
+      "key": "m_tech",
+      "category": "avatar",
+      "name": "Coder",
+      "coins": 180,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 7
+    },
+    {
+      "key": "m_singer",
+      "category": "avatar",
+      "name": "Rockstar",
+      "coins": 220,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 8
+    },
+    {
+      "key": "m_detective",
+      "category": "avatar",
+      "name": "Detective",
+      "coins": 220,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 9
+    },
+    {
+      "key": "m_pilot",
+      "category": "avatar",
+      "name": "Captain",
+      "coins": 260,
+      "rarity": "rare",
+      "gender": "male",
+      "sortOrder": 10
+    },
+    {
+      "key": "m_tuxedo",
+      "category": "avatar",
+      "name": "Black tie",
+      "coins": 320,
+      "rarity": "epic",
+      "gender": "male",
+      "sortOrder": 11
+    },
+    {
+      "key": "m_elf",
+      "category": "avatar",
+      "name": "Elf",
+      "coins": 320,
+      "rarity": "epic",
+      "gender": "male",
+      "sortOrder": 12
+    },
+    {
+      "key": "m_mage",
+      "category": "avatar",
+      "name": "Mage",
+      "coins": 360,
+      "rarity": "epic",
+      "gender": "male",
+      "sortOrder": 13
+    },
+    {
+      "key": "m_vampire",
+      "category": "avatar",
+      "name": "Vampire",
+      "coins": 360,
+      "rarity": "epic",
+      "gender": "male",
+      "sortOrder": 14
+    },
+    {
+      "key": "m_hero",
+      "category": "avatar",
+      "name": "Hero",
+      "coins": 420,
+      "rarity": "epic",
+      "gender": "male",
+      "sortOrder": 15
+    },
+    {
+      "key": "m_prince",
+      "category": "avatar",
+      "name": "Prince",
+      "coins": 700,
+      "rarity": "legendary",
+      "gender": "male",
+      "sortOrder": 16
+    },
+    {
+      "key": "m_astro",
+      "category": "avatar",
+      "name": "Astronaut",
+      "coins": 800,
+      "rarity": "legendary",
+      "gender": "male",
+      "sortOrder": 17
+    },
+    {
+      "key": "m_ninja",
+      "category": "avatar",
+      "name": "Ninja",
+      "coins": 900,
+      "rarity": "legendary",
+      "gender": "male",
+      "sortOrder": 18
+    },
+    {
+      "key": "f_classic",
+      "category": "avatar",
+      "name": "Classic",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "female",
+      "sortOrder": 19
+    },
+    {
+      "key": "f_light",
+      "category": "avatar",
+      "name": "Fair",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "female",
+      "sortOrder": 20
+    },
+    {
+      "key": "f_deep",
+      "category": "avatar",
+      "name": "Deep",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "female",
+      "sortOrder": 21
+    },
+    {
+      "key": "f_curly",
+      "category": "avatar",
+      "name": "Curls",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 22
+    },
+    {
+      "key": "f_red",
+      "category": "avatar",
+      "name": "Ginger",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 23
+    },
+    {
+      "key": "f_blonde",
+      "category": "avatar",
+      "name": "Blonde",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 24
+    },
+    {
+      "key": "f_scarf",
+      "category": "avatar",
+      "name": "Headscarf",
+      "coins": 150,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 25
+    },
+    {
+      "key": "f_tech",
+      "category": "avatar",
+      "name": "Coder",
+      "coins": 180,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 26
+    },
+    {
+      "key": "f_singer",
+      "category": "avatar",
+      "name": "Popstar",
+      "coins": 220,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 27
+    },
+    {
+      "key": "f_detective",
+      "category": "avatar",
+      "name": "Detective",
+      "coins": 220,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 28
+    },
+    {
+      "key": "f_pilot",
+      "category": "avatar",
+      "name": "Captain",
+      "coins": 260,
+      "rarity": "rare",
+      "gender": "female",
+      "sortOrder": 29
+    },
+    {
+      "key": "f_dancer",
+      "category": "avatar",
+      "name": "Dancer",
+      "coins": 300,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 30
+    },
+    {
+      "key": "f_veil",
+      "category": "avatar",
+      "name": "Bride",
+      "coins": 320,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 31
+    },
+    {
+      "key": "f_elf",
+      "category": "avatar",
+      "name": "Elf",
+      "coins": 320,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 32
+    },
+    {
+      "key": "f_fairy",
+      "category": "avatar",
+      "name": "Fairy",
+      "coins": 360,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 33
+    },
+    {
+      "key": "f_mage",
+      "category": "avatar",
+      "name": "Sorceress",
+      "coins": 360,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 34
+    },
+    {
+      "key": "f_hero",
+      "category": "avatar",
+      "name": "Hero",
+      "coins": 420,
+      "rarity": "epic",
+      "gender": "female",
+      "sortOrder": 35
+    },
+    {
+      "key": "f_princess",
+      "category": "avatar",
+      "name": "Princess",
+      "coins": 700,
+      "rarity": "legendary",
+      "gender": "female",
+      "sortOrder": 36
+    },
+    {
+      "key": "f_astro",
+      "category": "avatar",
+      "name": "Astronaut",
+      "coins": 800,
+      "rarity": "legendary",
+      "gender": "female",
+      "sortOrder": 37
+    },
+    {
+      "key": "f_vampire",
+      "category": "avatar",
+      "name": "Vampire",
+      "coins": 900,
+      "rarity": "legendary",
+      "gender": "female",
+      "sortOrder": 38
+    },
+    {
+      "key": "pet_dog",
+      "category": "pet",
+      "name": "Puppy",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 39
+    },
+    {
+      "key": "pet_cat",
+      "category": "pet",
+      "name": "Kitten",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 40
+    },
+    {
+      "key": "pet_hamster",
+      "category": "pet",
+      "name": "Hamster",
+      "coins": 80,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 41
+    },
+    {
+      "key": "pet_rabbit",
+      "category": "pet",
+      "name": "Bunny",
+      "coins": 80,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 42
+    },
+    {
+      "key": "pet_parrot",
+      "category": "pet",
+      "name": "Parrot",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 43
+    },
+    {
+      "key": "pet_fox",
+      "category": "pet",
+      "name": "Fox",
+      "coins": 200,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 44
+    },
+    {
+      "key": "pet_panda",
+      "category": "pet",
+      "name": "Panda",
+      "coins": 250,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 45
+    },
+    {
+      "key": "pet_koala",
+      "category": "pet",
+      "name": "Koala",
+      "coins": 250,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 46
+    },
+    {
+      "key": "pet_tiger",
+      "category": "pet",
+      "name": "Tiger",
+      "coins": 400,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 47
+    },
+    {
+      "key": "pet_unicorn",
+      "category": "pet",
+      "name": "Unicorn",
+      "coins": 600,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 48
+    },
+    {
+      "key": "veh_bicycle",
+      "category": "vehicle",
+      "name": "Bicycle",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 49
+    },
+    {
+      "key": "veh_scooter",
+      "category": "vehicle",
+      "name": "Scooter",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 50
+    },
+    {
+      "key": "veh_auto",
+      "category": "vehicle",
+      "name": "Auto",
+      "coins": 100,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 51
+    },
+    {
+      "key": "veh_bike",
+      "category": "vehicle",
+      "name": "Motorbike",
+      "coins": 150,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 52
+    },
+    {
+      "key": "veh_car",
+      "category": "vehicle",
+      "name": "Hatchback",
+      "coins": 200,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 53
+    },
+    {
+      "key": "veh_sail",
+      "category": "vehicle",
+      "name": "Sailboat",
+      "coins": 250,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 54
+    },
+    {
+      "key": "veh_suv",
+      "category": "vehicle",
+      "name": "SUV",
+      "coins": 300,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 55
+    },
+    {
+      "key": "veh_boat",
+      "category": "vehicle",
+      "name": "Speedboat",
+      "coins": 400,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 56
+    },
+    {
+      "key": "veh_race",
+      "category": "vehicle",
+      "name": "Supercar",
+      "coins": 450,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 57
+    },
+    {
+      "key": "veh_rocket",
+      "category": "vehicle",
+      "name": "Rocket",
+      "coins": 900,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 58
+    },
+    {
+      "key": "home_hut",
+      "category": "home",
+      "name": "Cabin",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 59
+    },
+    {
+      "key": "home_house",
+      "category": "home",
+      "name": "House",
+      "coins": 150,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 60
+    },
+    {
+      "key": "home_villa",
+      "category": "home",
+      "name": "Villa",
+      "coins": 400,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 61
+    },
+    {
+      "key": "home_tower",
+      "category": "home",
+      "name": "Penthouse",
+      "coins": 500,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 62
+    },
+    {
+      "key": "home_jp",
+      "category": "home",
+      "name": "Pagoda castle",
+      "coins": 700,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 63
+    },
+    {
+      "key": "home_castle",
+      "category": "home",
+      "name": "Castle",
+      "coins": 900,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 64
+    },
+    {
+      "key": "sky_heli",
+      "category": "sky",
+      "name": "Helicopter",
+      "coins": 450,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 65
+    },
+    {
+      "key": "sky_jet",
+      "category": "sky",
+      "name": "Private jet",
+      "coins": 500,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 66
+    },
+    {
+      "key": "sky_jumbo",
+      "category": "sky",
+      "name": "Jumbo jet",
+      "coins": 800,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 67
+    },
+    {
+      "key": "sky_ufo",
+      "category": "sky",
+      "name": "Flying saucer",
+      "coins": 1000,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 68
+    },
+    {
+      "key": "acc_shades",
+      "category": "accessory",
+      "name": "Shades",
+      "coins": 60,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 69
+    },
+    {
+      "key": "acc_grad",
+      "category": "accessory",
+      "name": "Grad cap",
+      "coins": 100,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 70
+    },
+    {
+      "key": "acc_tophat",
+      "category": "accessory",
+      "name": "Top hat",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 71
+    },
+    {
+      "key": "acc_sunhat",
+      "category": "accessory",
+      "name": "Sun hat",
+      "coins": 120,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 72
+    },
+    {
+      "key": "acc_headphone",
+      "category": "accessory",
+      "name": "Headphones",
+      "coins": 150,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 73
+    },
+    {
+      "key": "acc_crown",
+      "category": "accessory",
+      "name": "Crown",
+      "coins": 500,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 74
+    },
+    {
+      "key": "bg_midnight",
+      "category": "background",
+      "name": "Midnight",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 75,
+      "colors": [
+        "#1B1033",
+        "#3A1C71",
+        "#0E0B14"
+      ]
+    },
+    {
+      "key": "bg_sunset",
+      "category": "background",
+      "name": "Sunset",
+      "coins": 0,
+      "rarity": "common",
+      "gender": "any",
+      "sortOrder": 76,
+      "colors": [
+        "#FF7E5F",
+        "#FEB47B",
+        "#4B1D3F"
+      ]
+    },
+    {
+      "key": "bg_beach",
+      "category": "background",
+      "name": "Beach",
+      "coins": 150,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 77,
+      "colors": [
+        "#2BC0E4",
+        "#EAECC6",
+        "#1C7C9C"
+      ]
+    },
+    {
+      "key": "bg_island",
+      "category": "background",
+      "name": "Island",
+      "coins": 200,
+      "rarity": "rare",
+      "gender": "any",
+      "sortOrder": 78,
+      "colors": [
+        "#11998E",
+        "#38EF7D",
+        "#0B3D3A"
+      ]
+    },
+    {
+      "key": "bg_city",
+      "category": "background",
+      "name": "Neon city",
+      "coins": 350,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 79,
+      "colors": [
+        "#0F2027",
+        "#2C5364",
+        "#FF2E93"
+      ]
+    },
+    {
+      "key": "bg_rainbow",
+      "category": "background",
+      "name": "Rainbow",
+      "coins": 350,
+      "rarity": "epic",
+      "gender": "any",
+      "sortOrder": 80,
+      "colors": [
+        "#FDC830",
+        "#F37335",
+        "#7B2FF7"
+      ]
+    },
+    {
+      "key": "bg_galaxy",
+      "category": "background",
+      "name": "Galaxy",
+      "coins": 700,
+      "rarity": "legendary",
+      "gender": "any",
+      "sortOrder": 81,
+      "colors": [
+        "#0B0B2B",
+        "#4C1D95",
+        "#DB2777"
+      ]
+    }
+  ]
+}

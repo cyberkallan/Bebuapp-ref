@@ -22,6 +22,7 @@ const setting = require("./setting.route");
 const login = require("./login.route");
 const aiChat = require("./aiChat.route");
 const appearance = require("./appearance.route");
+const avatarStudio = require("./avatarStudio.route");
 
 //exports admin's route.js
 route.use("/", admin);
@@ -39,6 +40,7 @@ route.use("/currency", validateAdminAuth, currency);
 route.use("/setting", validateAdminAuth, setting);
 route.use("/aiChat", validateAdminAuth, aiChat);
 route.use("/appearance", validateAdminAuth, appearance);
+route.use("/avatarStudio", validateAdminAuth, avatarStudio);
 route.use("/login", login);
 
 module.exports = route;

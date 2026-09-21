@@ -13,6 +13,18 @@ const userSchema = new mongoose.Schema(
     countryCode: { type: String, default: "" },
     phoneNumber: { type: String, default: "" },
     profilePic: { type: String, default: "" },
+    // Avatar Studio look. `active` means the studio avatar is the profile picture.
+    avatar: {
+      active: { type: Boolean, default: false },
+      avatar: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      background: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      pet: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      home: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      sky: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+      accessory: { type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem", default: null },
+    },
+    unlockedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "AvatarItem" }],
     email: { type: String, default: "" },
     password: { type: String, default: "" },
     countryFlag: { type: String, default: "" },

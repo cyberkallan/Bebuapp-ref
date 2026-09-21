@@ -55,6 +55,9 @@ async function startServer() {
   require("./socket");
 
   app.use("/storage", express.static(path.join(__dirname, "storage")));
+  // Bundled Avatar Studio renders (Fluent Emoji 3D, MIT) — long cache, they are content-addressed by key.
+  app.use("/avatar-studio", express.static(path.join(__dirname, "assets", "avatar-studio"), { maxAge: "30d", immutable: true }));
+  require("./util/seedAvatarStudio")();
 
   db.on("error", () => {
     console.log("Connection Error: ");

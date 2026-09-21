@@ -275,11 +275,13 @@ exports.updateUserProfile = async (req, res) => {
       return res.status(401).json({ status: false, message: "Unauthorized access. Invalid token." });
     }
 
-    res.status(200).json({ status: true, message: "The user's profile has been modified." });
-
     const userId = new mongoose.Types.ObjectId(req.user.userId);
 
     const [user] = await Promise.all([User.findOne({ _id: userId })]);
+    if (!user) {
+      if (req.file) deleteFile(req.file);
+      return res.status(200).json({ status: false, message: "User does not found." });
+    }
 
     if (req?.file) {
       const profilePic = user?.profilePic?.split("storage");
@@ -294,6 +296,8 @@ exports.updateUserProfile = async (req, res) => {
       }
 
       user.profilePic = req.file.path;
+      // A real photo replaces the studio avatar as the picture others see.
+      if (user.avatar) user.avatar.active = false;
     }
 
     user.nickName = req.body.nickName ? req.body.nickName : user.nickName;
@@ -308,6 +312,9 @@ exports.updateUserProfile = async (req, res) => {
     user.countryFlag = req.body.countryFlag ? req.body.countryFlag : user.countryFlag;
     user.country = req.body.country ? req.body.country.toLowerCase()?.trim() : user.country;
     await user.save();
+
+    // Respond only after the write so the app's follow-up profile fetch sees the new data.
+    return res.status(200).json({ status: true, message: "The user's profile has been modified.", user });
   } catch (error) {
     if (req.file) deleteFile(req.file);
     console.log(error);

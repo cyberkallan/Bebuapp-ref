@@ -65,6 +65,13 @@ const settingSchema = new mongoose.Schema(
       soundEffects: { type: Boolean, default: true },
     },
 
+    // Avatar Studio: 3D avatar + scene items users unlock with coins.
+    // When disabled the app falls back to photo upload + 3 male / 3 female presets.
+    avatarStudio: {
+      enabled: { type: Boolean, default: true },
+      allowPhotoUpload: { type: Boolean, default: true },
+    },
+
     // AI auto-replies for fake hosts. Provider API keys live here and are
     // stripped from every app-facing settings response.
     aiChat: {
