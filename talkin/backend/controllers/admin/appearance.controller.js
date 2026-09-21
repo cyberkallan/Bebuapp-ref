@@ -23,6 +23,8 @@ const DEFAULTS = {
   liveRings: true,
   coinAnimation: true,
   soundEffects: true,
+  chatSounds: true,
+  haptics: true,
 };
 
 function normalize(raw = {}) {
@@ -38,6 +40,8 @@ function normalize(raw = {}) {
     liveRings: a.liveRings !== false,
     coinAnimation: a.coinAnimation !== false,
     soundEffects: a.soundEffects !== false,
+    chatSounds: a.chatSounds !== false,
+    haptics: a.haptics !== false,
   };
 }
 

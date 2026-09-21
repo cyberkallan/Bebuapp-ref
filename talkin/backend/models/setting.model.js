@@ -63,6 +63,8 @@ const settingSchema = new mongoose.Schema(
       liveRings: { type: Boolean, default: true },
       coinAnimation: { type: Boolean, default: true },
       soundEffects: { type: Boolean, default: true },
+      chatSounds: { type: Boolean, default: true }, // WhatsApp-style sent / received / recording tones in chat
+      haptics: { type: Boolean, default: true }, // vibration feedback on taps, sends, unlocks
     },
 
     // Avatar Studio: 3D avatar + scene items users unlock with coins.

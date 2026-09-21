@@ -5,7 +5,9 @@ import 'package:talk_in/custom/dialog/logout_dialog.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/widget/my_profile_screen_widget.dart';
 import 'package:talk_in/ui/user_flow/setting_screen/controller/setting_controller.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/utils/app_theme.dart';
+import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
 
 class SettingHeaderBar extends StatelessWidget {
@@ -51,6 +53,19 @@ class SettingView extends StatelessWidget {
                     value: controller.isShowNotification,
                     onChanged: controller.onSwitchNotification,
                   ),
+                  if (BebuTheme.chatSounds)
+                    _SwitchRow(
+                      icon: Icons.music_note_rounded,
+                      color: BebuTheme.green,
+                      title: 'Conversation tones',
+                      subtitle: 'Sounds for sent and received messages',
+                      value: Database.chatTones,
+                      onChanged: (v) async {
+                        await Database.onSetChatTones(v);
+                        controller.update();
+                        if (v) Sfx.messageReceived();
+                      },
+                    ),
                   ProfileRow(
                     icon: Icons.translate_rounded,
                     color: BebuTheme.blue,

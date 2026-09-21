@@ -63,6 +63,10 @@ class Database {
   static String get identity => localStorage.read("identity") ?? "";
 
   static bool get isSeenOnBoarding => localStorage.read("isSeenOnBoarding") ?? false;
+
+  /// User preference: WhatsApp-style tones in chat (Settings → Conversation tones).
+  static bool get chatTones => localStorage.read("chatTones") ?? true;
+  static Future<void> onSetChatTones(bool on) => localStorage.write("chatTones", on);
   static bool get isNewUser => localStorage.read("isNewUser") ?? true;
   static bool get isLogin => localStorage.read("isLogin") ?? false;
   static bool get isFillProfile => localStorage.read("isFillProfile") ?? false;

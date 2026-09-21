@@ -387,7 +387,9 @@ const AppearanceSettings = () => {
               ['ambientGlow', 'Ambient glow', 'Soft violet / accent glows behind Home, Random match and onboarding.'],
               ['liveRings', 'Ringing call buttons', 'Call buttons wiggle with expanding rings when a host is live.'],
               ['coinAnimation', 'Coin animation', 'The balance coin flips and sweeps every few seconds.'],
-              ['soundEffects', 'Sound effects', 'Soft UI sounds, e.g. the chime when a host card is chosen for a call.']
+              ['soundEffects', 'Sound effects', 'Soft UI sounds, e.g. the chime when a host card is chosen for a call.'],
+              ['chatSounds', 'Chat tones', 'WhatsApp-style tones in conversations: message sent, message received, recording start / cancel. Users can also mute these in Settings → Conversation tones.'],
+              ['haptics', 'Haptic feedback', 'Vibration on taps, sends, recording and unlocks. Off = no vibration anywhere in the app.']
             ].map(([key, label, hint]) => (
               <Grid item size={{ xs: 12, md: 6 }} key={key}>
                 <FormControlLabel

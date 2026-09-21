@@ -25,6 +25,8 @@ by three inputs, in this order:
 | `liveRings`            | bool                                             | Ringing call buttons for online hosts.                                        |
 | `coinAnimation`        | bool                                             | 3D flip / sweep on the coin balance pill.                                     |
 | `soundEffects`         | bool                                             | Soft UI sounds (select chime when a host card is chosen for a call).          |
+| `chatSounds`           | bool                                             | WhatsApp-style chat tones: sent, received, recording start / cancel. Users can also mute them (Settings → Conversation tones). |
+| `haptics`              | bool                                             | Vibration feedback anywhere in the app (taps, sends, recording, unlocks).      |
 
 API: `GET /api/admin/appearance` returns `{ settingId, appearance, options }`,
 `PATCH /api/admin/appearance` accepts any subset of the fields above.

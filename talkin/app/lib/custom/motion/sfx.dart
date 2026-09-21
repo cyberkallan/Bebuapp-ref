@@ -1,66 +1,129 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:talk_in/utils/app_theme.dart';
+import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/utils.dart';
 
 /// Tiny UI sound + haptic layer. Every call is a no-op when the admin has
-/// turned sound effects off, and never throws (a failed sound must not break
-/// the interaction it decorates).
+/// turned the matching effect off, and never throws (a failed sound must not
+/// break the interaction it decorates).
+///
+/// Three gates:
+/// - `BebuTheme.soundEffects` (admin) — UI chimes: select / pop / unlock.
+/// - `BebuTheme.chatSounds` (admin) and `Database.chatTones` (user, Settings →
+///   Conversation tones) — WhatsApp-style chat tones.
+/// - `BebuTheme.haptics` (admin) — every vibration.
 class Sfx {
   Sfx._();
 
   static AudioPlayer? _player;
+  static AudioPlayer? _chatPlayer;
 
-  static AudioPlayer get _p {
-    final existing = _player;
-    if (existing != null) return existing;
-    final p = AudioPlayer(playerId: 'bebu-sfx')
-      ..setReleaseMode(ReleaseMode.stop)
-      ..setPlayerMode(PlayerMode.lowLatency);
-    // Mix with other audio (e.g. a chat voice note) instead of pausing it.
-    p.setAudioContext(AudioContext(
-      android: const AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        usageType: AndroidUsageType.assistanceSonification,
-        audioFocus: AndroidAudioFocus.none,
-      ),
-      iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient, options: const {AVAudioSessionOptions.mixWithOthers}),
-    ));
-    _player = p;
-    return p;
+  static AudioPlayer? _make(String id) {
+    try {
+      final p = AudioPlayer(playerId: id)
+        ..setReleaseMode(ReleaseMode.stop)
+        ..setPlayerMode(PlayerMode.lowLatency);
+      // Mix with other audio (e.g. a chat voice note) instead of pausing it.
+      // iOS only allows mixWithOthers with the playback / playAndRecord /
+      // multiRoute categories.
+      p.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          contentType: AndroidContentType.sonification,
+          usageType: AndroidUsageType.assistanceSonification,
+          audioFocus: AndroidAudioFocus.none,
+        ),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.playback, options: const {AVAudioSessionOptions.mixWithOthers}),
+      ));
+      return p;
+    } catch (e) {
+      Utils.showLog('Sfx player unavailable: $e');
+      return null;
+    }
   }
 
-  static Future<void> _play(String asset, {double volume = 0.6}) async {
-    if (!BebuTheme.soundEffects) return;
+  static AudioPlayer? get _p => _player ??= _make('bebu-sfx');
+
+  // Chat tones use their own player so a "received" tone never cuts a
+  // "sent" tone short when both land within a few hundred milliseconds.
+  static AudioPlayer? get _c => _chatPlayer ??= _make('bebu-chat-sfx');
+
+  static Future<void> _play(AudioPlayer? p, String asset, {double volume = 0.6}) async {
+    if (p == null) return;
     try {
-      await _p.stop();
-      await _p.play(AssetSource(asset), volume: volume);
+      await p.stop();
+      await p.play(AssetSource(asset), volume: volume);
     } catch (e) {
       Utils.showLog('Sfx failed ($asset): $e');
     }
   }
 
-  /// Host card chosen for a call: medium tap, then a soft two-note chime.
-  static Future<void> select() {
-    HapticFeedback.mediumImpact();
-    return _play('audio/select.mp3', volume: 0.55);
+  static bool get _ui => BebuTheme.soundEffects;
+  static bool get _chat => BebuTheme.chatSounds && Database.chatTones;
+
+  // ---- haptics -----------------------------------------------------------
+
+  static void _h(Future<void> Function() f) {
+    if (!BebuTheme.haptics) return;
+    f().catchError((_) {});
   }
 
   /// Light confirmation tick with no sound.
-  static void tick() => HapticFeedback.selectionClick();
+  static void tick() => _h(HapticFeedback.selectionClick);
+
+  static void lightTap() => _h(HapticFeedback.lightImpact);
+
+  static void mediumTap() => _h(HapticFeedback.mediumImpact);
+
+  /// Something was refused (locked, not enough coins): vibrate only.
+  static void deny() => _h(HapticFeedback.vibrate);
+
+  // ---- UI chimes ---------------------------------------------------------
+
+  /// Host card chosen for a call: medium tap, then a soft two-note chime.
+  static Future<void> select() {
+    mediumTap();
+    return _ui ? _play(_p, 'audio/select.mp3', volume: 0.55) : Future.value();
+  }
 
   /// Item equipped / popped onto the stage: light tap + short pop.
   static Future<void> pop() {
-    HapticFeedback.lightImpact();
-    return _play('audio/pop.mp3', volume: 0.5);
+    lightTap();
+    return _ui ? _play(_p, 'audio/pop.mp3', volume: 0.5) : Future.value();
   }
 
   /// Premium item unlocked: heavy tap + rising four-note chime.
   static Future<void> unlock() {
-    HapticFeedback.heavyImpact();
-    return _play('audio/unlock.mp3', volume: 0.65);
+    _h(HapticFeedback.heavyImpact);
+    return _ui ? _play(_p, 'audio/unlock.mp3', volume: 0.65) : Future.value();
   }
 
-  /// Something was refused (locked, not enough coins): vibrate only.
-  static void deny() => HapticFeedback.vibrate();
+  // ---- chat tones (WhatsApp-style) ---------------------------------------
+
+  /// My message left the phone: light tap + short rising "swoosh".
+  static Future<void> messageSent() {
+    lightTap();
+    return _chat ? _play(_c, 'audio/msg_sent.mp3', volume: 0.45) : Future.value();
+  }
+
+  /// A message arrived in the open conversation: soft pop-ding.
+  static Future<void> messageReceived() {
+    lightTap();
+    return _chat ? _play(_c, 'audio/msg_in.mp3', volume: 0.5) : Future.value();
+  }
+
+  /// Voice recording started: medium tap + crisp tick.
+  static Future<void> recordStart() {
+    mediumTap();
+    return _chat ? _play(_c, 'audio/rec_start.mp3', volume: 0.5) : Future.value();
+  }
+
+  /// Voice note released and sent: same as a sent message.
+  static Future<void> recordSent() => messageSent();
+
+  /// Recording slid away / too short: vibrate + low "dud".
+  static Future<void> recordCancel() {
+    deny();
+    return _chat ? _play(_c, 'audio/rec_cancel.mp3', volume: 0.45) : Future.value();
+  }
 }

@@ -23,6 +23,8 @@ class BebuTheme {
   static bool _liveRings = true;
   static bool _coinAnimation = true;
   static bool _soundEffects = true;
+  static bool _chatSounds = true;
+  static bool _haptics = true;
 
   /// Called by [Appearance] whenever the effective look changes.
   static void configure({
@@ -34,6 +36,8 @@ class BebuTheme {
     bool liveRings = true,
     bool coinAnimation = true,
     bool soundEffects = true,
+    bool chatSounds = true,
+    bool haptics = true,
   }) {
     _p = palette;
     _a = accent;
@@ -43,6 +47,8 @@ class BebuTheme {
     _liveRings = liveRings;
     _coinAnimation = coinAnimation;
     _soundEffects = soundEffects;
+    _chatSounds = chatSounds;
+    _haptics = haptics;
   }
 
   static bool get isLight => _p.isLight;
@@ -52,6 +58,12 @@ class BebuTheme {
   static bool get liveRings => _liveRings && !_reducedMotion;
   static bool get coinAnimation => _coinAnimation && !_reducedMotion;
   static bool get soundEffects => _soundEffects;
+
+  /// Admin switch for WhatsApp-style chat tones (sent / received / recording).
+  static bool get chatSounds => _chatSounds;
+
+  /// Admin switch for vibration feedback.
+  static bool get haptics => _haptics;
   static BebuAccent get accent => _a;
 
   /// Status-bar icon brightness that reads well on [bg].
