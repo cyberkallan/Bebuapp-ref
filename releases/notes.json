@@ -3,6 +3,36 @@
   "items": [
     {
       "type": "new",
+      "title": "Avatar Studio",
+      "body": "Build a 3D look instead of a photo: pick an avatar, then a scene, a pet, a ride, a home, something in the sky and a worn accessory. The stage tilts when you drag it and everything on it idles gently. Free items are yours right away; premium ones unlock with coins from your wallet, with a burst, sound and haptics when they do. Nothing changes until you tap Save my look."
+    },
+    {
+      "type": "new",
+      "title": "Try before you unlock",
+      "body": "Tap a locked item to see it on your stage first. The button tells you exactly what it costs or how many more coins you need, and jumps to the wallet when you are short."
+    },
+    {
+      "type": "fixed",
+      "title": "My profile works again",
+      "body": "The profile page could fail to lay out after the theme picker was added and showed a blank or broken body. It is rebuilt: 3D-look hero or photo hero, a Complete your profile checklist, wallet card with recharge and history, quick actions, appearance, host promo and grouped account links."
+    },
+    {
+      "type": "fixed",
+      "title": "Edit profile keeps what you typed",
+      "body": "Fields load fresh every time you open the screen, gender no longer changes until you save, the birthday picker matches the theme, and the Save button only lights up when something changed. Leaving with unsaved edits asks first."
+    },
+    {
+      "type": "improved",
+      "title": "Settings and photo picker on the design system",
+      "body": "Settings uses the same grouped rows as the profile. If the admin turns Avatar Studio off, the photo picker offers camera, gallery and three male / three female preset pictures."
+    },
+    {
+      "type": "improved",
+      "title": "Admin: Avatar Studio tab",
+      "body": "Settings → Avatar Studio: switch the feature on or off, allow or block real photo uploads, see how many users have a 3D look and how many unlocks happened, and manage the catalog by category: add or edit items with an image, price, rarity and gender, hide, show or delete."
+    },
+    {
+      "type": "new",
       "title": "A coin you could pick up",
       "body": "The coin is now drawn as a real gold disc: visible edge, bevelled rim, embossed star and a moving highlight. It rests at a slight angle so you see its thickness, breathes gently and turns one full revolution with a light sweep every few seconds instead of flipping flat. Same coin everywhere: Home balance pill, wallet, receipts and the purchase celebration."
     },

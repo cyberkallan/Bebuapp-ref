@@ -5,13 +5,22 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.5.2-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.5.2-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.6.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
+| `bebu-1.6.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.6.0` adds Avatar Studio: a 3D look (avatar, scene, pet, ride, home, sky,
+accessory) built on a tilting diorama stage, with free items equipped
+instantly and premium items unlocked for coins; try-on, unlock celebration,
+sound and haptics. My profile is rebuilt around it (3D hero or photo,
+completeness checklist) and the layout crash that left the page broken is
+fixed. Edit profile and Settings are themed and Edit profile no longer loses or
+prematurely saves fields. The admin gets a Settings → Avatar Studio tab with an
+on/off switch and catalog management. Installs over `1.5.x`.
 
 `1.5.2` swaps the flat coin PNG for a vector 3D coin (edge, bevel, embossed
 star, specular sweep, slow breathing + one eased turn per cycle) used across

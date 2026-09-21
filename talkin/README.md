@@ -198,6 +198,45 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Avatar Studio, profile rebuild, edit-profile fixes (`1.6.0`)
+
+- `tools/build_avatar_assets.py` — builds the asset pack from Microsoft
+  Fluent Emoji 3D (MIT): sparse checkout, trim, resize, WebP, `manifest.json`
+  into `backend/assets/avatar-studio/` (served at `/avatar-studio`, seeds the
+  catalog) and `app/assets/avatar_studio/` (bundled, ≈1.3 MB). 81 items.
+- Backend — `AvatarItem` model; `User.avatar{active, avatar, background,
+  accessory, pet, vehicle, home, sky}` + `unlockedItems`;
+  `Setting.avatarStudio{enabled, allowPhotoUpload}`;
+  `HISTORY_TYPE.AVATAR_UNLOCK = 8`. `/api/user/avatar/{studio,unlock,equip,preset}`
+  (unlock is an atomic `coin >= price` decrement with a ledger row; equip
+  checks ownership and mirrors the avatar image into `profilePic` so every
+  existing screen shows it). `/api/admin/avatarStudio` settings + catalog CRUD
+  with image upload; delete refused while equipped. `util/seedAvatarStudio.js`
+  inserts missing manifest keys only. `updateUserProfile` now saves before
+  responding (the app used to refetch stale data) and turns the 3D look off
+  when a real photo is uploaded. See `docs/avatar-studio.md`.
+- App `ui/user_flow/avatar_studio/` — `AvatarStage` (layered diorama: scene
+  gradient + bokeh, home, drifting sky item, breathing avatar + accessory,
+  bobbing pet, rolling ride; drag parallax; `RepaintBoundary` per layer;
+  static under reduced motion), `AvatarStudioController` (draft slots, try-on,
+  unlock, save; nothing persisted until *Save my look*), tabs with 3D icons,
+  rarity grid, docked action bar, `UnlockCelebration`, `PhotoAvatarPicker`
+  fallback (camera / gallery / 3 + 3 presets) when the admin disables the
+  studio. `Sfx.pop()` / `Sfx.unlock()` / `Sfx.deny()` with `assets/audio/pop.mp3`,
+  `unlock.mp3`.
+- My profile — `ProfileHero` shows the stage (with *Customize*) when a look is
+  active, else the photo with a *Create your 3D avatar* card;
+  `ProfileCompleteness` checklist (avatar, nickname, birthday, gender, phone);
+  pull to refresh. `custom/theme_picker.dart` wraps its stretched `Row` in
+  `IntrinsicHeight` — the unbounded-height layout failure that broke the page.
+- Edit profile — controller `load()`s from `Database` on open, `isDirty`
+  gates the docked Save, gender/date only persist on save, themed date picker,
+  `PopScope` discard prompt; widgets `EditSection` / `EditField` /
+  `EditGenderRow` (`SegmentedPill`) / `EditCountryRow` / `EditPhoneRow`.
+  Settings screen restyled with `ProfileSection` rows.
+- Admin — `redux-store/slices/avatarStudio.js`, *Settings → Avatar Studio*
+  (`views/settings/tabs/AvatarStudioSettings.jsx`).
+
 ### Vector coin, wallet rows, chooser, history, dialogs (`1.5.2`)
 
 - `custom/motion/coin_3d.dart` — `Coin3D` (`Coin3DPainter`): gold disc with a
