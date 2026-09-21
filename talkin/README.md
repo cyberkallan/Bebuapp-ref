@@ -91,13 +91,13 @@ Both defines default to the staging server, so a plain
 build is signed with the debug key. Keep the release keystore safe — it is the
 only key that can update installed builds.
 
-Toolchain used for `1.1.0`–`1.3.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
+Toolchain used for `1.1.0`–`1.3.1`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
 
 ### What changed from the reference package
 
 - Branding: app name, launcher/adaptive icon, splash and in-app strings.
 - `lib/utils/api.dart` reads the base URL and secret from `--dart-define`.
-- `minSdk` 23 (required by current plugins), version `1.3.0+4`, release signing
+- `minSdk` 23 (required by current plugins), version `1.3.1+5`, release signing
   from `key.properties`.
 - Backend: corrected the service-account `project_id` so ID tokens verify;
   `ENVATO_PURCHASE_CHECK` switch; Dockerfile with health check.
@@ -147,6 +147,30 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   white flash before Flutter draws.
 - Theme additions: `AuroraBackground`, `GradientButton`, `GhostButton`,
   `GlassCard`, `BebuAvatar`.
+
+### Polish pass (`1.3.1`)
+
+- Home header — avatar, `SegmentedPill`, coin pill and bell share one 42dp
+  height (`_HomeHeader.controlHeight`); the pill thumb is inset 3px with a
+  border and shadow so it no longer reads taller than its neighbours. Back
+  cards in `ListenerDeck` scale from their top edge and peek a fixed 12dp per
+  depth (`_peek`), and the deck has 30dp of top padding, so cards never touch
+  the header on any screen size.
+- `custom/motion/coin_pill.dart` — `CoinPill` / `AnimatedCoin`: one repeating
+  4.2s controller drives a 3D Y-axis flip of the coin (first 18% of the loop),
+  a breathing amber glow, a skewed glossy sweep across the pill (42–62%), and a
+  `TweenAnimationBuilder` count-up with a small bounce when the balance
+  changes. Used on Home and the random-match header.
+- `custom/motion/ringing_call_button.dart` — `RingingCallButton`: when
+  `ringing` is true the handset wiggles ±14° for 0.9s then rests (2.4s
+  cadence) and two rings expand outwards. Explore tiles ring green for live
+  callers; the deck's main action rings pink. Static otherwise, controller
+  stopped, wrapped in a `RepaintBoundary`.
+- Performance — `GlassIconButton.blur` lets callers skip `BackdropFilter`
+  (a saveLayer per button); Explore tiles no longer blur. `ListenerPhoto.cacheWidth`
+  passes `memCacheWidth` so grid photos decode at ~220dp × DPR and deck photos
+  at screen width instead of full upload size. Grid tiles and back cards sit
+  in `RepaintBoundary`s so the ring/flip animations only repaint themselves.
 
 ### AI replies for fake hosts (backend + admin)
 
