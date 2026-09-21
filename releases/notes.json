@@ -3,6 +3,31 @@
   "items": [
     {
       "type": "new",
+      "title": "A coin you could pick up",
+      "body": "The coin is now drawn as a real gold disc: visible edge, bevelled rim, embossed star and a moving highlight. It rests at a slight angle so you see its thickness, breathes gently and turns one full revolution with a light sweep every few seconds instead of flipping flat. Same coin everywhere: Home balance pill, wallet, receipts and the purchase celebration."
+    },
+    {
+      "type": "improved",
+      "title": "Coin packs you can compare",
+      "body": "Packs are full-width rows now: a coin pile that grows with the pack, the coin count, minutes of voice calls it buys, price per coin, a SAVE tag and the Most popular / Best value ribbons. The selected row lights up and its price turns into the Pay button."
+    },
+    {
+      "type": "new",
+      "title": "New audio / video chooser",
+      "body": "The sheet that opens when you call a host is rebuilt: the host's photo and name on top, your coin balance with the minutes it buys and a Top up shortcut, then Audio call and Video call cards showing coins per minute and how long your balance lasts, and a free Messages row. Themed for dark and light."
+    },
+    {
+      "type": "new",
+      "title": "History, rebuilt",
+      "body": "Coin and payment history are grouped by day (Today, Yesterday, weekday) with a Coin / Payment switch, an All time / date-range filter chip, copyable receipt ids and proper loading and empty states."
+    },
+    {
+      "type": "improved",
+      "title": "Dialogs on the design system",
+      "body": "Log out, exit, delete account, restart, clear notifications, host request sent and the maintenance notice all use one themed card with a tinted icon, gradient primary action and ghost cancel."
+    },
+    {
+      "type": "new",
       "title": "Choosing a host feels like choosing",
       "body": "Tap Call (or swipe right) on the Home deck and that host stays right there: the card snaps to centre, lifts with a subtle 3D tilt, a light sweeps across the photo and an accent ring runs around the frame while the call chooser slides up over it. A soft chime and haptics confirm the pick. The card settles back when you close the chooser, and only Skip moves to the next host."
     },

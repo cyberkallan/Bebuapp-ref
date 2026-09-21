@@ -198,6 +198,43 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Vector coin, wallet rows, chooser, history, dialogs (`1.5.2`)
+
+- `custom/motion/coin_3d.dart` — `Coin3D` (`Coin3DPainter`): gold disc with a
+  swept edge (`thickness = 0.2 r`, offset against the yaw), radial face,
+  light/dark bevel stroke, raised inner lip, embossed 5-point star (shadow +
+  highlight + gradient fill), soft top-left specular and an optional
+  travelling shine band. `CoinMotion` = the idle choreography (rest at
+  -0.42 rad so the edge reads, ±0.12 rad breathing, one `easeInOutCubic`
+  full turn in the first 28 % of the cycle, shine right after landing).
+  `SpinningCoin` (self-driven, `RepaintBoundary`, static when
+  `BebuTheme.coinAnimation` is off) and `AnimatedCoin3D` (external
+  animation). `CoinStack(count)` draws a pile for the pack rows.
+  `AnimatedCoin` in `coin_pill.dart` now paints `Coin3D`; the wallet hero,
+  celebration hero (136 px `SpinningCoin`), receipt rows, calls tab and
+  history all use it. `assets/images/star_coin.png` is no longer referenced
+  by user screens.
+- `my_wallet_screen/widget/coin_plan_widget.dart` — `CoinPlanGrid` is a
+  column of `CoinPlanCard` rows: `CoinStack` tier by size rank, coins,
+  `≈ min · ₹/coin`, `SAVE %`, Most popular / Best value ribbon hanging over
+  the top edge, price pill that becomes the gradient check pill when
+  selected. Shimmer matches the rows.
+- `custom/bottom_sheet/talk_now_button_bottom_sheet.dart` — themed sheet:
+  `_Header` (ringed `BebuAvatar` + name + close), `_BalanceStrip` (balance,
+  minutes of voice, "running low" amber state, Top up → wallet),
+  `_CallOption` cards (green voice / violet video, `coins/min · ≈ min left`,
+  dimmed when unaffordable, medium haptic) and a free Messages row. The
+  original `_startAudio`/`_startVideo` bodies (fake host branch, coin check
+  → wallet + toast, permission chain, `SocketEmit.emitCallOutgoingRinging`)
+  are unchanged.
+- `coin_history_screen/` — `HistoryHeader` (back, title, date-range chip
+  with clear), `HistoryTabs` (`SegmentedPill` Coin / Payment), `HistoryBody`
+  (day-grouped `WalletActivityRow` / `PaymentRow`, pagination spinner,
+  shimmer, empty states). Controller untouched.
+- `custom/dialog/bebu_dialog.dart` — `BebuDialog(icon, title, body,
+  primary, secondary, tone: accent|danger|success, illustration)`; the six
+  dialogs in `custom/dialog/` are thin wrappers keeping their actions.
+
 ### Choosing a host on the Home deck (`1.5.1`)
 
 - `home_screen/widget/listener_deck.dart` — Call (button or right swipe) no
