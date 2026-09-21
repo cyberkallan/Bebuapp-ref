@@ -28,13 +28,15 @@ import AdsSettings from './tabs/AdsSettings'
 import ContentModerationSettings from './tabs/ContentModerationSettings'
 import WithdrawalSettings from './tabs/WithdrawalSettings'
 import ProfileManagement from './tabs/ProfileManageMent'
+import AiChatSettings from './tabs/AiChatSettings'
 
 // Tab labels and values
 const tabs = [
   { label: 'General', value: 'general' },
   { label: 'Payment', value: 'payment' },
   { label: 'Currency', value: 'currency' },
-  { label: 'Withdrawal', value: 'withdrawal' }
+  { label: 'Withdrawal', value: 'withdrawal' },
+  { label: 'AI Chat', value: 'ai-chat' }
 ]
 
 const Settings = () => {
@@ -78,6 +80,8 @@ const Settings = () => {
         return <CurrencySettings />
       case 'withdrawal':
         return <WithdrawalSettings />
+      case 'ai-chat':
+        return <AiChatSettings />
       default:
         return <Typography>Select a tab</Typography>
     }

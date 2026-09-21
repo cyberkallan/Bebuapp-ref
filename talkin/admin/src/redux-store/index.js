@@ -40,6 +40,7 @@ import payoutRequestsReducer from '@/redux-store/slices/payoutRequests'
 import gameHistoryReducer from '@/redux-store/slices/gameHistory'
 import paymentOptionsReducer from '@/redux-store/slices/paymentOptions'
 import listenerReducer from '@/redux-store/slices/listener'
+import aiChatReducer from '@/redux-store/slices/aiChat'
 
 export const store = configureStore({
   reducer: {
@@ -63,6 +64,7 @@ export const store = configureStore({
 
     // reportReasons: reportReasonsReducer,
     settings: settingsReducer,
+    aiChat: aiChatReducer,
 
     // posts: postsReducer,
     faqs: faqsReducer,

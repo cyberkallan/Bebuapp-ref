@@ -11,7 +11,8 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import FilterListIcon from '@mui/icons-material/FilterList'
-import { Chip, CircularProgress } from '@mui/material'
+import { Chip, CircularProgress, FormControl, InputLabel, Select, Tooltip } from '@mui/material'
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import IconButton from '@mui/material/IconButton'
@@ -46,6 +47,9 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 import ListenerDialog from './ListenerDialog'
+import AiPersonaDialog from './AiPersonaDialog'
+
+import { assignAiLanguage, fetchAiConfig } from '@/redux-store/slices/aiChat'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -53,6 +57,7 @@ import tableStyles from '@core/styles/table.module.css'
 // Actions
 import {
   deleteListener,
+  fetchListeners,
   setDateRange,
   setPage,
   setPageSize,
@@ -108,6 +113,9 @@ const ListenerListTable = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [listenerToDelete, setListenerToDelete] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [aiListener, setAiListener] = useState(null)
+  const [bulkLanguage, setBulkLanguage] = useState('')
+  const { languages: aiLanguages, aiChat: aiConfig } = useSelector(state => state.aiChat)
 
   const router = useRouter()
   const pathname = usePathname()
@@ -121,6 +129,12 @@ const ListenerListTable = () => {
   useEffect(() => {
     setActiveTab(tabFromQuery ? tabFromQuery : 'real')
   }, [tabFromQuery])
+
+  useEffect(() => {
+    if (activeTab === 'fake' && !aiLanguages.length) dispatch(fetchAiConfig())
+  }, [activeTab, aiLanguages.length, dispatch])
+
+  const languageLabel = id => aiLanguages.find(l => l.id === id)?.label || id
 
   // Redux state
   const { listeners, total, loading, initialLoad, page, pageSize, startDate, endDate } = useSelector(
@@ -245,13 +259,55 @@ const ListenerListTable = () => {
           </Typography>
         )
       }),
+      ...(activeTab === 'fake'
+        ? [
+            columnHelper.accessor('aiProfile', {
+              header: () => <div className=''>AI Chat</div>,
+              enableSorting: false,
+              cell: ({ row }) => {
+                const p = row.original.aiProfile
+                const on = aiConfig?.enabled && (!p || p.enabled !== false)
+                const lang = p?.language || aiConfig?.defaultLanguage || ''
+
+                return (
+                  <div
+                    className='flex items-center gap-2 cursor-pointer'
+                    onClick={() => setAiListener(row.original)}
+                    role='button'
+                    tabIndex={0}
+                  >
+                    <Chip
+                      size='small'
+                      variant='tonal'
+                      color={on ? 'success' : 'default'}
+                      icon={<SmartToyOutlinedIcon fontSize='small' />}
+                      label={on ? languageLabel(lang) : 'Off'}
+                    />
+                    {p?.replies > 0 && (
+                      <Typography variant='caption' color='text.secondary'>
+                        {p.replies} replies
+                      </Typography>
+                    )}
+                  </div>
+                )
+              }
+            })
+          ]
+        : []),
       columnHelper.accessor('action', {
         header: () => <div className=''>Action</div>,
         cell: ({ row }) => (
           <div className='flex justify-between gap-1'>
             {/* {activeTab === 'fake' && (
               <>
-                <IconButton size='small' onClick={() => handleEditListener(row.original)}>
+                {activeTab === 'fake' && (
+              <Tooltip title='AI persona & language'>
+                <IconButton size='small' color='primary' onClick={() => setAiListener(row.original)}>
+                  <SmartToyOutlinedIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            )}
+            <IconButton size='small' onClick={() => handleEditListener(row.original)}>
                   <EditIcon fontSize='small' />
                 </IconButton>
                 <IconButton size='small' onClick={() => handleDeleteListener(row.original._id)}>
@@ -286,7 +342,7 @@ const ListenerListTable = () => {
         )
       })
     ],
-    [activeTab]
+    [activeTab, aiConfig, aiLanguages]
   )
 
   const table = useReactTable({
@@ -417,6 +473,31 @@ const ListenerListTable = () => {
                 router.replace(`${pathname}?${params.toString()}`, { scroll: false })
               }}
             />
+              {activeTab === 'fake' && Object.keys(rowSelection).length > 0 && (
+                <FormControl size='small' sx={{ minWidth: 220 }}>
+                  <InputLabel>Assign AI language to {Object.keys(rowSelection).length} selected</InputLabel>
+                  <Select
+                    label={`Assign AI language to ${Object.keys(rowSelection).length} selected`}
+                    value={bulkLanguage}
+                    onChange={async e => {
+                      const language = e.target.value
+                      const listenerIds = table.getSelectedRowModel().rows.map(r => r.original._id)
+
+                      setBulkLanguage(language)
+                      await dispatch(assignAiLanguage({ listenerIds, language, enabled: true }))
+                      setBulkLanguage('')
+                      setRowSelection({})
+                      dispatch(fetchListeners({ isFake: true }))
+                    }}
+                  >
+                    {aiLanguages.map(l => (
+                      <MenuItem key={l.id} value={l.id}>
+                        {l.label} · {l.native}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
               <Button variant='contained' startIcon={<AddIcon />} onClick={handleCreateListener}>
                 Add Listener
               </Button>
@@ -494,6 +575,13 @@ const ListenerListTable = () => {
 
       {/* Listener Dialog for Create/Edit */}
       <ListenerDialog open={open} onClose={handleDialogClose} listener={listenerToEdit} role={activeTab} />
+
+      <AiPersonaDialog
+        open={!!aiListener}
+        listener={aiListener}
+        onClose={() => setAiListener(null)}
+        onSaved={() => dispatch(fetchListeners({ isFake: true }))}
+      />
 
      
 
