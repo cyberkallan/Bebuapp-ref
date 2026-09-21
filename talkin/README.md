@@ -91,15 +91,37 @@ Both defines default to the staging server, so a plain
 build is signed with the debug key. Keep the release keystore safe — it is the
 only key that can update installed builds.
 
-Toolchain used for `1.1.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
+Toolchain used for `1.1.0`–`1.2.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
 
 ### What changed from the reference package
 
 - Branding: app name, launcher/adaptive icon, splash and in-app strings.
 - `lib/utils/api.dart` reads the base URL and secret from `--dart-define`.
-- `minSdk` 23 (required by current plugins), version `1.1.0+2`, release signing
+- `minSdk` 23 (required by current plugins), version `1.2.0+3`, release signing
   from `key.properties`.
 - Backend: corrected the service-account `project_id` so ID tokens verify;
   `ENVATO_PURCHASE_CHECK` switch; Dockerfile with health check.
 - Admin: configuration from environment instead of hand-edited constants; a
   missing import and two API URL joins fixed.
+
+### UI redesign (`1.2.0`)
+
+The user-facing discovery flow was rebuilt on a dark, photo-first design while
+keeping the original controllers, APIs and call/chat entry points untouched:
+
+- `lib/utils/app_theme.dart` — `BebuTheme` tokens (colours, Inter type,
+  radii, motion) plus shared widgets: `GlassIconButton`, `BebuChip`,
+  `StatusPill`, `SegmentedPill`, `FadeSlideIn`, `PressScale`.
+- `lib/custom/listeners/listener_actions.dart` — single place that opens
+  chat, the call chooser (`TalkNowButtonBottomSheet`) and profiles with the
+  exact argument lists the legacy screens used.
+- Home (`home_screen/`) — swipeable card deck (`ListenerDeck`): drag left to
+  skip, right to call; For You / Live feeds; coin pill; pull to refresh.
+- Explore (`listener_screen/`) — two-column photo grid, Live/Language/Topics
+  chips (the Language and Topics sheets are the existing ones), shimmer,
+  empty states, pagination.
+- Profile (`profile_detail_screen/`) — hero card, media strip with rates,
+  stats, About Me, More Info, reviews, floating Chat / Talk now bar.
+- Bottom bar — floating frosted pill with a sliding active indicator. Tabs
+  that were not redesigned (Random call, Chat, Calls) keep their light theme
+  and a reserved slot under the bar.
