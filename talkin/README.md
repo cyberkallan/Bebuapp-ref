@@ -147,3 +147,23 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   white flash before Flutter draws.
 - Theme additions: `AuroraBackground`, `GradientButton`, `GhostButton`,
   `GlassCard`, `BebuAvatar`.
+
+### AI replies for fake hosts (backend + admin)
+
+Fake hosts answer user messages with an LLM, in the language and personality
+the admin assigns. Full plan, provider table and runbook: `docs/ai-chat.md`.
+
+- Backend: `util/aiChat/` (language presets, OpenAI-compatible provider chain
+  with failover + cooldown, reply pipeline), `models/listenerAiProfile`,
+  `models/aiUsage`, `Setting.aiChat`, admin routes under `/api/admin/aiChat`.
+  `socket.js` triggers a reply after a user's text/photo/voice message to a
+  fake host. Provider keys are stripped from every app-facing settings
+  endpoint.
+- Admin: **Settings → AI Chat** (providers, language, behaviour, limits, call
+  nudges, safety, playground, usage) and the robot action on the **Fake**
+  listeners tab (per-host language, tone, persona, opening line, bulk assign).
+- Free providers only: Groq (primary, fastest), Gemini (best Indic quality),
+  Cerebras/OpenRouter/Mistral as backups, or any self-hosted OpenAI-compatible
+  endpoint. Keys are created by the admin in the panel; no code changes.
+- The app is unchanged: replies arrive as normal `messageDispatched` events
+  and FCM pushes.
