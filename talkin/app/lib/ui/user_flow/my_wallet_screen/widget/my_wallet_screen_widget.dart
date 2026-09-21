@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/coin_history_screen/model/coin_history_model.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/controller/my_wallet_controller.dart';
-import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
@@ -384,7 +384,7 @@ class WalletActivityRow extends StatelessWidget {
               Text(income ? '+' : '−', style: BebuTheme.label(size: 14, color: income ? BebuTheme.green : BebuTheme.textMuted)),
               Text(formatCoins(amount.abs()), style: BebuTheme.label(size: 14, color: income ? BebuTheme.green : BebuTheme.text)),
               const SizedBox(width: 4),
-              Image.asset(AppAsset.starCoin, width: 13, height: 13),
+              const Coin3D(size: 14),
             ],
           ),
         ],

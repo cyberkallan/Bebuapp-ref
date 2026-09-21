@@ -11,24 +11,15 @@ class CoinPlanShimmer extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: BebuTheme.surface,
       highlightColor: BebuTheme.surface3,
-      child: LayoutBuilder(
-        builder: (context, box) {
-          const gap = 12.0;
-          final cols = box.maxWidth >= 560 ? 3 : 2;
-          final w = (box.maxWidth - gap * (cols - 1)) / cols;
-          return Wrap(
-            spacing: gap,
-            runSpacing: gap,
-            children: [
-              for (var i = 0; i < 4; i++)
-                Container(
-                  width: w,
-                  height: 158,
-                  decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusLg)),
-                ),
-            ],
-          );
-        },
+      child: Column(
+        children: [
+          for (var i = 0; i < 4; i++)
+            Container(
+              height: 92,
+              margin: EdgeInsets.only(bottom: i == 3 ? 0 : 12),
+              decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusLg)),
+            ),
+        ],
       ),
     );
   }

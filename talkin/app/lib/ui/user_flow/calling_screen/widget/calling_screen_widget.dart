@@ -8,7 +8,7 @@ import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/custom/motion/ringing_call_button.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/calling_screen/model/calling_history_response_model.dart';
-import 'package:talk_in/utils/app_asset.dart';
+import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
@@ -218,7 +218,7 @@ class CallHistoryRow extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Image.asset(AppAsset.starCoin, width: 12, height: 12),
+                              const Coin3D(size: 12),
                               const SizedBox(width: 4),
                               Text(coins.toString(), style: BebuTheme.label(size: 11, color: BebuTheme.amber)),
                             ],

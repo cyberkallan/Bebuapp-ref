@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:talk_in/utils/app_asset.dart';
+import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/utils/app_theme.dart';
 
 /// Coin balance pill with a slow 3D coin flip, a glossy sweep across the pill
@@ -23,7 +23,7 @@ class CoinPill extends StatefulWidget {
 }
 
 class _CoinPillState extends State<CoinPill> with SingleTickerProviderStateMixin {
-  static const _period = Duration(milliseconds: 4200);
+  static const _period = Duration(milliseconds: 5200);
 
   late final AnimationController _loop = AnimationController(vsync: this, duration: _period);
 
@@ -131,12 +131,10 @@ class AnimatedCoin extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: progress,
-      builder: (context, child) {
+      builder: (context, _) {
         final t = progress.value;
-        final flipT = (t / 0.18).clamp(0.0, 1.0);
-        final angle = Curves.easeInOutCubic.transform(flipT) * math.pi * 2;
-        // Cosine so the coin looks thin at 90° and full again at 180°/360°.
-        final glow = 0.25 + 0.35 * (0.5 - 0.5 * math.cos(t * math.pi * 2));
+        // Glow breathes with the flip so the pill reads as lit from the coin.
+        final glow = 0.2 + 0.3 * (0.5 - 0.5 * math.cos(t * math.pi * 2));
         return Container(
           width: size + 8,
           height: size + 8,
@@ -145,16 +143,9 @@ class AnimatedCoin extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [BoxShadow(color: BebuTheme.amber.withValues(alpha: glow), blurRadius: 10, spreadRadius: -2)],
           ),
-          child: Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.0012)
-              ..rotateY(angle),
-            child: child,
-          ),
+          child: Coin3D(size: size, yaw: CoinMotion.yaw(t), pitch: CoinMotion.pitch(t), shine: CoinMotion.shine(t)),
         );
       },
-      child: Image.asset(AppAsset.starCoin, height: size, width: size),
     );
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/custom/motion/coin_burst.dart';
 import 'package:talk_in/ui/user_flow/coin_purchase_screen/controller/coin_purchase_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/widget/my_wallet_screen_widget.dart';
-import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/utils.dart';
@@ -62,14 +62,14 @@ class _PurchaseHeroState extends State<PurchaseHero> with SingleTickerProviderSt
               ScaleTransition(
                 scale: _scale,
                 child: Container(
-                  width: 128,
-                  height: 128,
+                  width: 150,
+                  height: 150,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFE08A), Color(0xFFFFB020), Color(0xFFE08A00)]),
-                    boxShadow: [BoxShadow(color: BebuTheme.amber.withValues(alpha: 0.55), blurRadius: 40, offset: const Offset(0, 14))],
+                    boxShadow: [BoxShadow(color: BebuTheme.amber.withValues(alpha: 0.5), blurRadius: 44, spreadRadius: -6, offset: const Offset(0, 14))],
                   ),
-                  child: Center(child: Image.asset(AppAsset.starCoin, width: 84, height: 84)),
+                  child: const SpinningCoin(size: 136, period: Duration(milliseconds: 4200)),
                 ),
               ),
               Positioned(
@@ -145,7 +145,7 @@ class PurchaseBalanceCard extends StatelessWidget {
                     builder: (_, v, __) => Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Image.asset(AppAsset.starCoin, width: 22, height: 22),
+                        const Coin3D(size: 22),
                         const SizedBox(width: 8),
                         Text(formatCoins(v.round()), style: BebuTheme.title(size: 26)),
                       ],

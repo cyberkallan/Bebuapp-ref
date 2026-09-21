@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/controller/my_wallet_controller.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/model/fetch_coin_plan.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/shimmer/coin_plan_shimmer.dart';
@@ -13,9 +14,10 @@ import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
 
-/// Two-column grid of coin packs. Tapping selects; the sticky CTA below
-/// confirms. The popular pack is pre-selected and the cheapest-per-coin pack
-/// carries a "Best value" ribbon so the comparison is made for the user.
+/// Coin packs as full-width rows so price, size and value line up in
+/// columns and can be compared at a glance. Tapping selects; the sticky CTA
+/// below confirms. The popular pack is pre-selected and the cheapest-per-coin
+/// pack carries a "Best value" ribbon so the comparison is made for the user.
 class CoinPlanGrid extends StatelessWidget {
   const CoinPlanGrid({super.key});
 
@@ -38,39 +40,34 @@ class CoinPlanGrid extends StatelessWidget {
           );
         }
         final best = c.bestValuePlan;
-        return LayoutBuilder(
-          builder: (context, box) {
-            const gap = 12.0;
-            final cols = box.maxWidth >= 560 ? 3 : 2;
-            final w = (box.maxWidth - gap * (cols - 1)) / cols;
-            return Wrap(
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                for (var i = 0; i < c.coinPlan.length; i++)
-                  SizedBox(
-                    width: w,
-                    child: FadeSlideIn(
-                      delayMs: 40 * i,
-                      child: GetBuilder<MyWalletController>(
-                        id: MyWalletController.idSelection,
-                        builder: (_) => CoinPlanCard(
-                          plan: c.coinPlan[i],
-                          selected: c.selectedCoinPlan?.id == c.coinPlan[i].id,
-                          bestValue: best != null && best.id == c.coinPlan[i].id,
-                          savings: c.savingsPercent(c.coinPlan[i]),
-                          minutes: c.audioMinutes(c.coinPlan[i].coins ?? 0),
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            c.selectPlan(c.coinPlan[i]);
-                          },
-                        ),
-                      ),
+        // Pile height follows the pack's rank by size, not its absolute count.
+        final ranked = [...c.coinPlan]..sort((a, b) => (a.coins ?? 0).compareTo(b.coins ?? 0));
+        int tier(CoinPlan p) => 1 + ranked.indexWhere((x) => x.id == p.id).clamp(0, 5);
+        return Column(
+          children: [
+            for (var i = 0; i < c.coinPlan.length; i++)
+              Padding(
+                padding: EdgeInsets.only(bottom: i == c.coinPlan.length - 1 ? 0 : 12),
+                child: FadeSlideIn(
+                  delayMs: 40 * i,
+                  child: GetBuilder<MyWalletController>(
+                    id: MyWalletController.idSelection,
+                    builder: (_) => CoinPlanCard(
+                      plan: c.coinPlan[i],
+                      tier: tier(c.coinPlan[i]),
+                      selected: c.selectedCoinPlan?.id == c.coinPlan[i].id,
+                      bestValue: best != null && best.id == c.coinPlan[i].id,
+                      savings: c.savingsPercent(c.coinPlan[i]),
+                      minutes: c.audioMinutes(c.coinPlan[i].coins ?? 0),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        c.selectPlan(c.coinPlan[i]);
+                      },
                     ),
                   ),
-              ],
-            );
-          },
+                ),
+              ),
+          ],
         );
       },
     );
@@ -81,6 +78,7 @@ class CoinPlanCard extends StatelessWidget {
   const CoinPlanCard({
     super.key,
     required this.plan,
+    required this.tier,
     required this.selected,
     required this.bestValue,
     required this.savings,
@@ -89,6 +87,7 @@ class CoinPlanCard extends StatelessWidget {
   });
 
   final CoinPlan plan;
+  final int tier;
   final bool selected;
   final bool bestValue;
   final int savings;
@@ -101,115 +100,136 @@ class CoinPlanCard extends StatelessWidget {
     final ribbon = popular ? EnumLocale.txtMostPopularPlan.name.tr : (bestValue ? 'Best value' : null);
     final ribbonGradient = popular ? BebuTheme.pinkGradient : BebuTheme.violetGradient;
     final radius = BorderRadius.circular(BebuTheme.radiusLg);
+    final coins = plan.coins ?? 0;
+    final perCoin = coins > 0 && (plan.price ?? 0) > 0 ? (plan.price ?? 0) / coins : null;
+    final sub = <String>[
+      if (minutes != null && minutes! > 0) '≈ $minutes min',
+      if (perCoin != null) '$currencySymbol${perCoin < 1 ? perCoin.toStringAsFixed(2) : perCoin.toStringAsFixed(1)}/coin',
+    ].join(' · ');
 
     return PressScale(
       onTap: onTap,
-      scale: 0.97,
-      child: AnimatedContainer(
-        duration: BebuTheme.fast,
-        curve: BebuTheme.curve,
-        padding: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          gradient: selected ? BebuTheme.pinkGradient : null,
-          color: selected ? null : BebuTheme.border,
-          boxShadow: selected ? [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.35), blurRadius: 28, offset: const Offset(0, 10))] : null,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedContainer(
-              duration: BebuTheme.fast,
-              padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(BebuTheme.radiusLg - 2),
-                color: selected ? (BebuTheme.isLight ? const Color(0xFFFFF4F9) : const Color(0xFF231522)) : BebuTheme.surface,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [BebuTheme.amber.withValues(alpha: 0.35), BebuTheme.amber.withValues(alpha: 0)])),
-                        child: Image.asset(AppAsset.starCoin, width: 28, height: 28),
-                      ),
-                      const Spacer(),
-                      AnimatedSwitcher(
-                        duration: BebuTheme.fast,
-                        child: selected
-                            ? Container(
-                                key: const ValueKey('on'),
-                                width: 22,
-                                height: 22,
-                                decoration: BoxDecoration(shape: BoxShape.circle, gradient: BebuTheme.pinkGradient),
-                                child: const Icon(Icons.check_rounded, size: 15, color: Colors.white),
-                              )
-                            : Container(
-                                key: const ValueKey('off'),
-                                width: 22,
-                                height: 22,
-                                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: BebuTheme.borderStrong, width: 1.5)),
-                              ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(formatCoins(plan.coins ?? 0), style: BebuTheme.display(size: 28)),
-                  ),
-                  Text(minutes != null && minutes! > 0 ? 'coins · ≈ $minutes min' : 'coins', style: BebuTheme.body(size: 12, color: BebuTheme.textMuted)),
-                  const SizedBox(height: 12),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text('$currencySymbol${formatPrice(plan.price)}', style: BebuTheme.title(size: 18, color: selected ? BebuTheme.pink : BebuTheme.text)),
-                        ),
-                      ),
-                      if (savings > 0) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(color: BebuTheme.green.withValues(alpha: BebuTheme.isLight ? 0.16 : 0.2), borderRadius: BorderRadius.circular(6)),
-                          child: Text('SAVE $savings%', style: BebuTheme.label(size: 9.5, color: BebuTheme.isLight ? const Color(0xFF047857) : BebuTheme.green)),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            if (ribbon != null)
-              Positioned(
-                top: -10,
-                left: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(
-                    gradient: ribbonGradient,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 3))],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(popular ? Icons.local_fire_department_rounded : Icons.workspace_premium_rounded, size: 11, color: Colors.white),
-                      const SizedBox(width: 4),
-                      Text(ribbon.toUpperCase(), style: BebuTheme.label(size: 9.5, color: Colors.white, weight: FontWeight.w800)),
-                    ],
+      scale: 0.98,
+      child: Padding(
+        // Room for the ribbon that hangs over the top edge.
+        padding: EdgeInsets.only(top: ribbon != null ? 8 : 0),
+        child: AnimatedContainer(
+          duration: BebuTheme.fast,
+          curve: BebuTheme.curve,
+          padding: const EdgeInsets.all(1.5),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            gradient: selected ? BebuTheme.pinkGradient : null,
+            color: selected ? null : BebuTheme.border,
+            boxShadow: selected ? [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.32), blurRadius: 28, offset: const Offset(0, 10))] : null,
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: BebuTheme.fast,
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(BebuTheme.radiusLg - 1.5),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: selected
+                        ? (BebuTheme.isLight ? [const Color(0xFFFFF1F7), const Color(0xFFFFF7FB)] : [const Color(0xFF2A1626), const Color(0xFF1B1220)])
+                        : [BebuTheme.surface, BebuTheme.surface],
                   ),
                 ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 64,
+                      height: 64,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [BebuTheme.amber.withValues(alpha: selected ? 0.38 : 0.22), BebuTheme.amber.withValues(alpha: 0)])),
+                          ),
+                          CoinStack(count: tier, width: 52),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Flexible(child: Text(formatCoins(coins), maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.display(size: 26))),
+                              const SizedBox(width: 5),
+                              Padding(padding: const EdgeInsets.only(bottom: 4), child: Text('coins', style: BebuTheme.label(size: 12.5, color: BebuTheme.textMuted))),
+                            ],
+                          ),
+                          if (sub.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 12, color: BebuTheme.textMuted)),
+                          ],
+                          if (savings > 0) ...[
+                            const SizedBox(height: 7),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                              decoration: BoxDecoration(color: BebuTheme.green.withValues(alpha: BebuTheme.isLight ? 0.16 : 0.2), borderRadius: BorderRadius.circular(6)),
+                              child: Text('SAVE $savings%', style: BebuTheme.label(size: 10, color: BebuTheme.isLight ? const Color(0xFF047857) : BebuTheme.green, weight: FontWeight.w800)),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    AnimatedContainer(
+                      duration: BebuTheme.fast,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        gradient: selected ? BebuTheme.pinkGradient : null,
+                        color: selected ? null : BebuTheme.surface2,
+                        border: selected ? null : Border.all(color: BebuTheme.borderStrong),
+                        boxShadow: selected ? [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.4), blurRadius: 14, offset: const Offset(0, 5))] : null,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (selected) ...[const Icon(Icons.check_rounded, size: 15, color: Colors.white), const SizedBox(width: 5)],
+                          Text('$currencySymbol${formatPrice(plan.price)}', style: BebuTheme.title(size: 16, color: selected ? Colors.white : BebuTheme.text)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-          ],
+              if (ribbon != null)
+                Positioned(
+                  top: -11,
+                  left: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                    decoration: BoxDecoration(
+                      gradient: ribbonGradient,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 3))],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(popular ? Icons.local_fire_department_rounded : Icons.workspace_premium_rounded, size: 11, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(ribbon.toUpperCase(), style: BebuTheme.label(size: 9.5, color: Colors.white, weight: FontWeight.w800)),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -315,7 +335,7 @@ class PaymentOptionBottomSheet extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Image.asset(AppAsset.starCoin, width: 38, height: 38),
+                    const CoinStack(count: 3, width: 44),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
