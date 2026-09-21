@@ -61,7 +61,7 @@ const PhonePreview = ({ draft, accent, mode }) => {
       sx={{
         width: 236,
         height: 470,
-        borderRadius: 34,
+        borderRadius: '34px',
         p: '10px',
         background: 'linear-gradient(160deg,#2a2a31,#0b0b0d)',
         boxShadow: '0 30px 60px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.08)',
@@ -74,7 +74,7 @@ const PhonePreview = ({ draft, accent, mode }) => {
           position: 'relative',
           overflow: 'hidden',
           height: '100%',
-          borderRadius: 26,
+          borderRadius: '26px',
           background: p.bg,
           color: p.text,
           fontFamily: 'Inter, system-ui, sans-serif'
@@ -90,13 +90,13 @@ const PhonePreview = ({ draft, accent, mode }) => {
         {/* header */}
         <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', p: '14px 12px 8px' }}>
           <Box sx={{ width: 24, height: 24, borderRadius: '50%', background: p.surface2, border: `1px solid ${p.border}` }} />
-          <Box sx={{ flex: 1, height: 24, borderRadius: 999, background: p.surface, border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', p: '2px', gap: '2px' }}>
-            <Box sx={{ flex: 1, height: '100%', borderRadius: 999, background: p.surface2, fontSize: 8, fontWeight: 700, display: 'grid', placeItems: 'center' }}>
+          <Box sx={{ flex: 1, height: 24, borderRadius: '999px', background: p.surface, border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', p: '2px', gap: '2px' }}>
+            <Box sx={{ flex: 1, height: '100%', borderRadius: '999px', background: p.surface2, fontSize: 8, fontWeight: 700, display: 'grid', placeItems: 'center' }}>
               <span style={{ color: accent.primary }}>●</span>&nbsp;For You
             </Box>
             <Box sx={{ flex: 1, fontSize: 8, color: p.muted, textAlign: 'center' }}>Live</Box>
           </Box>
-          <Box sx={{ height: 24, px: '6px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: '4px', background: `linear-gradient(90deg, rgba(255,176,32,.18), ${p.surface})`, border: '1px solid rgba(255,176,32,.35)', fontSize: 8.5, fontWeight: 800, color: '#FFB020' }}>
+          <Box sx={{ height: 24, px: '6px', borderRadius: '999px', display: 'flex', alignItems: 'center', gap: '4px', background: `linear-gradient(90deg, rgba(255,176,32,.18), ${p.surface})`, border: '1px solid rgba(255,176,32,.35)', fontSize: 8.5, fontWeight: 800, color: '#FFB020' }}>
             <Box component='span' sx={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: 'radial-gradient(circle at 35% 35%, #ffe08a, #f4a300 70%)', animation: draft.coinAnimation && draft.motion === 'full' ? 'bebuFlip 4.2s linear infinite' : 'none' }} />
             1,240
           </Box>
@@ -104,13 +104,13 @@ const PhonePreview = ({ draft, accent, mode }) => {
 
         {/* deck */}
         <Box sx={{ position: 'relative', mx: '14px', mt: '18px', height: 268 }}>
-          <Box sx={{ position: 'absolute', inset: '-12px 14px auto 14px', height: 40, borderRadius: r, background: p.surface2, opacity: .5 }} />
-          <Box sx={{ position: 'absolute', inset: '-6px 7px auto 7px', height: 40, borderRadius: r, background: p.surface2, opacity: .8 }} />
+          <Box sx={{ position: 'absolute', inset: '-12px 14px auto 14px', height: 40, borderRadius: `${r}px`, background: p.surface2, opacity: .5 }} />
+          <Box sx={{ position: 'absolute', inset: '-6px 7px auto 7px', height: 40, borderRadius: `${r}px`, background: p.surface2, opacity: .8 }} />
           <Box
             sx={{
               position: 'absolute',
               inset: 0,
-              borderRadius: r,
+              borderRadius: `${r}px`,
               overflow: 'hidden',
               background: 'linear-gradient(180deg,#6b4a3a 0%,#3b2a24 55%,#151013 100%)',
               boxShadow: '0 18px 30px rgba(0,0,0,.35)'
@@ -119,11 +119,11 @@ const PhonePreview = ({ draft, accent, mode }) => {
             <Box sx={{ position: 'absolute', left: 12, right: 12, bottom: 12, color: '#F7F7F8' }}>
               <Box sx={{ display: 'flex', gap: '4px', mb: '6px' }}>
                 {['Late-night talk', 'Movies'].map(t => (
-                  <Box key={t} sx={{ fontSize: 7, px: '6px', py: '2px', borderRadius: 999, background: 'rgba(255,255,255,.2)' }}>{t}</Box>
+                  <Box key={t} sx={{ fontSize: 7, px: '6px', py: '2px', borderRadius: '999px', background: 'rgba(255,255,255,.2)' }}>{t}</Box>
                 ))}
               </Box>
               <Typography sx={{ fontSize: 15, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1.1, color: '#F7F7F8' }}>Anjali Menon, 23</Typography>
-              <Box sx={{ mt: '5px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: 7.5, px: '6px', py: '2px', borderRadius: 999, background: 'rgba(0,0,0,.35)' }}>
+              <Box sx={{ mt: '5px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: 7.5, px: '6px', py: '2px', borderRadius: '999px', background: 'rgba(0,0,0,.35)' }}>
                 <Box component='span' sx={{ width: 5, height: 5, borderRadius: '50%', background: '#34D399' }} /> In real time
               </Box>
             </Box>
@@ -146,7 +146,7 @@ const PhonePreview = ({ draft, accent, mode }) => {
         </Box>
 
         {/* nav */}
-        <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12, height: 34, borderRadius: 999, background: p.surface, border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-around', px: '6px' }}>
+        <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12, height: 34, borderRadius: '999px', background: p.surface, border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-around', px: '6px' }}>
           {[0, 1, 2, 3, 4].map(i => (
             <Box key={i} sx={{ width: i === 0 ? 24 : 6, height: i === 0 ? 24 : 6, borderRadius: '50%', background: i === 0 ? p.text : p.muted, opacity: i === 0 ? 1 : .5 }} />
           ))}
@@ -203,7 +203,7 @@ const ThemeSwatch = ({ id }) => {
   return (
     <Box sx={{ position: 'relative', height: 64, borderRadius: 1.5, overflow: 'hidden', border: `1px solid ${p.border}`, background: p.bg, mb: 1.5 }}>
       {split && <Box sx={{ position: 'absolute', inset: '0 0 0 50%', background: PALETTE.light.bg }} />}
-      <Box sx={{ position: 'absolute', left: 8, top: 8, width: 46, height: 8, borderRadius: 999, background: p.surface2 }} />
+      <Box sx={{ position: 'absolute', left: 8, top: 8, width: 46, height: 8, borderRadius: '999px', background: p.surface2 }} />
       <Box sx={{ position: 'absolute', left: 8, top: 22, right: split ? '52%' : 8, bottom: 8, borderRadius: 1, background: p.surface, border: `1px solid ${p.border}` }} />
       {split && <Box sx={{ position: 'absolute', left: '52%', top: 22, right: 8, bottom: 8, borderRadius: 1, background: PALETTE.light.surface, border: `1px solid ${PALETTE.light.border}` }} />}
     </Box>
@@ -324,7 +324,7 @@ const AppearanceSettings = () => {
                     pr: 2,
                     pl: 1,
                     py: 1,
-                    borderRadius: 999,
+                    borderRadius: '999px',
                     border: theme => `2px solid ${draft.accent === a.id ? theme.palette.primary.main : theme.palette.divider}`
                   }}
                 >
@@ -347,7 +347,7 @@ const AppearanceSettings = () => {
               <Box sx={{ display: 'flex', gap: 2 }}>
                 {CORNERS.map(c => (
                   <OptionCard key={c.id} selected={draft.cornerStyle === c.id} onClick={() => set({ cornerStyle: c.id })} sx={{ flex: 1, textAlign: 'center', p: 1.5 }}>
-                    <Box sx={{ height: 34, borderRadius: c.radius / 1.6, background: theme => theme.palette.action.selected, mb: 1 }} />
+                    <Box sx={{ height: 34, borderRadius: `${c.radius / 1.6}px`, background: theme => theme.palette.action.selected, mb: 1 }} />
                     <Typography variant='body2' fontWeight={600}>
                       {c.label}
                     </Typography>
@@ -359,7 +359,13 @@ const AppearanceSettings = () => {
               <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
                 Motion
               </Typography>
-              <Select fullWidth size='small' value={draft.motion} onChange={e => set({ motion: e.target.value })}>
+              <Select
+                fullWidth
+                size='small'
+                value={draft.motion}
+                onChange={e => set({ motion: e.target.value })}
+                renderValue={v => MOTION.find(m => m.id === v)?.label}
+              >
                 {MOTION.map(m => (
                   <MenuItem key={m.id} value={m.id}>
                     <Box>
