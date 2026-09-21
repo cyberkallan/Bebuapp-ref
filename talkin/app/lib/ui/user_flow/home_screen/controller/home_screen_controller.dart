@@ -77,9 +77,53 @@ class HomeScreenController extends GetxController {
     }
   }
 
+  /// ---- Card deck state (redesigned home) ----
+
+  /// 0 = For You (everyone), 1 = Live now (only "Available").
+  int feedIndex = 0;
+
+  /// Ids the user has swiped away in this session; they come back on refresh.
+  final Set<String> dismissedIds = {};
+
+  List<TopListeners> get deckListeners {
+    final source = feedIndex == 1 ? topListeners.where((l) => l.statusLabel == "Available") : topListeners;
+    return source.where((l) => !dismissedIds.contains(l.id ?? '')).toList();
+  }
+
+  void setFeed(int index) {
+    if (feedIndex == index) return;
+    feedIndex = index;
+    update([Constant.idGetListener]);
+  }
+
+  void dismissListener(TopListeners l) {
+    dismissedIds.add(l.id ?? '');
+    update([Constant.idGetListener]);
+    if (deckListeners.length < 4) loadMore();
+  }
+
+  /// Fetches the next page without depending on a scroll position.
+  Future<void> loadMore() async {
+    if (isPaginationLoading || isLoading) return;
+    final uid = Database.loginUserFirebaseId;
+    final token = await FirebaseAccessToken.onGet() ?? "";
+    isPaginationLoading = true;
+    update([Constant.idPaginationListener]);
+    final page = await TopListenersApi.callApi(token: token, uid: uid, searchString: "All");
+    final known = topListeners.map((e) => e.id).toSet();
+    final fresh = (page?.data ?? []).where((e) => !known.contains(e.id)).toList();
+    if (fresh.isNotEmpty) {
+      topListenersModel = page;
+      topListeners.addAll(fresh);
+    }
+    isPaginationLoading = false;
+    update([Constant.idPaginationListener, Constant.idGetListener]);
+  }
+
   onRefresh() async {
     TopListenersApi.startPagination = 0;
     topListeners.clear();
+    dismissedIds.clear();
     userCoinModel = await UserCoinApi.callApi();
     Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
     update([Constant.idCoinUpdate]);

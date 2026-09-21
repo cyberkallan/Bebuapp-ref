@@ -236,8 +236,18 @@ class ListenersScreenController extends GetxController {
       log(" ::::: $allListener");
 
       isPaginationLoading = false;
-      update([Constant.idPaginationListener]);
+      update([Constant.idPaginationListener, Constant.idAllListener]);
     }
+  }
+
+  /// ---- Explore (redesigned) client-side filter ----
+  bool liveOnly = false;
+
+  List<TopListeners> get visibleListeners => liveOnly ? allListener.where((l) => l.statusLabel == "Available").toList() : allListener;
+
+  void toggleLiveOnly() {
+    liveOnly = !liveOnly;
+    update([Constant.idAllListener]);
   }
 
   Future<void> onRefresh() async {

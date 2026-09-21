@@ -1,81 +1,115 @@
-import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:talk_in/custom/bottom_bar/salomon_bottom_bar.dart';
 import 'package:talk_in/ui/user_flow/bottom_bar/controller/bottom_bar_controller.dart';
-import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/enums.dart';
 
+/// Floating frosted pill navigation, like the reference design.
+///
+/// The active item is a white circle that slides between slots; inactive
+/// items are quiet glyphs. Sits above page content (`extendBody: true`).
 class BottomBarView extends StatelessWidget {
   const BottomBarView({super.key});
 
+  static const double height = 64;
+
   @override
   Widget build(BuildContext context) {
+    final items = [
+      _NavItem(Icons.home_rounded, Icons.home_outlined, EnumLocale.txtHome.name.tr),
+      _NavItem(Icons.explore_rounded, Icons.explore_outlined, EnumLocale.txtListener.name.tr),
+      _NavItem(Icons.shuffle_rounded, Icons.shuffle_rounded, EnumLocale.txtRandomCall.name.tr),
+      _NavItem(Icons.chat_bubble_rounded, Icons.chat_bubble_outline_rounded, EnumLocale.txtChat.name.tr),
+      _NavItem(Icons.call_rounded, Icons.call_outlined, EnumLocale.txtCalling.name.tr),
+    ];
+
     return GetBuilder<BottomBarController>(
       id: Constant.idBottomBar,
       builder: (logic) {
-        return Container(
-          height: Platform.isIOS ? 100 : 80,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.5),
-                offset: const Offset(
-                  6.0,
-                  6.0,
+        return SafeArea(
+          top: false,
+          minimum: const EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                child: Container(
+                  height: height,
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: BebuTheme.surface.withValues(alpha: 0.82),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: BebuTheme.border),
+                    boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 30, offset: Offset(0, 12))],
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, c) {
+                      final slot = c.maxWidth / items.length;
+                      return Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: BebuTheme.normal,
+                            curve: Curves.easeOutBack,
+                            left: logic.selectIndex * slot,
+                            top: 0,
+                            bottom: 0,
+                            width: slot,
+                            child: Center(
+                              child: Container(
+                                width: 52,
+                                height: 52,
+                                decoration: const BoxDecoration(
+                                  color: BebuTheme.text,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 18)],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              for (var i = 0; i < items.length; i++)
+                                Expanded(
+                                  child: Semantics(
+                                    button: true,
+                                    selected: i == logic.selectIndex,
+                                    label: items[i].label,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () => logic.onClick(i),
+                                      child: Center(
+                                        child: AnimatedScale(
+                                          scale: i == logic.selectIndex ? 1.08 : 1,
+                                          duration: BebuTheme.normal,
+                                          curve: Curves.easeOutBack,
+                                          child: AnimatedSwitcher(
+                                            duration: BebuTheme.fast,
+                                            transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
+                                            child: Icon(
+                                              i == logic.selectIndex ? items[i].active : items[i].inactive,
+                                              key: ValueKey('$i-${i == logic.selectIndex}'),
+                                              size: 23,
+                                              color: i == logic.selectIndex ? BebuTheme.bg : BebuTheme.textFaint,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-                blurRadius: 6.0,
-                spreadRadius: 2.0,
-              ), //BoxShadow
-            ],
-          ),
-          child: OverflowBox(
-            maxHeight: double.infinity,
-            maxWidth: double.infinity,
-            child: SalomonBottomBar(
-              currentIndex: logic.selectIndex,
-              onTap: (value) async {
-                logic.onClick(value);
-              },
-              curve: Curves.easeInOut,
-              margin: EdgeInsets.only(left: 10, right: 10, top: 20),
-              selectedColorOpacity: 1,
-              items: [
-                bottomBarItemView(
-                  index: 0,
-                  selectIndex: logic.selectIndex,
-                  image: AppAsset.homeFilled,
-                  label: EnumLocale.txtHome.name.tr,
-                ),
-                bottomBarItemView(
-                  index: 1,
-                  selectIndex: logic.selectIndex,
-                  image: AppAsset.listener,
-                  label: EnumLocale.txtListener.name.tr,
-                ),
-                bottomBarItemView(
-                  index: 2,
-                  selectIndex: logic.selectIndex,
-                  image: AppAsset.randomCall,
-                  label: EnumLocale.txtRandomCall.name.tr,
-                ),
-                bottomBarItemView(
-                  index: 3,
-                  selectIndex: logic.selectIndex,
-                  image: AppAsset.chat,
-                  label: EnumLocale.txtChat.name.tr,
-                ),
-                bottomBarItemView(
-                  index: 4,
-                  selectIndex: logic.selectIndex,
-                  image: AppAsset.calling,
-                  label: EnumLocale.txtCalling.name.tr,
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -84,27 +118,9 @@ class BottomBarView extends StatelessWidget {
   }
 }
 
-SalomonBottomBarItem bottomBarItemView({
-  required final int index,
-  required final int selectIndex,
-  required final String image,
-  required final String label,
-}) {
-  return SalomonBottomBarItem(
-    icon: Image.asset(
-      image,
-      height: 26,
-      width: 26,
-      color: selectIndex == index ? AppColors.white : AppColors.unSelected,
-    ),
-    title: Text(
-      label,
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: selectIndex == index ? FontWeight.w700 : FontWeight.w500,
-        color: selectIndex == index ? AppColors.appColor : AppColors.unSelected,
-      ),
-    ).paddingOnly(bottom: 5),
-    selectedColor: AppColors.appColor,
-  );
+class _NavItem {
+  const _NavItem(this.active, this.inactive, this.label);
+  final IconData active;
+  final IconData inactive;
+  final String label;
 }
