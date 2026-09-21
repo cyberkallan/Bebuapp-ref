@@ -5,13 +5,18 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.3.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.3.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.4.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
+| `bebu-1.4.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.4.0` adds a light theme with a System / Dark / Light picker on My profile
+and in onboarding, rebuilds My profile and the Calls tab on the design system,
+and puts the look under admin control (default theme, user choice, accent,
+corners, motion, effects). Installs over `1.3.x`.
 
 `1.3.1` polishes the Home header (aligned For You / Live pill, animated coin
 balance), adds ringing call buttons for live callers on Explore and the deck,

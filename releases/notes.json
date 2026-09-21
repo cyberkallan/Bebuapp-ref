@@ -2,6 +2,26 @@
   "date": "2026-09-21",
   "items": [
     {
+      "type": "new",
+      "title": "Dark or light, your call",
+      "body": "Pick System, Dark or Light from My profile or during onboarding. Everything—Home, Explore, chats, calls, profile—switches instantly, with no restart."
+    },
+    {
+      "type": "new",
+      "title": "My profile, redesigned",
+      "body": "A gradient avatar ring, your coin balance with recharged / spent stats and one-tap recharge, an appearance picker, quick shortcuts and grouped links in the same dark, photo-first style as the rest of the app."
+    },
+    {
+      "type": "new",
+      "title": "Calls that tell a story",
+      "body": "Call history is grouped by day, filterable by missed / incoming / outgoing, shows duration and coins per call, and the call button rings when that host is online right now."
+    },
+    {
+      "type": "improved",
+      "title": "Controlled from the admin panel",
+      "body": "Admins set the default theme, allow or lock user choice, pick the brand accent, corner style and motion level, and toggle glows, ringing buttons and the coin animation."
+    },
+    {
       "type": "improved",
       "title": "Tidier Home header",
       "body": "For You / Live, the coin balance and the bell now share one height and sit clear of the caller cards. The cards behind the deck peek out evenly instead of creeping into the header."

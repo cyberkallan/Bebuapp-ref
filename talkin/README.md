@@ -91,13 +91,13 @@ Both defines default to the staging server, so a plain
 build is signed with the debug key. Keep the release keystore safe — it is the
 only key that can update installed builds.
 
-Toolchain used for `1.1.0`–`1.3.1`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
+Toolchain used for `1.1.0`–`1.4.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
 
 ### What changed from the reference package
 
 - Branding: app name, launcher/adaptive icon, splash and in-app strings.
 - `lib/utils/api.dart` reads the base URL and secret from `--dart-define`.
-- `minSdk` 23 (required by current plugins), version `1.3.1+5`, release signing
+- `minSdk` 23 (required by current plugins), version `1.4.0+6`, release signing
   from `key.properties`.
 - Backend: corrected the service-account `project_id` so ID tokens verify;
   `ENVATO_PURCHASE_CHECK` switch; Dockerfile with health check.
@@ -171,6 +171,32 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   passes `memCacheWidth` so grid photos decode at ~220dp × DPR and deck photos
   at screen width instead of full upload size. Grid tiles and back cards sit
   in `RepaintBoundary`s so the ring/flip animations only repaint themselves.
+
+### Themes and admin UI control (`1.4.0`)
+
+- `utils/app_theme.dart` — `BebuTheme` colours are now getters over a
+  `BebuPalette` (dark / light) and a `BebuAccent`; radii scale with the admin
+  corner style and durations collapse when motion is reduced. `onPhoto*`
+  constants keep text over photos light in both themes.
+- `utils/appearance.dart` — `Appearance` merges the admin config
+  (`setting.appearance`, cached locally), the user's saved pick and platform
+  brightness, then `BebuTheme.configure(...)` + `Get.forceAppUpdate()`.
+  `Utils.onChangeStatusBar` flips icon brightness for the light theme.
+- `custom/theme_picker.dart` — System / Dark / Light cards with mini previews,
+  used on My profile (when the admin allows) and as an optional last
+  onboarding step.
+- My profile (`my_profile_screen`) rebuilt: hero with gradient ring and edit
+  chip, wallet card (`CoinPill`, recharged / spent, history), appearance
+  section, four quick actions, host promo, grouped links, version footer.
+- Calls tab (`calling_screen`) rebuilt: `CustomScrollView` with header, filter
+  chips (all / missed / incoming / outgoing with counts), day headers,
+  `CallHistoryRow` (presence avatar, direction + duration, coins, time,
+  `RingingCallButton` ringing while the host is online), shimmer, empty state
+  with an Explore shortcut, pagination spinner. Every tab is themed now, so the
+  nav bar floats over all of them.
+- Backend `appearance.controller.js` + `/api/admin/appearance`, admin
+  *Settings → Appearance* tab with a live phone preview. See
+  `docs/appearance.md`.
 
 ### AI replies for fake hosts (backend + admin)
 
