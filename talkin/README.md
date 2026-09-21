@@ -198,6 +198,49 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### My wallet and purchase celebration (`1.5.0`)
+
+- `my_wallet_screen/view` — `AuroraBackground` + `ListView` under a
+  `WalletHeaderBar`; `Scaffold.extendBody` so content scrolls under the docked
+  `WalletCheckoutBar` (gradient fade, CTA mirrors the selected pack, trust
+  strip). Pull to refresh reloads packs and recent activity.
+- `WalletBalanceCard` — amber/violet hero with the looping `AnimatedCoin`, a
+  `TweenAnimationBuilder` count-up from `previousCoin` to the new balance,
+  and a talk-time chip (`coins ~/ audioCallRatePrivate`) that turns into a
+  "Running low" nudge under three minutes. "Coins never expire" trust line.
+- `CoinPlanGrid` / `CoinPlanCard` — `Wrap` grid (2 columns, 3 on wide
+  screens). Tap selects (haptic), the popular pack is pre-selected on load
+  (`selectedCoinPlan` falls back to best value, then first). Ribbons: *Most
+  popular* (`isPopular`) and *Best value* (lowest price per coin), `SAVE x%`
+  against the worst price-per-coin anchor (`MyWalletController.savingsPercent`,
+  hidden under 5%). Selected card gets a gradient border, glow and tinted fill.
+- `PaymentOptionBottomSheet` — order summary (coins, ≈ minutes, price), one
+  `PaymentOptionTile` per enabled gateway with a one-line explainer, a single
+  enabled gateway is pre-selected (`openPaymentSheet`), `Pay ₹x` is disabled
+  until a method is picked, and a "charged once, no subscription" line.
+  `onClickPayNow` and the gateway services are unchanged.
+- `WalletRecentActivity` — last six `CoinHistory` rows via the existing
+  `CoinHistoryApi` (`startPagination` reset to 0 first): icon + colour per
+  `HISTORY_TYPE`, receiver name for calls, relative time, `+`/`−` amount.
+  Shimmer while loading, friendly empty card, *See all* → coin history.
+- `MyWalletController.onPurchaseSucceeded()` — one success path for Razorpay,
+  Stripe, Flutterwave and in-app purchase: refresh plans + balance, notify
+  Home/Random controllers if registered, close the sheet, then open
+  `CoinPurchaseScreen` with `coins`, `balance`, `previousBalance` and the
+  receipt fields. (IAP used to `Get.close(2)` past the wallet; it now returns
+  to it.)
+- `coin_purchase_screen` — celebration: `PurchaseHero` (coin drops in with
+  `elasticOut`, `PulseRings` behind it, green check, `+N coins` count-up,
+  heavy haptic), `PurchaseBalanceCard` (old → new balance roll, ≈ minutes),
+  `PurchaseReceipt` (amount, gateway, copyable transaction ID, date),
+  *Start talking now* (`Get.until` bottom bar → Explore) and *Back to wallet*.
+  Two `CoinBurst` layers fire at 260 ms and 1.1 s.
+- `custom/motion/coin_burst.dart` — `CoinBurst` is one `CustomPainter` for
+  ~70 particles (gold discs that squash to fake a flip + accent-coloured
+  confetti; gravity, sway, spin, fade) inside a `RepaintBoundary` +
+  `IgnorePointer`; `PulseRings` draws expanding rings. Both are static when
+  the admin sets reduced motion.
+
 ### AI replies for fake hosts (backend + admin)
 
 Fake hosts answer user messages with an LLM, in the language and personality

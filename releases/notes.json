@@ -3,6 +3,26 @@
   "items": [
     {
       "type": "new",
+      "title": "A wallet worth opening",
+      "body": "My wallet is rebuilt on the design system: a glowing balance card that also tells you how many minutes of voice calls you have, coin packs in a two-column grid with Most popular and Best value ribbons and Save % tags, and a docked Get coins button so checkout is one tap away."
+    },
+    {
+      "type": "new",
+      "title": "Coins rain when you buy",
+      "body": "Every successful purchase lands on a celebration screen: the coin drops in with a bounce, coins and confetti burst across the screen, +N coins counts up, your new balance rolls over, and a receipt with a copyable transaction ID sits underneath. Then one tap to start talking."
+    },
+    {
+      "type": "new",
+      "title": "Recent activity on the wallet",
+      "body": "Your last purchases, bonuses and calls show right under the packs with clear +/− amounts and relative times, with a link to the full history."
+    },
+    {
+      "type": "improved",
+      "title": "Cleaner checkout",
+      "body": "The payment sheet shows what you are buying, explains each gateway in one line, pre-selects the only option when there is one, and the Pay button stays disabled until a method is chosen. Works in dark and light themes."
+    },
+    {
+      "type": "new",
       "title": "Dark or light, your call",
       "body": "Pick System, Dark or Light from My profile or during onboarding. Everything—Home, Explore, chats, calls, profile—switches instantly, with no restart."
     },

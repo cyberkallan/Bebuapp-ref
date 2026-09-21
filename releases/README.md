@@ -5,13 +5,18 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.4.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.4.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.5.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
+| `bebu-1.5.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.5.0` rebuilds My wallet: balance hero framed as talk time, coin-pack grid
+with Most popular / Best value / Save % cues, docked checkout button, themed
+payment sheet, recent activity, and a coin-burst celebration screen after
+every successful purchase. Installs over `1.4.0`.
 
 `1.4.0` adds a light theme with a System / Dark / Light picker on My profile
 and in onboarding, rebuilds My profile and the Calls tab on the design system,
