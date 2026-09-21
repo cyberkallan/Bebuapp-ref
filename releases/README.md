@@ -5,13 +5,18 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.5.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.5.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.5.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
+| `bebu-1.5.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.5.1` fixes the Home deck call flow: the chosen host's card now stays on
+screen (lift, 3D tilt, light sweep, accent ring, chime + haptics) under the
+audio/video chooser instead of flying off and exposing the next host. Adds an
+admin *Sound effects* toggle. Installs over `1.5.0`.
 
 `1.5.0` rebuilds My wallet: balance hero framed as talk time, coin-pack grid
 with Most popular / Best value / Save % cues, docked checkout button, themed

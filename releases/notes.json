@@ -3,6 +3,21 @@
   "items": [
     {
       "type": "new",
+      "title": "Choosing a host feels like choosing",
+      "body": "Tap Call (or swipe right) on the Home deck and that host stays right there: the card snaps to centre, lifts with a subtle 3D tilt, a light sweeps across the photo and an accent ring runs around the frame while the call chooser slides up over it. A soft chime and haptics confirm the pick. The card settles back when you close the chooser, and only Skip moves to the next host."
+    },
+    {
+      "type": "fixed",
+      "title": "No more wrong face behind the call sheet",
+      "body": "Previously the chosen card flew away and the next host's photo showed behind the audio/video chooser. The chooser now always sits over the host you picked."
+    },
+    {
+      "type": "improved",
+      "title": "Sound effects under admin control",
+      "body": "Settings → Appearance gains a Sound effects toggle for the new UI chime."
+    },
+    {
+      "type": "new",
       "title": "A wallet worth opening",
       "body": "My wallet is rebuilt on the design system: a glowing balance card that also tells you how many minutes of voice calls you have, coin packs in a two-column grid with Most popular and Best value ribbons and Save % tags, and a docked Get coins button so checkout is one tap away."
     },

@@ -198,6 +198,27 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Choosing a host on the Home deck (`1.5.1`)
+
+- `home_screen/widget/listener_deck.dart` — Call (button or right swipe) no
+  longer flies the card away. `_choose()` keeps the host as `_focused`, snaps
+  the drag back to centre and runs `_focus` (720 ms): spring lift + scale,
+  perspective `rotateX`/`rotateY` tilt that returns to flat, `_ChosenOverlay`
+  (diagonal light sweep across the photo and `_ChosenRingPainter`: a sweep
+  gradient highlight running one lap around the border, then a steady accent
+  frame with inner glow), pink halo via `_ListenerCard.glow`. Back cards
+  recede (scale/offset/opacity) and the action row dims. The chooser opens at
+  380 ms with a lighter barrier; `ListenerActions.openTalkNow` is now
+  awaitable, and when the sheet closes the card settles (`_focus.reverse()`).
+  Only Skip (left swipe / ✕) calls `dismissListener`.
+- `custom/motion/sfx.dart` — `Sfx.select()` = medium haptic + a 0.45 s
+  two-note chime (`assets/audio/select.mp3`, synthesised with ffmpeg) through a
+  single low-latency `audioplayers` player that mixes with other audio;
+  `Sfx.tick()` = selection haptic. All no-ops when `BebuTheme.soundEffects`
+  is off, and failures are logged, never thrown.
+- Appearance gains `soundEffects` (backend defaults/normalize, admin Effects
+  toggle, `AppearanceConfig` + `BebuTheme.soundEffects`).
+
 ### My wallet and purchase celebration (`1.5.0`)
 
 - `my_wallet_screen/view` — `AuroraBackground` + `ListView` under a
