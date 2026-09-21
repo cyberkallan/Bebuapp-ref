@@ -13,7 +13,7 @@
 	# Some admin code joins URLs with a double slash; collapse before routing.
 	uri path_regexp /{2,} /
 
-	@backend path /api/* /storage/* /socket.io/*
+	@backend path /api/* /storage/* /socket.io/* /avatar-studio/*
 	handle @backend {
 		reverse_proxy talkin-backend:5000
 	}
