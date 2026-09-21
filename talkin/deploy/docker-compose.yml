@@ -31,6 +31,8 @@ services:
     environment:
       PORT: 5000
       MongoDb_Connection_String: mongodb://talkin-mongo:27017/talkin
+      # Self-hosted: admin sign-in does not call the Envato marketplace.
+      ENVATO_PURCHASE_CHECK: ${ENVATO_PURCHASE_CHECK:-off}
       secretKey: ${SECRET_KEY:?set SECRET_KEY}
     volumes:
       - backend-storage:/app/storage

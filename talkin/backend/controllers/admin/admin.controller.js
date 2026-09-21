@@ -144,6 +144,8 @@ function _0x9870() {
 }
 async function Auth(_0x4fb637, _0x58f38f) {
   const _0x55165a = _0x1d4493;
+  // Self-hosted deployments: ENVATO_PURCHASE_CHECK=off skips the marketplace lookup.
+  if (String(process.env.ENVATO_PURCHASE_CHECK || "").toLowerCase() === "off") return true;
   try {
     const _0x304a90 = await axios["get"]("https://api.envato.com/v3/market/author/sale?code=" + _0x4fb637, {
         headers: { Authorization: "Bearer\x20G9o1R8snTfNCpRgMzzKmpQP9kOVbapnP", "User-Agent": _0x55165a(0x183) },

@@ -5,11 +5,20 @@ coin-based billing. One backend and one admin console serve many branded mobile
 applications (tenants), each with its own users, callers, pricing and feature
 flags. Public site: [bebuapp.in](https://bebuapp.in/).
 
-This repository is the **foundation stage**: the architecture, data model,
-security pipeline and financial primitives are in place and tested; the
-product features that sit on top (payments, live calling, matching,
-re-engagement) are deliberately not implemented yet. See
-[What is implemented](#what-is-implemented) for an honest inventory.
+The repository holds two things:
+
+- **`talkin/` — the shipping app stack.** Flutter app, Express/MongoDB backend
+  and Next.js admin panel adapted from the Talkin reference package and
+  rebranded as bebu. This is what the APKs in `releases/` are built from and
+  what runs on the staging server. Start with [`talkin/README.md`](talkin/README.md).
+- **`apps/`, `packages/`, `infra/` — the ground-up platform foundation**
+  (NestJS API, Prisma schema, operator console, white-label Flutter shell).
+  Architecture, data model, security pipeline and financial primitives are in
+  place and tested; product features on top are not implemented yet. See
+  [What is implemented](#what-is-implemented).
+
+The landing site (`apps/landing/`) serves both: the marketing page and the
+`/download` page that publishes the signed APKs from `releases/`.
 
 ## Repository layout
 
@@ -26,7 +35,12 @@ infra/
   docker/     docker compose for local Postgres + Redis
   deploy/     single-VPS production stack (Docker Compose + Caddy HTTPS, console at /admin)
   scripts/    bootstrap and readiness helpers
-releases/     signed test APKs + checksums
+talkin/
+  app/        Flutter user + caller app (Firebase Auth, ZegoCloud calls)
+  backend/    Express + MongoDB + Socket.IO API
+  admin/      Next.js 15 admin panel
+  deploy/     Docker Compose stack for the above + DB seed
+releases/     signed test APKs + checksums + release notes
 docs/         architecture, development, security, deployment
 ```
 
