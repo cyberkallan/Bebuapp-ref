@@ -1,0 +1,29 @@
+class SocketParams {
+  static const senderRole = "senderRole";
+  static const receiverRole = "receiverRole";
+  static const chatTopicId = "chatTopicId";
+  static const senderId = "senderId";
+  static const receiverId = "receiverId";
+  static const message = "message";
+  static const messageType = "messageType";
+  static const messageId = "messageId";
+  static const image = "image";
+  static const audio = "audio";
+  static const date = "date";
+  static const callerId = "callerId";
+  static const callType = "callType";
+  static const callerRole = "callerRole";
+  static const callId = "callId";
+  static const isAccept = "isAccept";
+  static const callMode = "callMode";
+  static const receiverName = "receiverName";
+  static const receiverImage = "receiverImage";
+  static const callerName = "callerfullName";
+  static const callerImage = "callerImage";
+  static const name = "name";
+  static const profilePic = "profilePic";
+  static const ratePrivateAudioCall = "ratePrivateAudioCall";
+  static const ratePrivateVideoCall = "ratePrivateVideoCall";
+  static const video = "video";
+  static const isFake = "isFake";
+}

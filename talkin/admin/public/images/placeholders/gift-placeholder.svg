@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#f0f1f4"/>
+  <g transform="translate(50, 50)">
+    <path d="M80 15H20C17.2386 15 15 17.2386 15 20V80C15 82.7614 17.2386 85 20 85H80C82.7614 85 85 82.7614 85 80V20C85 17.2386 82.7614 15 80 15Z" fill="#e0e2ea" stroke="#c0c2cc" stroke-width="2"/>
+    <rect x="15" y="30" width="70" height="10" fill="#c0c2cc"/>
+    <rect x="45" y="15" width="10" height="70" fill="#c0c2cc"/>
+    <path d="M50 15C50 15 40 0 30 0C20 0 20 15 50 15Z" fill="#eb8f8f" stroke="#c06a6a" stroke-width="2"/>
+    <path d="M50 15C50 15 60 0 70 0C80 0 80 15 50 15Z" fill="#eb8f8f" stroke="#c06a6a" stroke-width="2"/>
+  </g>
+  <text x="100" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">Gift Image</text>
+</svg>

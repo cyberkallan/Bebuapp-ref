@@ -1,0 +1,125 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+
+android {
+    namespace = "com.incodes.talkin"
+    compileSdk = 35
+    ndkVersion = "28.0.12433566"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.incodes.talkin"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = 23
+        targetSdk = 35
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties['keyAlias']
+                keyPassword = keystoreProperties['keyPassword']
+                storeFile = file(keystoreProperties['storeFile'])
+                storePassword = keystoreProperties['storePassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Signed with android/key.properties when present (see README), else debug.
+            signingConfig = keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+dependencies {
+    implementation 'com.google.android.material:material:1.10.0' // or later version
+    implementation 'androidx.lifecycle:lifecycle-process:2.6.2' // or later version
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+}
+
+
+//// android/app/build.gradle
+//
+//plugins {
+//    id "com.android.application"
+//    id "kotlin-android"  // Kotlin plugin
+//    id "dev.flutter.flutter-gradle-plugin"  // Flutter plugin
+//    id "com.google.gms.google-services"  // Google Services plugin
+//}
+//
+//android {
+//    namespace = "com.incodes.talkin"
+//    compileSdk = 33  // Update to the desired compile SDK version (should match flutter.compileSdkVersion)
+//
+//    defaultConfig {
+//        applicationId = "com.incodes.talkin"
+//        minSdk = 23  // Minimum SDK version
+//        targetSdk = 33  // Target SDK version (should match flutter.targetSdkVersion)
+//        versionCode = 1  // Update this value as per your versioning
+//        versionName = "1.0.0"  // Update your version name
+//    }
+//
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_1_8
+//        targetCompatibility = JavaVersion.VERSION_1_8
+//    }
+//
+//    kotlinOptions {
+//        jvmTarget = JavaVersion.VERSION_1_8  // Kotlin jvm target
+//    }
+//
+//    buildTypes {
+//        release {
+//            // Signing config for release (you can replace this with your custom signing config)
+//            signingConfig = signingConfigs.debug
+//        }
+//    }
+//}
+//
+//flutter {
+//    source = "../.."  // Path to your Flutter project source
+//}
+//
+//dependencies {
+//    implementation 'com.google.android.material:material:1.5.0'  // Material design library
+//    implementation 'androidx.lifecycle:lifecycle-process:2.4.1'  // Lifecycle components
+//}

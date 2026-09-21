@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "488115751804",
+    "project_id": "talk-in-98cd8",
+    "storage_bucket": "talk-in-98cd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488115751804:android:0e5d417dc3732a750632f9",
+        "android_client_info": {
+          "package_name": "com.incodes.talkin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488115751804-5knucrmtdff13jvnosq5go7igf2gs3c1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.incodes.talkin",
+            "certificate_hash": "b31be083555c210e477f2a2243a7ffff40d26b00"
+          }
+        },
+        {
+          "client_id": "488115751804-93c1e4feiq5joi9ii7om4dminji4ssek.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.incodes.talkin",
+            "certificate_hash": "b8501b816efa58e9ac942b4b4ff534a1e2733481"
+          }
+        },
+        {
+          "client_id": "488115751804-uhiidrt6gtik07uobv8nunc3sg82870r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.incodes.talkin",
+            "certificate_hash": "66e21b469b6e9276b16b99ec4d1b31ed695dad52"
+          }
+        },
+        {
+          "client_id": "488115751804-h5ssu04k6evca2sgprda056cagnshdi9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTdXn65ztgZeSQBwlGnZfh9cv4otsi6Qg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488115751804-h5ssu04k6evca2sgprda056cagnshdi9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "488115751804-cfbjg8p58dpi6k1la5cfrq48ia2m7imm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.incodes.talkin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

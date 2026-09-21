@@ -1,0 +1,89 @@
+# Talkin stack (backend + MongoDB + admin panel) behind an internal edge.
+#   cp .env.example .env && edit, then: docker compose up -d --build
+name: talkin
+
+x-logging: &default-logging
+  driver: json-file
+  options: { max-size: '20m', max-file: '5' }
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: talkin-mongo
+    restart: unless-stopped
+    command: ['--wiredTigerCacheSizeGB', '0.5']
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+    logging: *default-logging
+
+  backend:
+    build: ../backend
+    # Unique names: the edge also sits on the shared network, where plain
+    # service names like `admin` may belong to other projects.
+    container_name: talkin-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      MongoDb_Connection_String: mongodb://talkin-mongo:27017/talkin
+      secretKey: ${SECRET_KEY:?set SECRET_KEY}
+    volumes:
+      - backend-storage:/app/storage
+    depends_on:
+      mongo: { condition: service_healthy }
+    networks: [internal]
+    logging: *default-logging
+
+  admin:
+    container_name: talkin-admin
+    build:
+      context: ../admin
+      args:
+        NEXT_PUBLIC_BASE_URL: ${PUBLIC_URL:?set PUBLIC_URL}
+        NEXT_PUBLIC_SECRET_KEY: ${SECRET_KEY}
+        NEXT_PUBLIC_PROJECT_NAME: ${PROJECT_NAME:-bebu}
+        NEXT_PUBLIC_FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET:-}
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${FIREBASE_MESSAGING_SENDER_ID:-}
+        NEXT_PUBLIC_FIREBASE_APP_ID: ${FIREBASE_APP_ID:-}
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${FIREBASE_MEASUREMENT_ID:-}
+    restart: unless-stopped
+    environment:
+      NEXTAUTH_URL: ${PUBLIC_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?set NEXTAUTH_SECRET}
+      secretKey: ${SECRET_KEY}
+      API_URL: http://talkin-backend:5000/api
+    depends_on: [backend]
+    networks: [internal]
+    logging: *default-logging
+
+  edge:
+    image: caddy:2-alpine
+    container_name: talkin-edge
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on: [backend, admin]
+    networks:
+      internal: {}
+      shared:
+        aliases: [talkin-edge]
+    logging: *default-logging
+
+volumes:
+  mongo-data:
+  backend-storage:
+
+networks:
+  internal:
+    driver: bridge
+  shared:
+    external: true
+    name: ${EDGE_NETWORK:?set EDGE_NETWORK}
