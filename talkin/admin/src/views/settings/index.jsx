@@ -30,6 +30,7 @@ import WithdrawalSettings from './tabs/WithdrawalSettings'
 import ProfileManagement from './tabs/ProfileManageMent'
 import AiChatSettings from './tabs/AiChatSettings'
 import AppearanceSettings from './tabs/AppearanceSettings'
+import AvatarStudioSettings from './tabs/AvatarStudioSettings'
 
 // Tab labels and values
 const tabs = [
@@ -38,7 +39,8 @@ const tabs = [
   { label: 'Currency', value: 'currency' },
   { label: 'Withdrawal', value: 'withdrawal' },
   { label: 'AI Chat', value: 'ai-chat' },
-  { label: 'Appearance', value: 'appearance' }
+  { label: 'Appearance', value: 'appearance' },
+  { label: 'Avatar Studio', value: 'avatar-studio' }
 ]
 
 const Settings = () => {
@@ -86,6 +88,8 @@ const Settings = () => {
         return <AiChatSettings />
       case 'appearance':
         return <AppearanceSettings />
+      case 'avatar-studio':
+        return <AvatarStudioSettings />
       default:
         return <Typography>Select a tab</Typography>
     }

@@ -42,6 +42,7 @@ import paymentOptionsReducer from '@/redux-store/slices/paymentOptions'
 import listenerReducer from '@/redux-store/slices/listener'
 import aiChatReducer from '@/redux-store/slices/aiChat'
 import appearanceReducer from '@/redux-store/slices/appearance'
+import avatarStudioReducer from '@/redux-store/slices/avatarStudio'
 
 export const store = configureStore({
   reducer: {
@@ -67,6 +68,7 @@ export const store = configureStore({
     settings: settingsReducer,
     aiChat: aiChatReducer,
     appearance: appearanceReducer,
+    avatarStudio: avatarStudioReducer,
 
     // posts: postsReducer,
     faqs: faqsReducer,
