@@ -3,28 +3,28 @@
   "items": [
     {
       "type": "new",
-      "title": "A new look",
-      "body": "Dark, photo-first design across Home, Explore and caller profiles. Full-bleed portraits, live status, verified badges and a floating navigation bar."
+      "title": "Random match, reimagined",
+      "body": "A live radar shows callers who are online right now orbiting around you. Pick audio or video, tap Random Match and meet someone in seconds. The match screen shows their intro, topics and rate before you call."
     },
     {
       "type": "new",
-      "title": "Swipe to meet callers",
-      "body": "Home is now a deck of caller cards. Swipe left to skip, swipe right or tap the heart to start a call. Switch between For You and Live."
+      "title": "Chats that feel alive",
+      "body": "Search, presence dots, photo / voice / call previews, relative times and unread badges in a clean dark list."
     },
     {
       "type": "new",
-      "title": "Explore grid",
-      "body": "Browse everyone in a two-column photo wall with quick filters for Live now, Language and Topics."
+      "title": "A better conversation",
+      "body": "Gradient bubbles, day dividers, call history inline, a one-tap card to start a call, and a frosted composer with photo, hold-to-record voice notes and send."
     },
     {
-      "type": "improved",
-      "title": "Richer profiles",
-      "body": "Hero photo, per-minute rates, stats, About Me, topics and languages, reviews and a one-tap Chat / Talk now bar."
+      "type": "new",
+      "title": "Welcome and onboarding",
+      "body": "A new animated splash and a three-step onboarding for first-time users, with Skip and a single Get started action."
     },
     {
       "type": "improved",
       "title": "Smoother everywhere",
-      "body": "Shimmer loading, staggered entrance animations, press feedback and shared-element transitions from Explore into profiles."
+      "body": "Shimmer loading, entrance animations and press feedback across the new screens. The app launches straight into dark, with no white flash."
     }
   ]
 }

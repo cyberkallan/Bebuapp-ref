@@ -91,13 +91,13 @@ Both defines default to the staging server, so a plain
 build is signed with the debug key. Keep the release keystore safe — it is the
 only key that can update installed builds.
 
-Toolchain used for `1.1.0`–`1.2.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
+Toolchain used for `1.1.0`–`1.3.0`: Flutter 3.32.8, Android SDK 35, NDK 28, JDK 17.
 
 ### What changed from the reference package
 
 - Branding: app name, launcher/adaptive icon, splash and in-app strings.
 - `lib/utils/api.dart` reads the base URL and secret from `--dart-define`.
-- `minSdk` 23 (required by current plugins), version `1.2.0+3`, release signing
+- `minSdk` 23 (required by current plugins), version `1.3.0+4`, release signing
   from `key.properties`.
 - Backend: corrected the service-account `project_id` so ID tokens verify;
   `ENVATO_PURCHASE_CHECK` switch; Dockerfile with health check.
@@ -122,6 +122,28 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   empty states, pagination.
 - Profile (`profile_detail_screen/`) — hero card, media strip with rates,
   stats, About Me, More Info, reviews, floating Chat / Talk now bar.
-- Bottom bar — floating frosted pill with a sliding active indicator. Tabs
-  that were not redesigned (Random call, Chat, Calls) keep their light theme
-  and a reserved slot under the bar.
+- Bottom bar — floating frosted pill with a sliding active indicator. The
+  Calls tab keeps its light theme and a reserved slot under the bar.
+
+### Second pass (`1.3.0`)
+
+- Random match (`random_call_screen/`) — radar of live callers orbiting a
+  glowing core (`_Radar`, `CustomPainter` rings + sweep while searching),
+  Audio/Video segmented toggle replacing the old dialog, gradient match
+  button. `RandomMatchView` shows the matched caller with rings, intro,
+  topics, rate and the same Call / Say hello actions.
+- Chat list (`chat_screen/`) — search field, glass rows with presence dot,
+  typed previews (photo / voice / call), relative time, unread badge,
+  shimmer and empty state. Pagination unchanged.
+- Personal chat (`personal_chat_screen/`) — `personal_chat_dark_widgets.dart`
+  holds the header (back, presence, call, profile), day dividers, text and
+  call bubbles, the call-permission card and the frosted composer (photo,
+  long-press mic with a recording pill, gradient send). Photo and voice-note
+  bubbles reuse the original widgets; the reversed list + pagination scroll
+  logic is untouched.
+- Splash and onboarding — animated logo with expanding rings and a loading
+  bar; onboarding pages with parallax art, animated dots, Skip and a single
+  primary action. Android `launch_background` is now `#0E0E10` so there is no
+  white flash before Flutter draws.
+- Theme additions: `AuroraBackground`, `GradientButton`, `GhostButton`,
+  `GlassCard`, `BebuAvatar`.
