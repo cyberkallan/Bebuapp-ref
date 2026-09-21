@@ -2,6 +2,26 @@
   "date": "2026-09-21",
   "items": [
     {
+      "type": "improved",
+      "title": "Tidier Home header",
+      "body": "For You / Live, the coin balance and the bell now share one height and sit clear of the caller cards. The cards behind the deck peek out evenly instead of creeping into the header."
+    },
+    {
+      "type": "new",
+      "title": "A coin that feels like money",
+      "body": "The coin in your balance does a slow 3D flip with a glossy sweep, and the number counts up when coins arrive."
+    },
+    {
+      "type": "new",
+      "title": "Ringing call buttons",
+      "body": "When a caller is live, the call button on Explore tiles and the big deck action wiggle like an incoming call with soft expanding rings, so you can spot who is ready right now."
+    },
+    {
+      "type": "improved",
+      "title": "Faster scrolling",
+      "body": "Explore tiles no longer blur the photo behind each button and decode images at tile size, so the grid scrolls smoothly on mid-range phones."
+    },
+    {
       "type": "new",
       "title": "Random match, reimagined",
       "body": "A live radar shows callers who are online right now orbiting around you. Pick audio or video, tap Random Match and meet someone in seconds. The match screen shows their intro, topics and rate before you call."

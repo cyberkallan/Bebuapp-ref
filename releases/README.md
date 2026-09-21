@@ -5,13 +5,17 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.3.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.3.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.3.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
+| `bebu-1.3.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.3.1` polishes the Home header (aligned For You / Live pill, animated coin
+balance), adds ringing call buttons for live callers on Explore and the deck,
+and makes the Explore grid cheaper to render. Installs over `1.3.0`.
 
 `1.3.0` completes the dark redesign: random match radar, chat list, one-to-one
 chat, welcome splash and first-run onboarding. It installs over `1.1.0`/`1.2.0`
