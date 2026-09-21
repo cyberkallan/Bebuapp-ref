@@ -1,9 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:talk_in/custom/listeners/listener_actions.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/custom/motion/ringing_call_button.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/ui/user_flow/home_screen/controller/home_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/top_listeners_model.dart';
 import 'package:talk_in/utils/app_theme.dart';
@@ -11,9 +14,12 @@ import 'package:talk_in/utils/constant.dart';
 
 /// Tinder-style stack of listener cards.
 ///
-/// Drag left to skip, drag right (or tap the heart) to open the call chooser.
-/// The two cards behind the front one are scaled and lifted so the deck reads
-/// as a physical stack, and they ease forward as the top card leaves.
+/// Drag left to skip. Drag right or tap the call button to *choose* the front
+/// card: it snaps back to centre, lifts with a slight 3D tilt, a light sweeps
+/// across the photo and an accent ring runs around the border while the call
+/// chooser opens over it. The chosen host stays on screen the whole time; the
+/// card only settles back when the sheet closes. Skipping still flies the
+/// card off and reveals the next one.
 class ListenerDeck extends StatefulWidget {
   const ListenerDeck({super.key});
 
@@ -21,58 +27,85 @@ class ListenerDeck extends StatefulWidget {
   State<ListenerDeck> createState() => _ListenerDeckState();
 }
 
-class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderStateMixin {
+class _ListenerDeckState extends State<ListenerDeck> with TickerProviderStateMixin {
   Offset _drag = Offset.zero;
   late final AnimationController _fly = AnimationController(vsync: this, duration: const Duration(milliseconds: 380));
   Animation<Offset>? _flyAnim;
   TopListeners? _flying;
-  int? _flyDirection; // -1 skip, +1 call
+
+  /// Choose-for-call animation. Forward = lift + reveal, reverse = settle.
+  late final AnimationController _focus = AnimationController(vsync: this, duration: const Duration(milliseconds: 720), reverseDuration: const Duration(milliseconds: 360));
+  TopListeners? _focused;
+  Offset _focusFrom = Offset.zero; // drag offset when the choose started, snapped back to zero
 
   static const double _threshold = 110;
+
+  bool get _busy => _fly.isAnimating || _focused != null;
 
   @override
   void dispose() {
     _fly.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
   void _onPanUpdate(DragUpdateDetails d) {
-    if (_fly.isAnimating) return;
+    if (_busy) return;
     setState(() => _drag += d.delta);
   }
 
   void _onPanEnd(DragEndDetails d, TopListeners top) {
-    if (_fly.isAnimating) return;
+    if (_busy) return;
     final vx = d.velocity.pixelsPerSecond.dx;
     if (_drag.dx > _threshold || vx > 900) {
-      _flyOut(top, 1);
+      _choose(top);
     } else if (_drag.dx < -_threshold || vx < -900) {
-      _flyOut(top, -1);
+      _flyOut(top);
     } else {
       setState(() => _drag = Offset.zero);
     }
   }
 
-  void _flyOut(TopListeners top, int direction) {
+  /// Skip: fly the card off to the left and reveal the next host.
+  void _flyOut(TopListeners top) {
     final width = MediaQuery.sizeOf(context).width;
-    final end = Offset(direction * (width * 1.3), _drag.dy + 40);
+    final end = Offset(-(width * 1.3), _drag.dy + 40);
     _flying = top;
-    _flyDirection = direction;
     _flyAnim = Tween(begin: _drag, end: end).animate(CurvedAnimation(parent: _fly, curve: Curves.easeInCubic));
     _fly.forward(from: 0).whenComplete(() {
       final controller = Get.find<HomeScreenController>();
       final l = _flying;
-      final dir = _flyDirection;
       setState(() {
         _drag = Offset.zero;
         _flying = null;
-        _flyDirection = null;
         _flyAnim = null;
       });
-      if (l == null) return;
-      controller.dismissListener(l);
-      if (dir == 1) ListenerActions.openTalkNowFor(l);
+      if (l != null) controller.dismissListener(l);
     });
+  }
+
+  /// Call: keep this host front and centre, present the card, open the
+  /// chooser over it, then settle the card once the sheet is gone.
+  Future<void> _choose(TopListeners top) async {
+    if (_busy) return;
+    setState(() {
+      _focused = top;
+      _focusFrom = _drag;
+      _drag = Offset.zero;
+    });
+    Sfx.select();
+    final reveal = _focus.forward(from: 0);
+    // Open the sheet while the ring is still running so both motions overlap
+    // and the card is already presented by the time the sheet is up.
+    await Future.delayed(BebuTheme.reducedMotion ? Duration.zero : const Duration(milliseconds: 380));
+    if (!mounted) return;
+    Sfx.tick();
+    await ListenerActions.openTalkNowFor(top, barrierColor: Colors.black.withValues(alpha: 0.42));
+    await reveal;
+    if (!mounted) return;
+    await _focus.reverse();
+    if (!mounted) return;
+    setState(() => _focused = null);
   }
 
   @override
@@ -90,13 +123,19 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
           );
         }
         final visible = deck.take(3).toList();
+        // While a host is chosen, keep drawing that host even if the feed
+        // refreshes underneath (the sheet is talking about *this* person).
+        final front = _focused ?? visible[0];
         return LayoutBuilder(
           builder: (context, c) {
             return AnimatedBuilder(
-              animation: _fly,
+              animation: Listenable.merge([_fly, _focus]),
               builder: (context, _) {
-                final drag = _flyAnim?.value ?? _drag;
-                final progress = (drag.dx.abs() / _threshold).clamp(0.0, 1.0);
+                final f = _focused == null ? 0.0 : _focus.value;
+                final snap = Curves.easeOutCubic.transform((f / 0.4).clamp(0.0, 1.0));
+                final drag = _focused != null ? _focusFrom * (1 - snap) : (_flyAnim?.value ?? _drag);
+                final progress = _focused != null ? 0.0 : (drag.dx.abs() / _threshold).clamp(0.0, 1.0);
+                final recede = Curves.easeOutCubic.transform((f / 0.5).clamp(0.0, 1.0));
                 return Column(
                   children: [
                     Expanded(
@@ -104,18 +143,21 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
                         alignment: Alignment.center,
                         clipBehavior: Clip.none,
                         children: [
-                          for (var i = visible.length - 1; i >= 0; i--)
-                            if (i == 0) _frontCard(visible[0], drag, c) else _backCard(visible[i], i, progress, c),
+                          for (var i = visible.length - 1; i >= 1; i--) _backCard(visible[i], i, progress, recede, c),
+                          _frontCard(front, drag, f, c),
                         ],
                       ),
                     ),
                     const SizedBox(height: 18),
-                    _DeckActions(
-                      onSkip: () => _flyOut(visible[0], -1),
-                      onCall: () => _flyOut(visible[0], 1),
-                      onChat: () => ListenerActions.openChatFor(visible[0]),
-                      canCall: ListenerActions.canCall(visible[0]),
-                      live: visible[0].statusLabel == 'Available',
+                    Opacity(
+                      opacity: 1 - 0.5 * recede,
+                      child: _DeckActions(
+                        onSkip: () => _busy ? null : _flyOut(visible[0]),
+                        onCall: () => _choose(visible[0]),
+                        onChat: () => ListenerActions.openChatFor(visible[0]),
+                        canCall: ListenerActions.canCall(visible[0]),
+                        live: visible[0].statusLabel == 'Available',
+                      ),
                     ),
                   ],
                 );
@@ -130,20 +172,21 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
   /// How far each back card peeks above the one in front of it.
   static const double _peek = 12;
 
-  Widget _backCard(TopListeners l, int depth, double progress, BoxConstraints c) {
+  Widget _backCard(TopListeners l, int depth, double progress, double recede, BoxConstraints c) {
     // depth 1 sits just behind the front card, depth 2 behind that.
     final t = depth - progress; // eases towards the front as the top card leaves
-    final scale = 1 - 0.045 * t;
+    final scale = (1 - 0.045 * t) * (1 - 0.03 * recede);
     // Scale from the top edge so the peek is exactly [_peek] per depth and
     // never creeps up into the header; the shrink happens behind the front card.
+    // While a host is chosen the stack recedes and dims so only the chosen card reads.
     return Positioned.fill(
       child: Transform.translate(
-        offset: Offset(0, -_peek * t),
+        offset: Offset(0, -_peek * t + 10 * recede),
         child: Transform.scale(
           scale: scale,
           alignment: Alignment.topCenter,
           child: Opacity(
-            opacity: (1 - 0.3 * t).clamp(0.0, 1.0),
+            opacity: ((1 - 0.3 * t) * (1 - 0.6 * recede)).clamp(0.0, 1.0),
             child: RepaintBoundary(child: _ListenerCard(listener: l, showDetails: false)),
           ),
         ),
@@ -151,28 +194,46 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
     );
   }
 
-  Widget _frontCard(TopListeners l, Offset drag, BoxConstraints c) {
+  Widget _frontCard(TopListeners l, Offset drag, double f, BoxConstraints c) {
     final angle = (drag.dx / c.maxWidth) * 0.35;
     final callOpacity = (drag.dx / _threshold).clamp(0.0, 1.0);
     final skipOpacity = (-drag.dx / _threshold).clamp(0.0, 1.0);
+
+    // Choose animation: lift with a spring, tilt back then present forward,
+    // hold slightly raised while the sheet is open.
+    final lift = Curves.easeOutBack.transform((f / 0.55).clamp(0.0, 1.0));
+    final tilt = math.sin(math.pi * (f / 0.8).clamp(0.0, 1.0));
+    final transform = Matrix4.identity()
+      ..setEntry(3, 2, 0.0011)
+      ..translate(0.0, -14 * lift)
+      ..scale(1 + 0.035 * lift)
+      ..rotateX(-0.12 * tilt)
+      ..rotateY(0.05 * tilt);
+
     return Positioned.fill(
       child: GestureDetector(
         onPanUpdate: _onPanUpdate,
         onPanEnd: (d) => _onPanEnd(d, l),
-        onTap: () => ListenerActions.openProfile(l),
+        onTap: _busy ? null : () => ListenerActions.openProfile(l),
         child: Transform.translate(
           offset: drag,
           child: Transform.rotate(
             angle: angle,
             alignment: Alignment.bottomCenter,
-            child: _ListenerCard(
-              listener: l,
-              showDetails: true,
-              overlay: Stack(
-                children: [
-                  _SwipeStamp(label: 'CALL', color: BebuTheme.pink, opacity: callOpacity, alignment: Alignment.topLeft, angle: -0.25),
-                  _SwipeStamp(label: 'SKIP', color: BebuTheme.textMuted, opacity: skipOpacity, alignment: Alignment.topRight, angle: 0.25),
-                ],
+            child: Transform(
+              alignment: Alignment.center,
+              transform: transform,
+              child: _ListenerCard(
+                listener: l,
+                showDetails: true,
+                glow: lift,
+                overlay: Stack(
+                  children: [
+                    _SwipeStamp(label: 'CALL', color: BebuTheme.pink, opacity: callOpacity, alignment: Alignment.topLeft, angle: -0.25),
+                    _SwipeStamp(label: 'SKIP', color: BebuTheme.textMuted, opacity: skipOpacity, alignment: Alignment.topRight, angle: 0.25),
+                    if (f > 0) _ChosenOverlay(progress: f),
+                  ],
+                ),
               ),
             ),
           ),
@@ -182,12 +243,107 @@ class _ListenerDeckState extends State<ListenerDeck> with SingleTickerProviderSt
   }
 }
 
+/// Light sweep + running accent ring drawn over the chosen card.
+class _ChosenOverlay extends StatelessWidget {
+  const _ChosenOverlay({required this.progress});
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = progress;
+    // Sheen crosses the card between 12% and 70% of the timeline.
+    final sweep = ((t - 0.12) / 0.58).clamp(0.0, 1.0);
+    final sheenOpacity = sweep == 0 || sweep == 1 ? 0.0 : math.sin(math.pi * sweep);
+    return Positioned.fill(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (sheenOpacity > 0)
+            ClipRect(
+              child: FractionalTranslation(
+                translation: Offset(-1.2 + 2.4 * Curves.easeInOut.transform(sweep), 0),
+                child: Transform.rotate(
+                  angle: -0.45,
+                  child: Opacity(
+                    opacity: 0.55 * sheenOpacity,
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0x00FFFFFF), Color(0x66FFFFFF), Color(0xCCFFFFFF), Color(0x66FFFFFF), Color(0x00FFFFFF)],
+                          stops: [0.3, 0.44, 0.5, 0.56, 0.7],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          CustomPaint(painter: _ChosenRingPainter(t, BebuTheme.accent, BebuTheme.radiusXl)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Accent ring that runs once around the border, then holds as a steady frame.
+class _ChosenRingPainter extends CustomPainter {
+  _ChosenRingPainter(this.t, this.accent, this.radius);
+  final double t;
+  final BebuAccent accent;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final fade = Curves.easeOut.transform((t / 0.3).clamp(0.0, 1.0));
+    if (fade <= 0) return;
+    final rect = Rect.fromLTWH(1.5, 1.5, size.width - 3, size.height - 3);
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius - 1.5));
+    // Steady frame.
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..color = accent.primary.withValues(alpha: 0.55 * fade),
+    );
+    // Travelling highlight: one lap over the first 80% of the timeline.
+    final lap = (t / 0.8).clamp(0.0, 1.0);
+    final head = lap * math.pi * 2 - math.pi / 2;
+    final highlight = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..shader = SweepGradient(
+        startAngle: 0,
+        endAngle: math.pi * 2,
+        transform: GradientRotation(head),
+        colors: [Colors.white.withValues(alpha: 0.95 * fade * (1 - lap * 0.6)), accent.light.withValues(alpha: 0.9 * fade), accent.primary.withValues(alpha: 0), Colors.transparent],
+        stops: const [0.0, 0.08, 0.32, 1.0],
+      ).createShader(rect);
+    canvas.drawRRect(rrect, highlight);
+    // Soft inner glow along the frame.
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 10
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
+        ..color = accent.primary.withValues(alpha: 0.28 * fade),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChosenRingPainter old) => old.t != t || old.accent != accent;
+}
+
 class _ListenerCard extends StatelessWidget {
-  const _ListenerCard({required this.listener, required this.showDetails, this.overlay});
+  const _ListenerCard({required this.listener, required this.showDetails, this.overlay, this.glow = 0});
 
   final TopListeners listener;
   final bool showDetails;
   final Widget? overlay;
+
+  /// 0..1 — how strongly the accent halo shows around the card (chosen state).
+  final double glow;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +353,10 @@ class _ListenerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(BebuTheme.radiusXl),
-        boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 30, offset: Offset(0, 18))],
+        boxShadow: [
+          const BoxShadow(color: Color(0x80000000), blurRadius: 30, offset: Offset(0, 18)),
+          if (glow > 0) BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.45 * glow.clamp(0.0, 1.0)), blurRadius: 44, spreadRadius: 2),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(BebuTheme.radiusXl),

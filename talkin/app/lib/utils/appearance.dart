@@ -42,6 +42,7 @@ class AppearanceConfig {
     this.cornerStyle = 'rounded',
     this.liveRings = true,
     this.coinAnimation = true,
+    this.soundEffects = true,
   });
 
   final BebuThemeMode defaultTheme;
@@ -53,6 +54,7 @@ class AppearanceConfig {
   final String cornerStyle; // rounded | soft | sharp
   final bool liveRings;
   final bool coinAnimation;
+  final bool soundEffects;
 
   static const defaults = AppearanceConfig();
 
@@ -70,6 +72,7 @@ class AppearanceConfig {
       cornerStyle: s('cornerStyle', 'rounded'),
       liveRings: b('liveRings', true),
       coinAnimation: b('coinAnimation', true),
+      soundEffects: b('soundEffects', true),
     );
   }
 
@@ -83,6 +86,7 @@ class AppearanceConfig {
         'cornerStyle': cornerStyle,
         'liveRings': liveRings,
         'coinAnimation': coinAnimation,
+        'soundEffects': soundEffects,
       };
 
   double get radiusScale => switch (cornerStyle) { 'soft' => 0.72, 'sharp' => 0.45, _ => 1.0 };
@@ -182,6 +186,7 @@ class Appearance {
       ambientGlow: config.ambientGlow,
       liveRings: config.liveRings,
       coinAnimation: config.coinAnimation,
+      soundEffects: config.soundEffects,
     );
     if (rebuild && rebuildOnChange) {
       Utils.onChangeStatusBar(brightness: Brightness.light);

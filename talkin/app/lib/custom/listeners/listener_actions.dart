@@ -67,7 +67,7 @@ class ListenerActions {
       );
 
   /// Opens the existing call chooser (audio / video / chat).
-  static void openTalkNow({
+  static Future<void> openTalkNow({
     required String? id,
     required String? name,
     required String? image,
@@ -80,8 +80,9 @@ class ListenerActions {
     required bool? isAvailableForPrivateAudioCall,
     VoidCallback? chatOnTap,
     bool showMessage = true,
-  }) {
-    Get.bottomSheet(
+    Color? barrierColor,
+  }) async {
+    await Get.bottomSheet(
       TalkNowButtonBottomSheet(
         chatOnTap: chatOnTap,
         showMessage: showMessage,
@@ -103,10 +104,11 @@ class ListenerActions {
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      barrierColor: barrierColor,
     );
   }
 
-  static void openTalkNowFor(TopListeners l) => openTalkNow(
+  static Future<void> openTalkNowFor(TopListeners l, {Color? barrierColor}) => openTalkNow(
         id: l.id,
         name: l.name,
         image: l.image,
@@ -118,6 +120,7 @@ class ListenerActions {
         isAvailableForPrivateVideoCall: l.isAvailableForPrivateVideoCall,
         isAvailableForPrivateAudioCall: l.isAvailableForPrivateAudioCall,
         chatOnTap: () => openChatFor(l),
+        barrierColor: barrierColor,
       );
 
   static bool canCall(TopListeners l) =>

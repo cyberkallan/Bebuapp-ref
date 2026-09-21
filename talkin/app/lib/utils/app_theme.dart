@@ -22,6 +22,7 @@ class BebuTheme {
   static bool _ambientGlow = true;
   static bool _liveRings = true;
   static bool _coinAnimation = true;
+  static bool _soundEffects = true;
 
   /// Called by [Appearance] whenever the effective look changes.
   static void configure({
@@ -32,6 +33,7 @@ class BebuTheme {
     bool ambientGlow = true,
     bool liveRings = true,
     bool coinAnimation = true,
+    bool soundEffects = true,
   }) {
     _p = palette;
     _a = accent;
@@ -40,6 +42,7 @@ class BebuTheme {
     _ambientGlow = ambientGlow;
     _liveRings = liveRings;
     _coinAnimation = coinAnimation;
+    _soundEffects = soundEffects;
   }
 
   static bool get isLight => _p.isLight;
@@ -48,6 +51,7 @@ class BebuTheme {
   static bool get ambientGlow => _ambientGlow;
   static bool get liveRings => _liveRings && !_reducedMotion;
   static bool get coinAnimation => _coinAnimation && !_reducedMotion;
+  static bool get soundEffects => _soundEffects;
   static BebuAccent get accent => _a;
 
   /// Status-bar icon brightness that reads well on [bg].

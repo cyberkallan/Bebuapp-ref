@@ -62,6 +62,7 @@ const settingSchema = new mongoose.Schema(
       cornerStyle: { type: String, default: "rounded" }, // rounded | soft | sharp
       liveRings: { type: Boolean, default: true },
       coinAnimation: { type: Boolean, default: true },
+      soundEffects: { type: Boolean, default: true },
     },
 
     // AI auto-replies for fake hosts. Provider API keys live here and are

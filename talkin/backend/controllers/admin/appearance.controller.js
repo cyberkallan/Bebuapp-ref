@@ -22,6 +22,7 @@ const DEFAULTS = {
   cornerStyle: "rounded",
   liveRings: true,
   coinAnimation: true,
+  soundEffects: true,
 };
 
 function normalize(raw = {}) {
@@ -36,6 +37,7 @@ function normalize(raw = {}) {
     cornerStyle: CORNERS.includes(a.cornerStyle) ? a.cornerStyle : DEFAULTS.cornerStyle,
     liveRings: a.liveRings !== false,
     coinAnimation: a.coinAnimation !== false,
+    soundEffects: a.soundEffects !== false,
   };
 }
 

@@ -386,9 +386,10 @@ const AppearanceSettings = () => {
             {[
               ['ambientGlow', 'Ambient glow', 'Soft violet / accent glows behind Home, Random match and onboarding.'],
               ['liveRings', 'Ringing call buttons', 'Call buttons wiggle with expanding rings when a host is live.'],
-              ['coinAnimation', 'Coin animation', 'The balance coin flips and sweeps every few seconds.']
+              ['coinAnimation', 'Coin animation', 'The balance coin flips and sweeps every few seconds.'],
+              ['soundEffects', 'Sound effects', 'Soft UI sounds, e.g. the chime when a host card is chosen for a call.']
             ].map(([key, label, hint]) => (
-              <Grid item size={{ xs: 12, md: 4 }} key={key}>
+              <Grid item size={{ xs: 12, md: 6 }} key={key}>
                 <FormControlLabel
                   sx={{ alignItems: 'flex-start', m: 0 }}
                   control={<Switch checked={draft[key]} disabled={draft.motion === 'reduced' && key !== 'ambientGlow'} onChange={e => set({ [key]: e.target.checked })} />}

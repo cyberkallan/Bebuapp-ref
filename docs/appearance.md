@@ -24,6 +24,7 @@ by three inputs, in this order:
 | `cornerStyle`          | `rounded`, `soft`, `sharp`                       | Scales every `BebuTheme.radius*` token (1.0 / 0.72 / 0.45).                    |
 | `liveRings`            | bool                                             | Ringing call buttons for online hosts.                                        |
 | `coinAnimation`        | bool                                             | 3D flip / sweep on the coin balance pill.                                     |
+| `soundEffects`         | bool                                             | Soft UI sounds (select chime when a host card is chosen for a call).          |
 
 API: `GET /api/admin/appearance` returns `{ settingId, appearance, options }`,
 `PATCH /api/admin/appearance` accepts any subset of the fields above.
