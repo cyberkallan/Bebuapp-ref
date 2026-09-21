@@ -3,23 +3,28 @@
   "items": [
     {
       "type": "new",
-      "title": "The full bebu app",
-      "body": "Quick login, caller discovery, voice and video calls, chat, coins and purchases \u2014 everything in one build."
+      "title": "A new look",
+      "body": "Dark, photo-first design across Home, Explore and caller profiles. Full-bleed portraits, live status, verified badges and a floating navigation bar."
     },
     {
       "type": "new",
-      "title": "bebu branding",
-      "body": "New icon, name and splash. Same violet look across the app, the website and the console."
+      "title": "Swipe to meet callers",
+      "body": "Home is now a deck of caller cards. Swipe left to skip, swipe right or tap the heart to start a call. Switch between For You and Live."
+    },
+    {
+      "type": "new",
+      "title": "Explore grid",
+      "body": "Browse everyone in a two-column photo wall with quick filters for Live now, Language and Topics."
     },
     {
       "type": "improved",
-      "title": "Live on a dedicated server",
-      "body": "The app talks to bebu's own backend over HTTPS, so calls and payments run against real infrastructure."
+      "title": "Richer profiles",
+      "body": "Hero photo, per-minute rates, stats, About Me, topics and languages, reviews and a one-tap Chat / Talk now bar."
     },
     {
       "type": "improved",
-      "title": "Signed release build",
-      "body": "Signed with a release key instead of the debug key, so future updates install over this one."
+      "title": "Smoother everywhere",
+      "body": "Shimmer loading, staggered entrance animations, press feedback and shared-element transitions from Explore into profiles."
     }
   ]
 }

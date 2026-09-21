@@ -5,15 +5,19 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.1.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
-| `bebu-1.1.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
+| `bebu-1.2.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 92 MB |
+| `bebu-1.2.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 85 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
 
-`1.1.0` is the full bebu app built on the proven Talkin engine: quick login,
+`1.2.0` adds the redesigned dark, photo-first UI: a swipeable caller deck on
+Home, an Explore photo grid with filters, richer caller profiles and a floating
+navigation bar. It installs over `1.1.0` (same package and signing key).
+
+`1.1.0` was the first full bebu app built on the proven Talkin engine: quick login,
 caller discovery, voice and video calls (ZegoCloud), chat, coins, purchases and
 the caller ("host") flow. It talks to bebu's own backend at
 `https://bebu.145.223.79.74.sslip.io` (see `talkin/deploy`).
