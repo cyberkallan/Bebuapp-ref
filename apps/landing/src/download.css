@@ -120,6 +120,11 @@
   border-color: var(--dl-border);
 }
 
+.dl-header .nav__toggle {
+  background: var(--dl-surface-2);
+  border-color: var(--dl-border-strong);
+}
+
 .dl-header .nav__toggle-bar {
   background: var(--dl-text);
 }
@@ -368,6 +373,10 @@
   background: var(--dl-surface);
   color: var(--dl-muted);
   margin-bottom: 22px;
+}
+
+.dl-empty[hidden] {
+  display: none;
 }
 
 .dl-empty strong {
@@ -766,8 +775,8 @@
 }
 
 .dl-float--call {
-  top: 8%;
-  left: -8%;
+  top: 19%;
+  left: -16%;
 }
 
 .dl-float--bonus {
