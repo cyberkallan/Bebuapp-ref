@@ -147,9 +147,10 @@ class _StageHero extends StatelessWidget {
               ),
             ),
             Positioned(
-              right: 12,
-              bottom: 12,
-              child: GradientButton(label: 'Customize', icon: Icons.brush_rounded, expanded: false, height: 40, onTap: openAvatarStudio),
+              left: 0,
+              right: 0,
+              bottom: 10,
+              child: Center(child: GradientButton(label: 'Customize', icon: Icons.brush_rounded, expanded: false, height: 38, onTap: openAvatarStudio)),
             ),
           ],
         ),

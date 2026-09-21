@@ -13,24 +13,28 @@ class ThemePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = Appearance.mode;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final m in BebuThemeMode.values) ...[
-          Expanded(
-            child: _ThemeOption(
-              mode: m,
-              selected: current == m,
-              compact: compact,
-              onTap: () {
-                Appearance.setUserChoice(m);
-                onChanged?.call(m);
-              },
+    // IntrinsicHeight gives the stretch a finite height when the picker sits
+    // in a scrolling column (unbounded height would otherwise fail layout).
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final m in BebuThemeMode.values) ...[
+            Expanded(
+              child: _ThemeOption(
+                mode: m,
+                selected: current == m,
+                compact: compact,
+                onTap: () {
+                  Appearance.setUserChoice(m);
+                  onChanged?.call(m);
+                },
+              ),
             ),
-          ),
-          if (m != BebuThemeMode.values.last) const SizedBox(width: 10),
+            if (m != BebuThemeMode.values.last) const SizedBox(width: 10),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
