@@ -20,6 +20,9 @@ const moment = require("moment-timezone");
 //generateHistoryUniqueId
 const generateHistoryUniqueId = require("./util/generateHistoryUniqueId");
 
+//AI auto-replies for fake hosts
+const aiChat = require("./util/aiChat/service");
+
 io.on("connection", async (socket) => {
   console.log("Socket Connection done Client ID: ", socket.id);
 
@@ -111,6 +114,12 @@ io.on("connection", async (socket) => {
       io.in("globalRoom:" + chatTopic?.senderId?.toString()).emit("messageDispatched", eventData);
       io.in("globalRoom:" + chatTopic?.receiverId?.toString()).emit("messageDispatched", eventData);
 
+      if (senderRole === "user" && receiverRole === "listener") {
+        aiChat
+          .onIncomingMessage({ chatTopic, senderId: parseData?.senderId, receiverId: parseData?.receiverId, receiverRole, message: parseData?.message, messageType: 1 })
+          .catch((e) => console.log("AI reply error:", e?.message));
+      }
+
       if (receiver && receiver.isNotificationEnabled && !receiver.isBlock && receiver.fcmToken) {
         const senderName = parseData?.name || "";
         const senderProfilePic = parseData?.profilePic || "";
@@ -176,6 +185,12 @@ io.on("connection", async (socket) => {
 
       io.in("globalRoom:" + chatTopic?.senderId?.toString()).emit("messageDispatched", eventData);
       io.in("globalRoom:" + chatTopic?.receiverId?.toString()).emit("messageDispatched", eventData);
+
+      if (senderRole === "user" && receiverRole === "listener" && (parseData?.messageType == 2 || parseData?.messageType == 3)) {
+        aiChat
+          .onIncomingMessage({ chatTopic, senderId: parseData?.senderId, receiverId: parseData?.receiverId, receiverRole, message: "", messageType: Number(parseData?.messageType) })
+          .catch((e) => console.log("AI reply error:", e?.message));
+      }
     }
   });
 

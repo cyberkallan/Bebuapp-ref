@@ -20,6 +20,7 @@ const history = require("./history.route");
 const currency = require("./currency.route");
 const setting = require("./setting.route");
 const login = require("./login.route");
+const aiChat = require("./aiChat.route");
 
 //exports admin's route.js
 route.use("/", admin);
@@ -35,6 +36,7 @@ route.use("/withdrawalRecord", validateAdminAuth, withdrawalRecord);
 route.use("/history", validateAdminAuth, history);
 route.use("/currency", validateAdminAuth, currency);
 route.use("/setting", validateAdminAuth, setting);
+route.use("/aiChat", validateAdminAuth, aiChat);
 route.use("/login", login);
 
 module.exports = route;

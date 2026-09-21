@@ -481,8 +481,23 @@ exports.fetchListeners = async (req, res) => {
           },
         },
         {
+          $lookup: {
+            from: "listeneraiprofiles",
+            localField: "_id",
+            foreignField: "listenerId",
+            as: "aiProfile",
+          },
+        },
+        { $unwind: { path: "$aiProfile", preserveNullAndEmptyArrays: true } },
+        {
           $project: {
             name: 1,
+            "aiProfile.enabled": 1,
+            "aiProfile.language": 1,
+            "aiProfile.tone": 1,
+            "aiProfile.persona": 1,
+            "aiProfile.replies": 1,
+            "aiProfile.lastReplyAt": 1,
             nickName: 1,
             email: 1,
             selfIntro: 1,

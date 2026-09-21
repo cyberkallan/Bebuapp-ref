@@ -6,7 +6,10 @@ exports.fetchAppSettingsData = async (req, res) => {
       return res.status(200).json({ status: false, message: "Setting does not found." });
     }
 
-    return res.status(200).json({ status: true, message: "Success", data: setting });
+    const data = typeof setting.toObject === "function" ? setting.toObject() : { ...setting };
+    delete data.aiChat; // provider API keys never leave the server
+
+    return res.status(200).json({ status: true, message: "Success", data });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });

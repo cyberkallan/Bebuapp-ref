@@ -49,6 +49,50 @@ const settingSchema = new mongoose.Schema(
     audioCallRatePrivate: { type: Number, default: 0 },
     videoCallRateRandom: { type: Number, default: 0 },
     audioCallRateRandom: { type: Number, default: 0 },
+
+    // AI auto-replies for fake hosts. Provider API keys live here and are
+    // stripped from every app-facing settings response.
+    aiChat: {
+      enabled: { type: Boolean, default: false },
+      providers: {
+        type: [
+          {
+            preset: { type: String, default: "groq" }, // groq | gemini | openrouter | cerebras | mistral | custom
+            label: { type: String, default: "" },
+            baseUrl: { type: String, default: "" },
+            apiKey: { type: String, default: "" },
+            model: { type: String, default: "" },
+            enabled: { type: Boolean, default: true },
+          },
+        ],
+        default: [],
+      },
+      defaultLanguage: { type: String, default: "manglish" },
+      tone: { type: String, default: "warm" }, // warm | playful | caring | flirty | professional
+      replyLength: { type: String, default: "short" }, // short | medium
+      emojiLevel: { type: String, default: "light" }, // none | light | expressive
+      identityRule: { type: String, default: "stay_in_character" }, // stay_in_character | honest
+      memoryMessages: { type: Number, default: 12 },
+      typingDelayMinSec: { type: Number, default: 2 },
+      typingDelayMaxSec: { type: Number, default: 7 },
+      splitLongReplies: { type: Boolean, default: true },
+      replyWhen: { type: String, default: "always" }, // always | online
+      quietHoursEnabled: { type: Boolean, default: false },
+      quietStart: { type: String, default: "01:00" },
+      quietEnd: { type: String, default: "07:00" },
+      timezone: { type: String, default: "Asia/Kolkata" },
+      maxRepliesPerUserPerDay: { type: Number, default: 80 },
+      maxRepliesPerDay: { type: Number, default: 3000 },
+      callNudgeEnabled: { type: Boolean, default: true },
+      callNudgeAfterMessages: { type: Number, default: 6 },
+      callNudgeEveryMessages: { type: Number, default: 6 },
+      blockedTopics: { type: [String], default: ["politics", "religion debates", "self-harm instructions", "explicit sexual content"] },
+      customRules: { type: String, default: "" },
+      fallbackEnabled: { type: Boolean, default: true },
+      temperature: { type: Number, default: 0.85 },
+      maxTokens: { type: Number, default: 180 },
+      timeoutMs: { type: Number, default: 20000 },
+    },
   },
   {
     timestamps: true,
