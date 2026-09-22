@@ -4,12 +4,12 @@ Everything Play Console needs is in the release bundle:
 
 | File                                   | Use                                                              |
 | -------------------------------------- | ---------------------------------------------------------------- |
-| `bebu-1.8.0.aab`                       | **Upload this** — Play Console → Production (or Internal testing) → Create release |
-| `bebu-1.8.0-arm64-v8a.apk`, `…-armeabi-v7a.apk` | Side-loading / your website; not accepted by Play          |
+| `bebu-1.9.0.aab`                       | **Upload this** — Play Console → Production (or Internal testing) → Create release |
+| `bebu-1.9.0-arm64-v8a.apk`, `…-armeabi-v7a.apk` | Side-loading / your website; not accepted by Play          |
 | `SHA256SUMS.txt`                       | Integrity check for the files above                              |
 | `app/android/bebu-release.jks` + `key.properties` | The upload key the bundle is signed with (production package only) |
 
-Package name `in.bebuapp.app`, version 1.8.0 (versionCode 17). The `.aab`
+Package name `in.bebuapp.app`, version 1.9.0 (versionCode 18). The `.aab`
 contains all three ABIs; Play generates per-device APKs itself.
 
 ## 1. Create the app (once)
@@ -27,7 +27,7 @@ contains all three ABIs; Play generates per-device APKs itself.
 
 ## 2. First release
 
-1. **Testing → Internal testing → Create new release** → upload `bebu-1.8.0.aab`.
+1. **Testing → Internal testing → Create new release** → upload `bebu-1.9.0.aab`.
 2. Release notes: paste from `releases/notes.json` (the *Gifts* and *Login*
    items).
 3. Add testers (e-mail list), roll out, install from the opt-in link and

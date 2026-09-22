@@ -6,9 +6,9 @@ this repository (`flutter build apk --release --split-per-abi` and
 
 | File                             | Use                                                  | Size   |
 | -------------------------------- | ---------------------------------------------------- | ------ |
-| `bebu-1.8.0-arm64-v8a.apk`       | Side-load: practically every phone from ~2017 on     | 91 MB  |
-| `bebu-1.8.0-armeabi-v7a.apk`     | Side-load: older 32-bit devices                      | 84 MB  |
-| `bebu-1.8.0.aab`                 | Google Play upload (all ABIs; not committed to git — too large for GitHub, download it from Admin → Downloads or rebuild) | 128 MB |
+| `bebu-1.9.0-arm64-v8a.apk`       | Side-load: practically every phone from ~2017 on     | 95 MB  |
+| `bebu-1.9.0-armeabi-v7a.apk`     | Side-load: older 32-bit devices                      | 88 MB  |
+| `bebu-1.9.0.aab`                 | Google Play upload (all ABIs; not committed to git — too large for GitHub, download it from Admin → Downloads or rebuild) | ~128 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`. Play Store steps: `docs/play-store.md`. iOS: `docs/ios-release.md`.
@@ -16,6 +16,23 @@ Distribution bundles (production with keys / marketplace without) are built by
 `tools/package.sh` and published on the admin panel's Downloads page.
 
 ## What this build is
+
+`1.9.0` adds three more ways to earn coins and a new **Earn coins** screen
+(Wallet → *Earn free coins*, Profile → *Earn coins*). **Complete your profile**
+pays 25 coins once name, photo, gender, birthday, country and a short bio (new
+field on Edit profile) are filled — granted the moment the profile is saved.
+**Invite friends**: every user has a 6-character invite code with a Share
+button; a friend who signs up with it earns the inviter 20 coins, and the
+friend's first coin-pack purchase pays the inviter 40 % of those coins. New
+users can enter a code from the same screen for 7 days. **Premium avatar
+bonus**: unlocking a paid Avatar Studio item pays 4–10 coins straight back
+(5 % of the price, clamped), shown as "+N back" on the tile before buying and
+in the unlock celebration. Every grant plays the new reward celebration — a
+gold coin drops in and spins, rays and a coin burst bloom behind it, the amount
+counts up with haptic beats — built as one animation controller and one
+custom painter so it stays smooth on budget phones. All amounts, percentages
+and switches live in Admin → Settings → Login & Rewards, which also shows
+stats for each reward. Installs over `1.8.0`.
 
 `1.8.0` adds gifts. A gift button sits beside the message box and in the voice
 / video call bars; the sheet shows ten 3D gifts (rose 5 · heart 10 · chocolate

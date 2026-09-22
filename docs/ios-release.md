@@ -5,7 +5,7 @@ one until you have an Apple Developer account.** Apple only lets iOS apps be
 compiled and signed on macOS, and only with a certificate issued to a paid
 Apple Developer Program member. Android could be built and signed on our
 Linux build server; iOS cannot. The iOS *project* is complete and ready
-(`bebu/app/ios/`, also in `bebu-app-flutter-1.8.0.zip` on Admin →
+(`bebu/app/ios/`, also in `bebu-app-flutter-1.9.0.zip` on Admin →
 Downloads); what remains is a Mac (real or rented) plus your Apple account.
 
 ## The shortest path to a phone (no Mac): Codemagic + TestFlight
@@ -39,7 +39,7 @@ Downloads); what remains is a Mac (real or rented) plus your Apple account.
    **TestFlight** app from the App Store and gets the build by e-mail
    invitation. Internal testers need no review; *External* testers (up to
    10,000, via a public link) need a one-time light review.
-6. **Publish**: App Store Connect → the app → *+ Version* 1.8.0 → pick the
+6. **Publish**: App Store Connect → the app → *+ Version* 1.9.0 → pick the
    TestFlight build, fill the listing (§4 below) → *Submit for Review*.
 
 Prefer GitHub Actions instead of Codemagic? `.github/workflows/ios-release.yml`
@@ -129,4 +129,4 @@ Profiles* in the browser plus `openssl` to produce the CSR and the .p12.
   chat). Provide a demo host account for the reviewer in *App Review
   Information*.
 - Version and build number come from `pubspec.yaml`
-  (`version: 1.8.0+17` → 1.8.0 (17)); bump the `+N` for every upload.
+  (`version: 1.9.0+18` → 1.9.0 (18)); bump the `+N` for every upload.
