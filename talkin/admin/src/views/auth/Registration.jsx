@@ -13,7 +13,7 @@ import * as yup from 'yup'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled, useTheme } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -33,6 +33,7 @@ import { auth } from '@/libs/firebase'
 // Component Imports
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
+import BrandPanel from './BrandPanel'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Config Imports
@@ -48,35 +49,6 @@ import { setRememberMe } from '@/utils/firebase-auth'
 import { projectName } from '@/config'
 import HoverPopover from '@/common/HoverPopover'
 import { toolTipData } from '@/settingTooltip'
-
-// Styled Custom Components
-const LoginIllustration = styled('div')(({ theme }) => ({
-  zIndex: 2,
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-}))
-
-const PhotoContainer = styled('div')({
-  width: '100%',
-  position: 'relative',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-})
-
-const MainImage = styled('img')({
-  width: '100%',
-
-  // objectFit: 'contain',
-  height: '100dvh',
-  objectFit: 'cover'
-
-  // borderRadius: '16px'
-})
 
 // Validation Schema
 const schema = yup.object().shape({
@@ -331,21 +303,7 @@ const Registration = ({ mode }) => {
           }
         )}
       >
-        {/* <SidebarBackground /> */}
-        <LoginIllustration>
-          <PhotoContainer>
-            <div className=''>
-              <img
-                src='/images/illustrations/auth/login2.png'
-                className='p-14 rounded-3xl'
-                alt='login collage'
-                style={{ width: '100%', height: '99dvh', objectFit: 'cover' }}
-                width={100}
-                height={100}
-              />
-            </div>
-          </PhotoContainer>
-        </LoginIllustration>
+        <BrandPanel />
         {/* {!hidden && <MaskImg alt='mask' src={authBackground} />} */}
       </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper p-6 md:px-16 w-full md:is-[50dvw]'>

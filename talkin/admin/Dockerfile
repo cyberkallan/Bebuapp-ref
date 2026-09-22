@@ -1,4 +1,4 @@
-# Talkin admin panel: Next.js 15 (Vuexy template).
+# bebu admin panel (Elevanza Ltd): Next.js 15 (Vuexy template).
 FROM node:22-alpine AS build
 WORKDIR /app
 RUN apk add --no-cache libc6-compat

@@ -15,8 +15,9 @@ import '@assets/iconify-icons/generated-icons.css'
 import { projectName } from '@/config'
 
 export const metadata = {
-  title: projectName ||  '',
-  description: projectName || ''
+  title: { default: `${projectName} admin`, template: `%s · ${projectName} admin` },
+  description: `${projectName} admin panel by Elevanza Ltd: hosts, coins, gifts, rewards and payouts.`,
+  applicationName: `${projectName} admin`
 }
 
 const RootLayout = async props => {
