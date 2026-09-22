@@ -58,3 +58,4 @@ apps/mobile/**/*.keystore
 
 # VPS deployment secrets
 infra/deploy/.env
+releases/*.aab

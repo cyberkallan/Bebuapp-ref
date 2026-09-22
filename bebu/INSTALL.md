@@ -37,7 +37,7 @@ Tested with Ubuntu 22.04 / 24.04 and Debian 12, Docker 24+, Flutter 3.27+.
 
 ```bash
 cd /opt/bebu/deploy
-./install.sh
+./install.sh            # or: bash install.sh
 ```
 
 It asks for:

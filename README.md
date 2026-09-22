@@ -35,12 +35,16 @@ infra/
   deploy/     single-VPS production stack (Docker Compose + Caddy HTTPS, console at /admin)
   scripts/    bootstrap and readiness helpers
 bebu/
-  app/        Flutter user + caller app (Firebase Auth, ZegoCloud calls)
+  app/        Flutter user + caller app (Firebase Auth, ZegoCloud calls) — Android + iOS
   backend/    Express + MongoDB + Socket.IO API
-  admin/      Next.js 15 admin panel
-  deploy/     Docker Compose stack for the above + DB seed
-releases/     signed test APKs + checksums + release notes
-docs/         architecture, development, security, deployment
+  admin/      Next.js 15 admin panel (incl. Downloads page for release bundles)
+  deploy/     install.sh guided installer, Docker Compose stack, Caddy, DB seed
+  INSTALL.md  fresh-server installation for a first-time developer
+tools/
+  package.sh  builds bebu-production-<v>.zip (with keys) and bebu-codecanyon-<v>.zip (no keys)
+releases/     signed APKs + checksums + release notes (the .aab is built, not committed)
+docs/         admin-guide, play-store, ios-release, go-live, feature docs; older platform docs
+.github/      iOS release workflow (macOS runner → TestFlight)
 ```
 
 ## Quick start

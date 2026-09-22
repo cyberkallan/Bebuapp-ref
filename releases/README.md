@@ -1,15 +1,19 @@
-# Test builds
+# Release builds
 
-Signed Android release builds of the bebu app, produced from `talkin/app` in
-this repository.
+Signed Android release builds of the bebu app, produced from `bebu/app` in
+this repository (`flutter build apk --release --split-per-abi` and
+`flutter build appbundle --release`, key `bebu/app/android/bebu-release.jks`).
 
-| File                             | Devices                               | Size  |
-| -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.8.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
-| `bebu-1.8.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
+| File                             | Use                                                  | Size   |
+| -------------------------------- | ---------------------------------------------------- | ------ |
+| `bebu-1.8.0-arm64-v8a.apk`       | Side-load: practically every phone from ~2017 on     | 91 MB  |
+| `bebu-1.8.0-armeabi-v7a.apk`     | Side-load: older 32-bit devices                      | 84 MB  |
+| `bebu-1.8.0.aab`                 | Google Play upload (all ABIs; not committed to git — too large for GitHub, download it from Admin → Downloads or rebuild) | 128 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
-`notes.json`.
+`notes.json`. Play Store steps: `docs/play-store.md`. iOS: `docs/ios-release.md`.
+Distribution bundles (production with keys / marketplace without) are built by
+`tools/package.sh` and published on the admin panel's Downloads page.
 
 ## What this build is
 

@@ -42,7 +42,7 @@ rand() { openssl rand -hex "${1:-24}" 2>/dev/null || head -c "${1:-24}" /dev/ura
 envget() { [ -f .env ] && grep -E "^$1=" .env | head -1 | cut -d= -f2- || true; }
 
 # Values from a Firebase web config snippet pasted by the user.
-extract() { echo "$1" | tr -d '\n' | grep -oE "$2[\"']?\s*[:=]\s*[\"'][^\"']+[\"']" | head -1 | sed -E "s/.*[\"']([^\"']+)[\"']$/\1/"; }
+extract() { echo "$1" | tr -d '\n' | grep -oE "$2[\"']?\s*[:=]\s*[\"'][^\"']+[\"']" | head -1 | sed -E "s/.*[\"']([^\"']+)[\"']$/\1/" || true; }
 
 # ── 0. prerequisites ─────────────────────────────────────────────────────────
 clear 2>/dev/null || true
@@ -122,7 +122,7 @@ ask SA_PATH "Path to the service-account .json you downloaded" "$SA_DEFAULT"
 [ -n "$SA_PATH" ] || die "The service account is required: the backend verifies logins and sends push notifications with it."
 [ -f "$SA_PATH" ] || die "File not found: $SA_PATH"
 grep -q '"private_key"' "$SA_PATH" || die "$SA_PATH does not look like a Firebase service-account key."
-SA_PROJECT="$(grep -oE '"project_id"\s*:\s*"[^"]+"' "$SA_PATH" | sed -E 's/.*"([^"]+)"$/\1/')"
+SA_PROJECT="$(grep -oE '"project_id"\s*:\s*"[^"]+"' "$SA_PATH" | sed -E 's/.*"([^"]+)"$/\1/' || true)"
 [ "$SA_PROJECT" = "$FIREBASE_PROJECT_ID" ] || warn "Service account project ($SA_PROJECT) differs from projectId ($FIREBASE_PROJECT_ID). Both must be the same Firebase project."
 [ "$SA_PATH" = "firebase-service-account.json" ] || cp "$SA_PATH" firebase-service-account.json
 chmod 600 firebase-service-account.json
