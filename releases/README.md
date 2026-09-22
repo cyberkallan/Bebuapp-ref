@@ -5,13 +5,23 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.6.3-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
-| `bebu-1.6.3-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
+| `bebu-1.7.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
+| `bebu-1.7.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.7.0` rebuilds the front door. Sign-in is one screen: Continue with Google,
+phone code or a one-tap guest account, with the number and 6-digit code steps
+inline (SMS auto-fill, resend timer). Which methods show and which is the
+hero button is set in Admin → Settings → Login & Rewards (presets: Recommended,
+Phone only, Google only, Phone + Google, Social, Everything). Profile setup is
+down to name (pre-filled), gender and birthday. New daily gift: a hopping gift
+on the coin balance opens a streak sheet (day 1…7, growing coins, countdown to
+the next one); welcome coins arrive through the same sheet after the first
+sign-in. Installs over `1.6.x`.
 
 `1.6.3` ships the new bebu logo: the pink B with a face profile and heart is the
 launcher icon (adaptive icon on a deep-plum plate, iOS icon set regenerated),
