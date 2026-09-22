@@ -10,15 +10,15 @@ pictures (three male, three female).
 ## Assets
 
 All images come from [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji)
-(3D style, MIT licence). `talkin/tools/build_avatar_assets.py` sparse-checks
+(3D style, MIT licence). `bebu/tools/build_avatar_assets.py` sparse-checks
 out only the renders listed in its catalog, trims transparent margins,
 resizes (avatars 512 px, rides/homes 384 px, pets/sky 320 px, accessories
 256 px), and writes WebP files plus `manifest.json` to:
 
 | Path                                   | Purpose                                                          |
 | -------------------------------------- | ---------------------------------------------------------------- |
-| `talkin/backend/assets/avatar-studio/` | Served at `/avatar-studio/<key>.webp`; seeds the catalog on boot |
-| `talkin/app/assets/avatar_studio/`     | Bundled in the APK (≈1.3 MB) so the stage renders with no network |
+| `bebu/backend/assets/avatar-studio/` | Served at `/avatar-studio/<key>.webp`; seeds the catalog on boot |
+| `bebu/app/assets/avatar_studio/`     | Bundled in the APK (≈1.3 MB) so the stage renders with no network |
 
 The app tries the bundled file first (`StudioImage`) and falls back to the
 server URL, so items added later by the admin still render.

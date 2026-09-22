@@ -1,0 +1,22 @@
+# Override for hosts that already run a public reverse proxy (Caddy, Traefik,
+# nginx-proxy…) which terminates TLS and can reach Docker networks.
+#
+#   .env:  COMPOSE_FILE=docker-compose.yml:docker-compose.edge.yml
+#          EDGE_NETWORK=<docker network of the public proxy>
+#
+# The edge then listens on plain HTTP :80 inside EDGE_NETWORK only; point the
+# public proxy's site block at `<STACK_NAME>-edge:80`.
+services:
+  edge:
+    ports: !reset []
+    volumes: !override
+      - ./Caddyfile.edge:/etc/caddy/Caddyfile:ro
+    networks:
+      internal: {}
+      shared:
+        aliases: ['${STACK_NAME:-bebu}-edge']
+
+networks:
+  shared:
+    external: true
+    name: ${EDGE_NETWORK:?set EDGE_NETWORK}

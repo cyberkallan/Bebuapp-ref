@@ -1,0 +1,34 @@
+# bebu edge (standalone): Caddy terminates TLS for DOMAIN with automatic
+# Let's Encrypt certificates and routes API paths to the backend, everything
+# else to the admin panel. Give DOMAIN an http:// prefix to run plain HTTP.
+{
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size 50MB
+	}
+
+	# Some admin code joins URLs with a double slash; collapse before routing.
+	uri path_regexp /{2,} /
+
+	# /gifts/* and /avatar-studio/* are bundled renders served by the backend;
+	# the bare /gifts path (no trailing slash) is the admin's Gifts page.
+	@backend path /api/* /storage/* /socket.io/* /avatar-studio/* /gifts/*
+	handle @backend {
+		reverse_proxy {$STACK_NAME:bebu}-backend:5000
+	}
+
+	handle {
+		reverse_proxy {$STACK_NAME:bebu}-admin:5001
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

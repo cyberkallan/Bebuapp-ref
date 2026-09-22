@@ -7,10 +7,9 @@ flags. Public site: [bebuapp.in](https://bebuapp.in/).
 
 The repository holds two things:
 
-- **`talkin/` — the shipping app stack.** Flutter app, Express/MongoDB backend
-  and Next.js admin panel adapted from the Talkin reference package and
-  rebranded as bebu. This is what the APKs in `releases/` are built from and
-  what runs on the staging server. Start with [`talkin/README.md`](talkin/README.md).
+- **`bebu/` — the shipping app stack.** Flutter app, Express/MongoDB backend
+  and Next.js admin panel. This is what the APKs in `releases/` are built from and
+  what runs on the staging server. Start with [`bebu/README.md`](bebu/README.md).
 - **`apps/`, `packages/`, `infra/` — the ground-up platform foundation**
   (NestJS API, Prisma schema, operator console, white-label Flutter shell).
   Architecture, data model, security pipeline and financial primitives are in
@@ -35,7 +34,7 @@ infra/
   docker/     docker compose for local Postgres + Redis
   deploy/     single-VPS production stack (Docker Compose + Caddy HTTPS, console at /admin)
   scripts/    bootstrap and readiness helpers
-talkin/
+bebu/
   app/        Flutter user + caller app (Firebase Auth, ZegoCloud calls)
   backend/    Express + MongoDB + Socket.IO API
   admin/      Next.js 15 admin panel

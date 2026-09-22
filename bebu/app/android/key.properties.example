@@ -1,0 +1,7 @@
+# Copy to key.properties (same folder) and fill in. Never commit key.properties
+# or the .jks file. storeFile is relative to app/android/app/ (so ../release.jks
+# points at app/android/release.jks).
+storeFile=../release.jks
+storePassword=
+keyAlias=release
+keyPassword=
