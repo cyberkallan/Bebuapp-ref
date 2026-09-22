@@ -146,7 +146,7 @@ class _RewardBlastState extends State<RewardBlast> with SingleTickerProviderStat
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: RadialGradient(
-                        center: const Alignment(0, -0.18),
+                        center: Alignment(0, -0.18 - 220 / size.height),
                         radius: 0.95,
                         colors: [BebuTheme.amber.withValues(alpha: 0.38 * glow), Colors.black.withValues(alpha: 0.74), Colors.black.withValues(alpha: 0.84)],
                         stops: const [0, 0.55, 1],
@@ -157,7 +157,8 @@ class _RewardBlastState extends State<RewardBlast> with SingleTickerProviderStat
                 if (!BebuTheme.reducedMotion)
                   RepaintBoundary(
                     child: CustomPaint(
-                      painter: _BurstPainter(t: t, rays: _seg(t, .12, .46) * (1 - out), burst: burst, bits: _bits, fade: 1 - out, center: const Alignment(0, -0.18)),
+                      // The column is centred at -0.18; the coin sits ~110 px above that centre.
+                      painter: _BurstPainter(t: t, rays: _seg(t, .12, .46) * (1 - out), burst: burst, bits: _bits, fade: 1 - out, center: Alignment(0, -0.18 - 220 / size.height)),
                     ),
                   ),
                 Align(
