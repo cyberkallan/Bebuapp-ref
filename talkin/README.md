@@ -198,6 +198,34 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Random match radar, host preview, presence badge (`1.6.2`)
+
+- `random_call_screen/view/random_call_view.dart` — rebuilt around a
+  `_DiscPainter` (three filled radial-gradient discs, offset depth disc,
+  blurred halo, breathing pulse ring, sweep while searching) over a
+  `_MapPainter` street-grid texture that fades toward the controls. Host
+  avatars orbit on the rings (six slots, `_AnonChip` placeholders for empty
+  ones, fade-cycle replacement via `replaceListenerAt`), the `_Core` squircle
+  (ink on light / white on dark, rounded-triangle glyph) is the primary tap
+  target, and the controls are reference-style `_TypeChip`s (Audio / Video)
+  plus a full-width **Match now**. `_StatusPill` shows `liveCount` and the
+  current call type with **Edit** → `showCallTypeSheet`. All colours come from
+  `BebuTheme`, so the screen works on both palettes; painters are wrapped in
+  `RepaintBoundary`, and repeating animations stop under reduced motion.
+- `widget/random_match_view.dart` — host preview is a full-bleed `_HostCard`
+  (photo + scrim, `PresencePill` *Online now / On a call*, `_RateChip`,
+  name/age/verified, intro, `_Fact` chips for rating, calls, languages, topics,
+  and *Your balance covers about N min*), a one-shot `_MatchBurst`, and an
+  action row Skip / Say hello / Call. Skip calls
+  `RandomCallController.skipMatch()` (re-queries, retries once if the same
+  host comes back, `isSkipping` overlay) and swaps the card with an
+  `AnimatedSwitcher`. Call/chat paths are untouched.
+- `custom/motion/presence_badge.dart` — `Presence {online, busy, offline}`,
+  `PresenceBadge` (dot + surface border + glow, breathing halo when online,
+  bar glyph for busy) and `PresencePill`. `BebuAvatar.online` now renders a
+  `PresenceBadge` (`badgeBorder`, opt-in `pulse` so long lists stay cheap).
+  `Sfx.matchFound()` plays the rising chime + heavy haptic when a host is found.
+
 ### Chat that delivers, voice notes, chat tones (`1.6.1`)
 
 - Why messages were lost: the app emitted `messageDispatched` only when

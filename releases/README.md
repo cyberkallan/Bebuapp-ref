@@ -5,13 +5,21 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.6.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
-| `bebu-1.6.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
+| `bebu-1.6.2-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
+| `bebu-1.6.2-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.6.2` redesigns Random match: a layered proximity radar over a faint city
+map with hosts drifting on the rings, a tappable black/white core that starts
+the match, Audio / Video chips and a live-count pill — tuned for both the dark
+and light themes. The match preview is a full-bleed portrait card (Online now
+pill, rate, rating, calls, languages, topics, minutes your balance covers)
+with a Skip action. The flat green online dot is replaced app-wide by a
+presence badge (glow, breathing halo, amber for busy). Installs over `1.6.1`.
 
 `1.6.1` fixes chat: messages typed while the socket was reconnecting were
 shown as sent but never left the phone, Malayalam / emoji text was stripped to
