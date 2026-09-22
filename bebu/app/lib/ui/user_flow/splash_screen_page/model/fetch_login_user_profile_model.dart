@@ -67,6 +67,8 @@ class User {
   String? date;
   DateTime? createdAt;
   DateTime? updatedAt;
+  Map<String, dynamic>? premiumStatus; // bebu Pro entitlement (util/premium.js summary)
+  Map<String, dynamic>? activeStyle; // applied Style Studio look
 
   User({
     this.id,
@@ -103,6 +105,8 @@ class User {
     this.date,
     this.createdAt,
     this.updatedAt,
+    this.premiumStatus,
+    this.activeStyle,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -112,6 +116,8 @@ class User {
         birthDate: json["birthDate"],
         gender: json["gender"],
         bio: json["bio"],
+        premiumStatus: json["premiumStatus"] is Map ? Map<String, dynamic>.from(json["premiumStatus"]) : null,
+        activeStyle: json["activeStyle"] is Map ? Map<String, dynamic>.from(json["activeStyle"]) : null,
         age: json["age"],
         countryCode: json["countryCode"],
         phoneNumber: json["phoneNumber"],

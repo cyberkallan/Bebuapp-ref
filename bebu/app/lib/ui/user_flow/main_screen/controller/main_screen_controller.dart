@@ -21,6 +21,7 @@ import 'package:talk_in/ui/user_flow/splash_screen_page/model/fetch_login_user_p
 import 'package:talk_in/utils/anonymous_authentication.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
+import 'package:talk_in/utils/pro.dart';
 import 'package:talk_in/utils/enums.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
 import 'package:talk_in/utils/utils.dart';
@@ -259,6 +260,7 @@ class MainScreenController extends GetxController {
 
     fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: loginUserId, token: token ?? '');
     Database.fetchLoginUserProfileModel = fetchLoginUserProfileModel;
+    Pro.rememberUser(fetchLoginUserProfileModel?.user?.premiumStatus, fetchLoginUserProfileModel?.user?.activeStyle);
 
     log("fetchLoginUserProfileModel?.user?.id${fetchLoginUserProfileModel?.user?.id}");
     if (loginUserId.trim().isNotEmpty && token!.trim().isNotEmpty) {

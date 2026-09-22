@@ -81,6 +81,8 @@ import 'package:talk_in/ui/user_flow/mobile_number_screen/view/mobile_number_scr
 import 'package:talk_in/ui/user_flow/avatar_studio/binding/avatar_studio_binding.dart';
 import 'package:talk_in/ui/user_flow/avatar_studio/view/avatar_studio_screen.dart';
 import 'package:talk_in/ui/user_flow/rewards/view/earn_coins_screen.dart';
+import 'package:talk_in/ui/user_flow/premium/view/pro_screen.dart';
+import 'package:talk_in/ui/user_flow/premium/view/style_studio_screen.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/binding/my_profile_screen_binding.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/view/my_profile_screen_view.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/binding/my_wallet_screen_binding.dart';
@@ -240,6 +242,16 @@ class AppPages {
     GetPage(
       name: AppRoutes.earnCoins,
       page: () => const EarnCoinsScreen(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.pro,
+      page: () => const ProScreen(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.styleStudio,
+      page: () => const StyleStudioScreen(),
       transition: Transition.cupertino,
     ),
     GetPage(

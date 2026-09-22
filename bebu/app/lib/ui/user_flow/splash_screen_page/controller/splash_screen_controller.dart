@@ -16,6 +16,7 @@ import 'package:talk_in/ui/user_flow/splash_screen_page/model/ip_api_response_mo
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/setting_api_model.dart';
 import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/appearance.dart';
+import 'package:talk_in/utils/pro.dart';
 import 'package:talk_in/utils/login_config.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
@@ -48,11 +49,13 @@ class SplashScreenController extends GetxController {
       LoginConfig.remember(cfg.login);
       RewardTeaser.remember(cfg.toJson());
       if (cfg.appearance != null) Appearance.applyServer(cfg.appearance);
+      Pro.rememberConfig(cfg.premium);
     }
     final token = await FirebaseAccessToken.onGet();
 
     fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: Database.loginUserFirebaseId, token: token ?? '');
     Database.fetchLoginUserProfileModel = fetchLoginUserProfileModel;
+    Pro.rememberUser(fetchLoginUserProfileModel?.user?.premiumStatus, fetchLoginUserProfileModel?.user?.activeStyle);
 
     if (Database.settingApiModel?.data?.isApplicationLive == false) {
       log("Application is not live...");
@@ -92,6 +95,7 @@ class SplashScreenController extends GetxController {
     settingApiModel = await SettingApi.callApi();
     Database.settingApiModel = settingApiModel;
     Appearance.applyServer(settingApiModel?.data?.appearance);
+    Pro.rememberConfig(settingApiModel?.data?.premium);
   }
 }
 

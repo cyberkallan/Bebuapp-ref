@@ -8,6 +8,7 @@ import 'package:talk_in/ui/user_flow/avatar_studio/controller/avatar_studio_cont
 import 'package:talk_in/ui/user_flow/avatar_studio/model/avatar_studio_model.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/api/fetch_login_user_profile_api.dart';
 import 'package:talk_in/utils/database.dart';
+import 'package:talk_in/utils/pro.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
 import 'package:talk_in/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,6 +62,7 @@ class MyProfileScreenController extends GetxController {
       if ((u.nickName ?? '').isNotEmpty) Database.onSetLoginUserNickName(u.nickName!);
       if ((u.fullName ?? '').isNotEmpty) Database.onSetLoginUserName(u.fullName!);
       Database.onSetLoginUserBio(u.bio ?? '');
+      Pro.rememberUser(u.premiumStatus, u.activeStyle);
       Database.onSetUserCoin((u.coins ?? 0).toString());
     }
     await refreshLook();

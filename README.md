@@ -1,5 +1,9 @@
 # bebu platform
 
+**New here (human or AI):** read [`docs/AI-GUIDE.md`](docs/AI-GUIDE.md) then
+[`docs/PROJECT_HISTORY.md`](docs/PROJECT_HISTORY.md). The shipping product is
+the `bebu/` folder, not `apps/` or `talkin/`.
+
 Multi-tenant SaaS platform for real-time 1-to-1 voice and video calling with
 coin-based billing. One backend and one admin console serve many branded mobile
 applications (tenants), each with its own users, callers, pricing and feature

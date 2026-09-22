@@ -16,6 +16,7 @@ import 'package:talk_in/services/notification_service/notification_services.dart
 import 'localization/localizations_delegate.dart';
 import 'utils/utils.dart';
 import 'package:talk_in/utils/appearance.dart';
+import 'package:talk_in/utils/pro.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 
@@ -27,6 +28,7 @@ void main() async {
   await Firebase.initializeApp();
   await GetStorage.init();
   Appearance.init();
+  Pro.init();
 
   final identity = (await MobileDeviceIdentifier().getDeviceId())!;
   final fcmToken = await FirebaseMessaging.instance.getToken();

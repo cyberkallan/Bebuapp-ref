@@ -54,6 +54,7 @@ class Data {
   final bool? allowBecomeHostOption;
   final Map<String, dynamic>? appearance;
   final Map<String, dynamic>? avatarStudio;
+  final Map<String, dynamic>? premium;
   final int? adminCommissionPercent;
   final int? minimumCoinsForConversion;
   final int? minimumCoinsForPayout;
@@ -93,6 +94,7 @@ class Data {
     this.allowBecomeHostOption,
     this.appearance,
     this.avatarStudio,
+    this.premium,
     this.adminCommissionPercent,
     this.minimumCoinsForConversion,
     this.minimumCoinsForPayout,
@@ -133,6 +135,7 @@ class Data {
         allowBecomeHostOption: json["allowBecomeHostOption"],
         appearance: json["appearance"] is Map ? Map<String, dynamic>.from(json["appearance"]) : null,
         avatarStudio: json["avatarStudio"] is Map ? Map<String, dynamic>.from(json["avatarStudio"]) : null,
+        premium: json["premium"] is Map ? Map<String, dynamic>.from(json["premium"]) : null,
         adminCommissionPercent: json["adminCommissionPercent"],
         minimumCoinsForConversion: json["minimumCoinsForConversion"],
         minimumCoinsForPayout: json["minimumCoinsForPayout"],
@@ -173,6 +176,7 @@ class Data {
         "allowBecomeHostOption": allowBecomeHostOption,
         "appearance": appearance,
         "avatarStudio": avatarStudio,
+        "premium": premium,
         "adminCommissionPercent": adminCommissionPercent,
         "minimumCoinsForConversion": minimumCoinsForConversion,
         "minimumCoinsForPayout": minimumCoinsForPayout,

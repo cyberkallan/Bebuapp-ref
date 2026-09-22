@@ -2,9 +2,14 @@
 
 The shipping bebu product: a Flutter app, an Express + MongoDB backend and a
 Next.js admin panel. This is what the APKs/AAB in `/releases` are built from
-and what runs on the VPS today. New here? Read [`INSTALL.md`](INSTALL.md)
-(server in one command) and [`docs/admin-guide.md`](../docs/admin-guide.md)
-(what every admin page does).
+and what runs on the VPS today.
+
+New here? Read these in order:
+
+1. [`docs/AI-GUIDE.md`](../docs/AI-GUIDE.md) — map of the repo, where to edit, Pro status
+2. [`docs/PROJECT_HISTORY.md`](../docs/PROJECT_HISTORY.md) — how the product was built
+3. [`INSTALL.md`](INSTALL.md) — server in one command
+4. [`docs/admin-guide.md`](../docs/admin-guide.md) — what every admin page does
 
 | Folder     | What it is                                             | Runs as                       |
 | ---------- | ------------------------------------------------------ | ----------------------------- |

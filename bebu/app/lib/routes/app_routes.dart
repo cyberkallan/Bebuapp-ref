@@ -27,6 +27,8 @@ class AppRoutes {
   static const String myProfileScreen = '/myProfileScreen';
   static const String avatarStudio = '/avatarStudio';
   static const String earnCoins = '/earnCoins';
+  static const String pro = '/pro';
+  static const String styleStudio = '/styleStudio';
   static const String editProfileScreen = '/editProfileScreen';
   static const String selectGenderScreen = '/selectGenderScreen';
   static const String myWalletScreen = '/myWalletScreen';

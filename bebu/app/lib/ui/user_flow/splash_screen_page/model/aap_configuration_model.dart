@@ -39,6 +39,7 @@ class Data {
   Map<String, dynamic>? appearance;
   int? welcomeCoins;
   Map<String, dynamic>? dailyReward;
+  Map<String, dynamic>? premium;
 
   Data({
     this.userPrivacyPolicyUrl,
@@ -47,6 +48,7 @@ class Data {
     this.appearance,
     this.welcomeCoins,
     this.dailyReward,
+    this.premium,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
@@ -56,6 +58,7 @@ class Data {
         appearance: json["appearance"] is Map ? Map<String, dynamic>.from(json["appearance"]) : null,
         welcomeCoins: (json["welcomeCoins"] as num?)?.toInt(),
         dailyReward: json["dailyReward"] is Map ? Map<String, dynamic>.from(json["dailyReward"]) : null,
+        premium: json["premium"] is Map ? Map<String, dynamic>.from(json["premium"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -65,5 +68,6 @@ class Data {
         "appearance": appearance,
         "welcomeCoins": welcomeCoins,
         "dailyReward": dailyReward,
+        "premium": premium,
       };
 }

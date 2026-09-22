@@ -26,6 +26,16 @@ class BebuTheme {
   static bool _soundEffects = true;
   static bool _chatSounds = true;
   static bool _haptics = true;
+  static String? _fontFamily;
+
+  /// Google Fonts family chosen in the Style Studio (bebu Pro); null = Inter.
+  static String? get fontFamily => _fontFamily;
+
+  /// Swap the display font app-wide. Unknown families fall back to Inter.
+  static void configureFont(String? family) {
+    final f = (family ?? '').trim();
+    _fontFamily = f.isEmpty ? null : f;
+  }
 
   /// Called by [Appearance] whenever the effective look changes.
   static void configure({
@@ -127,18 +137,40 @@ class BebuTheme {
   static Duration get normal => _reducedMotion ? const Duration(milliseconds: 1) : const Duration(milliseconds: 320);
   static const Curve curve = Curves.easeOutCubic;
 
-  // Typography — Inter with tight display tracking, like the reference.
+  // Typography — Inter with tight display tracking, like the reference; a
+  // Style Studio font replaces the family everywhere while keeping the scale.
+  static TextStyle font({double? fontSize, Color? color, FontWeight? fontWeight, double? letterSpacing, double? height, String? family}) {
+    final fam = family ?? _fontFamily;
+    if (fam != null) {
+      try {
+        return GoogleFonts.getFont(fam, fontSize: fontSize, color: color, fontWeight: fontWeight, letterSpacing: letterSpacing, height: height);
+      } catch (_) {
+        // Unknown family: keep the default rather than crash a build.
+      }
+    }
+    return GoogleFonts.inter(fontSize: fontSize, color: color, fontWeight: fontWeight, letterSpacing: letterSpacing, height: height);
+  }
+
   static TextStyle display({double size = 32, Color? color, FontWeight weight = FontWeight.w800}) =>
-      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: -0.9, height: 1.05);
+      font(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: _fontFamily == null ? -0.9 : -0.2, height: 1.05);
 
   static TextStyle title({double size = 20, Color? color, FontWeight weight = FontWeight.w700}) =>
-      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: -0.4, height: 1.2);
+      font(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: _fontFamily == null ? -0.4 : 0, height: 1.2);
 
   static TextStyle body({double size = 14, Color? color, FontWeight weight = FontWeight.w400, double? height}) =>
-      GoogleFonts.inter(fontSize: size, color: color ?? textMuted, fontWeight: weight, height: height ?? 1.45);
+      font(fontSize: size, color: color ?? textMuted, fontWeight: weight, height: height ?? 1.45);
 
   static TextStyle label({double size = 12, Color? color, FontWeight weight = FontWeight.w600}) =>
-      GoogleFonts.inter(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: 0.1);
+      font(fontSize: size, color: color ?? text, fontWeight: weight, letterSpacing: 0.1);
+
+  // Gold, for the Pro tick and pass cards.
+  static const Color gold = Color(0xFFF5C451);
+  static const Color goldDeep = Color(0xFFC98A12);
+  static const LinearGradient goldGradient = LinearGradient(
+    colors: [Color(0xFFFFE9A8), Color(0xFFF5C451), Color(0xFFC98A12)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   static Color statusColor(String? status) {
     switch (status) {
