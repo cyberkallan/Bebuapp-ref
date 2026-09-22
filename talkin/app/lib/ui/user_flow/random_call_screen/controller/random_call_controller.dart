@@ -60,6 +60,26 @@ class RandomCallController extends GetxController {
     update();
   }
 
+  /// From the match preview: throw this one back and ask for another
+  /// available host. Returns whether someone else was found.
+  Future<bool> skipMatch() async {
+    final previous = randomAvailableListenerModel?.data?.id;
+    isSkipping = true;
+    update();
+    for (var attempt = 0; attempt < 2; attempt++) {
+      randomAvailableListenerModel = await GetRandomAvailableListenerApi.callApi(callType: selectedIndex == 0 ? "audio" : "video", callMode: "random");
+      final d = randomAvailableListenerModel?.data;
+      if (d != null && (d.id != previous || attempt == 1)) break;
+    }
+    isSkipping = false;
+    update();
+    return randomAvailableListenerModel?.data != null;
+  }
+
+  bool isSkipping = false;
+
+  int get liveCount => allListener.where((l) => l.statusLabel == 'Available' || l.isOnline == true).length;
+
   void selectCallType(int index) {
     selectedIndex = index;
     update();
