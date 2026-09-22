@@ -18,6 +18,7 @@ const setting = require("./setting.route");
 const avatar = require("./avatar.route");
 const dailyReward = require("./dailyReward.route");
 const rewards = require("./rewards.route");
+const premium = require("./premium.route");
 const gift = require("./gift.route");
 
 //exports user's route.js
@@ -36,6 +37,7 @@ route.use("/setting", setting);
 route.use("/avatar", avatar);
 route.use("/dailyReward", dailyReward);
 route.use("/rewards", rewards);
+route.use("/premium", premium);
 route.use("/gift", gift);
 
 module.exports = route;

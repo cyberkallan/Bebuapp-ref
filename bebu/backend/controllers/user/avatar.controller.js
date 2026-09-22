@@ -42,19 +42,24 @@ exports.getStudio = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user.userId);
 
     const presets = presetKeys();
+    const premium = require("../../util/premium");
+    const pcfg = premium.config();
     const [user, items, presetItems] = await Promise.all([
-      User.findById(userId, { coins: 1, avatar: 1, unlockedItems: 1, profilePic: 1, gender: 1 }).lean(),
+      User.findById(userId, { coins: 1, avatar: 1, unlockedItems: 1, profilePic: 1, gender: 1, premium: 1 }).lean(),
       AvatarItem.find({ isActive: true }).sort({ category: 1, sortOrder: 1 }).lean(),
       AvatarItem.find({ key: { $in: [...presets.male, ...presets.female] } }, { key: 1, image: 1, gender: 1 }).lean(),
     ]);
     if (!user) return res.status(200).json({ status: false, message: "User does not found." });
 
     const byKey = Object.fromEntries(presetItems.map((p) => [p.key, p]));
+    const pro = premium.isPro(user, pcfg);
+    const proItems = pcfg.enabled && pcfg.features.proAvatarItems;
     return res.status(200).json({
       status: true,
       message: "Success",
       data: {
-        settings: studioSettings(),
+        settings: { ...studioSettings(), proItems, proName: pcfg.name },
+        pro,
         coins: user.coins || 0,
         gender: user.gender || "",
         profilePic: user.profilePic || "",
@@ -92,7 +97,19 @@ exports.unlockItem = async (req, res) => {
       return res.status(200).json({ status: true, message: "Already unlocked.", coins: u?.coins || 0, itemId: String(item._id) });
     }
 
-    const price = Math.max(0, item.coins || 0);
+    let price = Math.max(0, item.coins || 0);
+    let viaPro = false;
+    if (item.includedInPro && price > 0) {
+      const premium = require("../../util/premium");
+      const pcfg = premium.config();
+      if (pcfg.enabled && pcfg.features.proAvatarItems) {
+        const u = await User.findById(userId, premium.PROJECTION).lean();
+        if (premium.isPro(u, pcfg)) {
+          price = 0;
+          viaPro = true;
+        }
+      }
+    }
     // Atomic: only succeeds if the balance still covers the price.
     const updated = await User.findOneAndUpdate(
       { _id: userId, coins: { $gte: price } },
@@ -131,7 +148,7 @@ exports.unlockItem = async (req, res) => {
       console.log("avatar bonus:", e.message);
     }
 
-    return res.status(200).json({ status: true, message: "Unlocked.", coins: balance, itemId: String(item._id), price, bonus });
+    return res.status(200).json({ status: true, message: viaPro ? "Included with Pro." : "Unlocked.", coins: balance, itemId: String(item._id), price, bonus, viaPro });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });

@@ -348,6 +348,11 @@ exports.getUserProfile = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user.userId);
 
     const [user] = await Promise.all([User.findOne({ _id: userId }).lean()]);
+    if (user) {
+      const premium = require("../../util/premium");
+      user.premiumStatus = premium.summary(user);
+      user.activeStyle = await premium.resolveStyle(user);
+    }
 
     res.status(200).json({ status: true, message: "The user has retrieved their profile.", user: user });
   } catch (error) {

@@ -82,6 +82,7 @@ function readBody(body = {}, file) {
   if (body.coins !== undefined) out.coins = Math.max(1, parseInt(body.coins, 10) || 1);
   if (body.sortOrder !== undefined) out.sortOrder = parseInt(body.sortOrder, 10) || 0;
   if (body.isActive !== undefined) out.isActive = body.isActive === true || body.isActive === "true";
+  if (body.tier !== undefined) out.tier = body.tier === "pro" ? "pro" : "standard";
   if (body.accent !== undefined && /^#?[0-9a-fA-F]{6}$/.test(String(body.accent).trim())) {
     const a = String(body.accent).trim();
     out.accent = a.startsWith("#") ? a : `#${a}`;

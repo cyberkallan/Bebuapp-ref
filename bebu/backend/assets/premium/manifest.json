@@ -1,0 +1,43 @@
+{
+  "_comment": "Bundled Style Studio catalog, seeded into the PremiumItem collection on first boot (util/premium.js). Wallpapers are Unsplash photos (Unsplash License: free for commercial use, no attribution required). Fonts are Google Fonts under the SIL Open Font License and are fetched by the app.",
+  "wallpapers": [
+    { "key": "love_bokeh", "name": "Heart Lights", "tagline": "Soft heart bokeh in warm rose", "mood": "love", "coins": 0, "includedInPro": true, "sortOrder": 1, "credit": "Unsplash / freestocks" },
+    { "key": "romance_sunset", "name": "Golden Hour", "tagline": "Two silhouettes, one sunset", "mood": "romantic", "coins": 0, "includedInPro": true, "sortOrder": 2, "credit": "Unsplash / Nathan Dumlao" },
+    { "key": "friends_sunset", "name": "Squad Goals", "tagline": "Friends against the evening sky", "mood": "friendship", "coins": 0, "includedInPro": true, "sortOrder": 3, "credit": "Unsplash / Chang Duong" },
+    { "key": "love_glow", "name": "Shoreline Heart", "tagline": "A glowing heart on the sand", "mood": "love", "coins": 120, "includedInPro": false, "sortOrder": 4, "credit": "Unsplash / Tyler Nix" },
+    { "key": "romance_hands", "name": "Hands & Heart", "tagline": "A heart framed by the sun", "mood": "romantic", "coins": 120, "includedInPro": false, "sortOrder": 5, "credit": "Unsplash / Mayur Gala" },
+    { "key": "romance_ride", "name": "Ride Together", "tagline": "Bikes, dusk and a held hand", "mood": "romantic", "coins": 150, "includedInPro": false, "sortOrder": 6, "credit": "Unsplash / Everton Vila" },
+    { "key": "romance_shore", "name": "Beach Hearts", "tagline": "Playful love at the waterline", "mood": "romantic", "coins": 150, "includedInPro": false, "sortOrder": 7, "credit": "Unsplash / Jonathan Borba" },
+    { "key": "love_bloom", "name": "Spring Bloom", "tagline": "Yellow tulips in full sun", "mood": "love", "coins": 100, "includedInPro": false, "sortOrder": 8, "credit": "Unsplash / Sergey Shmidt" },
+    { "key": "love_stars", "name": "Under the Stars", "tagline": "Deep blue night, endless sky", "mood": "love", "coins": 180, "includedInPro": false, "sortOrder": 9, "credit": "Unsplash / Ryan Hutton" },
+    { "key": "friends_hug", "name": "Group Hug", "tagline": "Colour, laughter and warm arms", "mood": "friendship", "coins": 120, "includedInPro": false, "sortOrder": 10, "credit": "Unsplash / Duy Pham" },
+    { "key": "friends_together", "name": "Weekend Crew", "tagline": "Arm in arm, looking ahead", "mood": "friendship", "coins": 120, "includedInPro": false, "sortOrder": 11, "credit": "Unsplash / Helena Lopes" },
+    { "key": "friends_night", "name": "Festival Night", "tagline": "Hands up under the lights", "mood": "friendship", "coins": 150, "includedInPro": false, "sortOrder": 12, "credit": "Unsplash / Anthony Delanoix" }
+  ],
+  "fonts": [
+    { "key": "font_quicksand", "name": "Quicksand", "tagline": "Soft and rounded", "coins": 0, "includedInPro": true, "sortOrder": 1, "data": { "family": "Quicksand", "sample": "Hey, how was your day?" } },
+    { "key": "font_playfair", "name": "Playfair Display", "tagline": "Elegant editorial serif", "coins": 0, "includedInPro": true, "sortOrder": 2, "data": { "family": "Playfair Display", "sample": "Good evening, lovely." } },
+    { "key": "font_dancing", "name": "Dancing Script", "tagline": "Romantic handwriting", "coins": 0, "includedInPro": true, "sortOrder": 3, "data": { "family": "Dancing Script", "sample": "Miss you already" } },
+    { "key": "font_comfortaa", "name": "Comfortaa", "tagline": "Friendly geometric", "coins": 90, "includedInPro": false, "sortOrder": 4, "data": { "family": "Comfortaa", "sample": "Let's talk tonight" } },
+    { "key": "font_lora", "name": "Lora", "tagline": "Classic book serif", "coins": 90, "includedInPro": false, "sortOrder": 5, "data": { "family": "Lora", "sample": "Tell me everything." } },
+    { "key": "font_caveat", "name": "Caveat", "tagline": "Casual marker notes", "coins": 90, "includedInPro": false, "sortOrder": 6, "data": { "family": "Caveat", "sample": "you + me = ❤" } },
+    { "key": "font_righteous", "name": "Righteous", "tagline": "Bold retro display", "coins": 110, "includedInPro": false, "sortOrder": 7, "data": { "family": "Righteous", "sample": "Party tonight?" } },
+    { "key": "font_pacifico", "name": "Pacifico", "tagline": "Sunny surf script", "coins": 110, "includedInPro": false, "sortOrder": 8, "data": { "family": "Pacifico", "sample": "Good vibes only" } }
+  ],
+  "chatThemes": [
+    { "key": "chat_midnight_rose", "name": "Midnight Rose", "tagline": "Deep plum with rose bubbles", "coins": 0, "includedInPro": true, "sortOrder": 1, "data": { "bg": ["#1A0B1E", "#2A0F2E"], "mine": ["#FF3D8A", "#B0176A"], "theirs": "#2E1B33", "text": "#FFFFFF", "theirsText": "#F7F7F8", "accent": "#FF5FA2", "composer": "#22112A", "pattern": "hearts", "wallpaper": "" } },
+    { "key": "chat_ocean", "name": "Ocean Breeze", "tagline": "Cool teal gradients", "coins": 0, "includedInPro": true, "sortOrder": 2, "data": { "bg": ["#06171F", "#0B2A38"], "mine": ["#38BDF8", "#0369A1"], "theirs": "#13303D", "text": "#FFFFFF", "theirsText": "#E6F6FF", "accent": "#7DD3FC", "composer": "#0E2530", "pattern": "waves", "wallpaper": "" } },
+    { "key": "chat_golden", "name": "Golden Hour", "tagline": "Warm amber over dusk", "coins": 0, "includedInPro": true, "sortOrder": 3, "data": { "bg": ["#1F1208", "#3A1C0A"], "mine": ["#FFB020", "#E2651D"], "theirs": "#3A2416", "text": "#1B1200", "theirsText": "#FFF4E6", "accent": "#FFD27A", "composer": "#2C1A0E", "pattern": "dots", "wallpaper": "romance_sunset" } },
+    { "key": "chat_lavender", "name": "Lavender Dream", "tagline": "Pastel violet, soft edges", "coins": 130, "includedInPro": false, "sortOrder": 4, "data": { "bg": ["#15102A", "#241A45"], "mine": ["#A78BFA", "#6D28D9"], "theirs": "#2A2150", "text": "#FFFFFF", "theirsText": "#EFEAFF", "accent": "#C4B5FD", "composer": "#1E1740", "pattern": "stars", "wallpaper": "love_stars" } },
+    { "key": "chat_cherry", "name": "Cherry Blossom", "tagline": "Blush pink and cream", "coins": 130, "includedInPro": false, "sortOrder": 5, "data": { "bg": ["#FFF1F5", "#FFE0EA"], "mine": ["#FF6B9D", "#E11D74"], "theirs": "#FFFFFF", "text": "#FFFFFF", "theirsText": "#2A1220", "accent": "#FF3D8A", "composer": "#FFFFFF", "pattern": "petals", "wallpaper": "love_bokeh", "light": true } },
+    { "key": "chat_aurora", "name": "Aurora", "tagline": "Northern lights in motion", "coins": 180, "includedInPro": false, "sortOrder": 6, "data": { "bg": ["#04111B", "#0B2A2E", "#1B0F33"], "mine": ["#34D399", "#0EA5E9", "#8B5CF6"], "theirs": "#10262F", "text": "#06121A", "theirsText": "#E8FBF5", "accent": "#6EE7B7", "composer": "#0D1F26", "pattern": "aurora", "wallpaper": "" } }
+  ],
+  "callThemes": [
+    { "key": "call_glass", "name": "Classic Glass", "tagline": "Blurred photo, frosted controls", "coins": 0, "includedInPro": true, "sortOrder": 1, "data": { "bg": ["#141018", "#2A1030"], "ring": ["#FF3D8A", "#8B5CF6"], "controls": "glass", "wallpaper": "", "usePhoto": true, "particles": "none" } },
+    { "key": "call_neon", "name": "Neon Pulse", "tagline": "Electric rings that beat with the call", "coins": 0, "includedInPro": true, "sortOrder": 2, "data": { "bg": ["#050014", "#1B0040"], "ring": ["#22D3EE", "#A855F7"], "controls": "neon", "wallpaper": "", "usePhoto": false, "particles": "pulse" } },
+    { "key": "call_sunset", "name": "Sunset Glow", "tagline": "Golden sky behind every call", "coins": 0, "includedInPro": true, "sortOrder": 3, "data": { "bg": ["#3A1C0A", "#FF7A45"], "ring": ["#FFD27A", "#FF5A5F"], "controls": "glass", "wallpaper": "romance_sunset", "usePhoto": false, "particles": "sparks" } },
+    { "key": "call_starry", "name": "Starry Night", "tagline": "Slow drifting stars", "coins": 160, "includedInPro": false, "sortOrder": 4, "data": { "bg": ["#020617", "#0F1D4A"], "ring": ["#93C5FD", "#6366F1"], "controls": "glass", "wallpaper": "love_stars", "usePhoto": false, "particles": "stars" } },
+    { "key": "call_rosegold", "name": "Rose Gold", "tagline": "Warm metallic shimmer", "coins": 160, "includedInPro": false, "sortOrder": 5, "data": { "bg": ["#2B0F14", "#7A2E3A"], "ring": ["#FFC6A5", "#FF6B9D"], "controls": "gold", "wallpaper": "love_bokeh", "usePhoto": false, "particles": "hearts" } },
+    { "key": "call_aurora", "name": "Aurora Borealis", "tagline": "Living gradient sky", "coins": 200, "includedInPro": false, "sortOrder": 6, "data": { "bg": ["#04111B", "#0B3B3F", "#2A0F4A"], "ring": ["#34D399", "#38BDF8", "#8B5CF6"], "controls": "neon", "wallpaper": "", "usePhoto": false, "particles": "aurora" } }
+  ]
+}

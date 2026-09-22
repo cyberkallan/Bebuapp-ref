@@ -77,6 +77,31 @@ const userSchema = new mongoose.Schema(
       avatarBonusCoins: { type: Number, default: 0 },
     },
 
+    // bebu Pro (util/premium.js). Active while `until` is in the future or lifetime is set.
+    premium: {
+      until: { type: Date, default: null },
+      lifetime: { type: Boolean, default: false },
+      planKey: { type: String, default: "" },
+      since: { type: Date, default: null }, // first time this user became Pro
+      badge: { type: Boolean, default: true }, // user's own switch for the golden tick
+      passes: { type: Number, default: 0 }, // passes bought
+      coinsSpent: { type: Number, default: 0 },
+      grantedBy: { type: String, default: "" }, // "admin" when the last pass came from the panel
+    },
+    // Style Studio look (keys of PremiumItem rows). Empty = app default.
+    style: {
+      font: { type: String, default: "" },
+      wallpaper: { type: String, default: "" },
+      chatTheme: { type: String, default: "" },
+      callTheme: { type: String, default: "" },
+    },
+    unlockedStyles: { type: [String], default: [] },
+    // Random match counter for the free daily cap (YYYY-MM-DD in the reward timezone).
+    randomMatch: {
+      date: { type: String, default: "" },
+      count: { type: Number, default: 0 },
+    },
+
     interests: {
       therapyType: { type: String, default: "" },
       gender: { type: String, default: "" },
@@ -101,5 +126,6 @@ userSchema.index({ isBlock: 1 });
 userSchema.index({ createdAt: -1 });
 userSchema.index({ referralCode: 1 }, { unique: true, partialFilterExpression: { referralCode: { $type: "string" } } });
 userSchema.index({ referredBy: 1 });
+userSchema.index({ "premium.until": 1 });
 
 module.exports = mongoose.model("User", userSchema);

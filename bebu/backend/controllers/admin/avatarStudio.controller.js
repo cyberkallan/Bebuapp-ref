@@ -78,6 +78,7 @@ function readItemBody(body = {}, file) {
   if (body.coins !== undefined) out.coins = Math.max(0, parseInt(body.coins, 10) || 0);
   if (body.sortOrder !== undefined) out.sortOrder = parseInt(body.sortOrder, 10) || 0;
   if (body.isActive !== undefined) out.isActive = body.isActive === true || body.isActive === "true";
+  if (body.includedInPro !== undefined) out.includedInPro = body.includedInPro === true || body.includedInPro === "true";
   if (body.colors !== undefined) {
     const arr = Array.isArray(body.colors) ? body.colors : String(body.colors).split(",");
     out.colors = arr.map((c) => String(c).trim()).filter((c) => /^#?[0-9a-fA-F]{6}$/.test(c)).map((c) => (c.startsWith("#") ? c : `#${c}`));

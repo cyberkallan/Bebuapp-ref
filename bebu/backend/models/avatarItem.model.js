@@ -15,6 +15,7 @@ const avatarItemSchema = new mongoose.Schema(
     colors: [{ type: String }], // background gradient stops (hex), backgrounds only
     coins: { type: Number, default: 0, min: 0 }, // 0 = free
     rarity: { type: String, enum: RARITIES, default: "common" },
+    includedInPro: { type: Boolean, default: false }, // bebu Pro users equip it without paying
     gender: { type: String, enum: GENDERS, default: "any" }, // avatars only
     isActive: { type: Boolean, default: true },
     sortOrder: { type: Number, default: 0 },

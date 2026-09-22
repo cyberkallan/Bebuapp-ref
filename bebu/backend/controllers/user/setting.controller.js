@@ -16,6 +16,7 @@ exports.fetchAppSettingsData = async (req, res) => {
     data.dailyReward = normalizeReward(data.dailyReward);
     data.gift = normalizeGiftSettings(data.gift);
     data.rewards = require("../../util/rewards").normalizeRewards(data.rewards);
+    data.premium = require("../../util/premium").normalizePremium(data.premium);
 
     return res.status(200).json({ status: true, message: "Success", data });
   } catch (error) {
@@ -41,6 +42,10 @@ exports.getAppConfiguration = async (req, res) => {
       welcomeCoins: Number(setting.dailyLoginBonusCoins) || 0,
       dailyReward: { enabled: dailyReward.enabled, coins: dailyReward.coins },
       rewards: require("../../util/rewards").normalizeRewards(setting.rewards),
+      premium: (() => {
+        const p = require("../../util/premium").normalizePremium(setting.premium);
+        return { enabled: p.enabled, name: p.name, tagline: p.tagline, features: p.features };
+      })(),
     };
 
     return res.status(200).json({ status: true, message: "Success", data: filteredData });

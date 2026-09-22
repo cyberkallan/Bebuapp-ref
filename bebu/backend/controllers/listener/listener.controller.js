@@ -335,7 +335,14 @@ exports.getProfileByUserId = async (req, res) => {
 
     const userId = new mongoose.Types.ObjectId(req.query.userId);
 
-    const [user] = await Promise.all([User.findOne({ _id: userId }).select("nickName fullName birthDate gender bio age profilePic email countryFlag country uniqueId isOnline").lean()]);
+    const [user] = await Promise.all([User.findOne({ _id: userId }).select("nickName fullName birthDate gender bio age profilePic email countryFlag country uniqueId isOnline premium").lean()]);
+    if (user) {
+      const premium = require("../../util/premium");
+      const cfg = premium.config();
+      user.isPro = premium.isPro(user, cfg);
+      user.showBadge = cfg.showBadgeToHosts && premium.showsBadge(user, cfg);
+      delete user.premium;
+    }
 
     return res.status(200).json({ status: true, message: "The user has retrieved their profile.", user: user });
   } catch (error) {

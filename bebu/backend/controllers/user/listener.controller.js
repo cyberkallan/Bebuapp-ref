@@ -460,6 +460,21 @@ exports.retrieveAvailableListener = async (req, res) => {
       return res.status(200).json({ status: false, message: "Invalid callMode. Must be 'private' or 'random'." });
     }
 
+    // bebu Pro: free users get a daily cap on random matches (settings → premium.features).
+    const premium = require("../../util/premium");
+    let quota = null;
+    if (callMode === "random") {
+      quota = await premium.randomMatchQuota(userId);
+      if (quota && !quota.unlimited && quota.left <= 0) {
+        return res.status(200).json({
+          status: false,
+          code: "MATCH_LIMIT",
+          message: `You've used today's ${quota.limit} free matches. Go Pro for unlimited matching.`,
+          quota,
+        });
+      }
+    }
+
     const [lastMatch] = await Promise.all([ListenerMatchHistory.findOne({ userId }).lean()]);
 
     const lastMatchedListenerId = lastMatch?.lastListenerId;
@@ -498,10 +513,16 @@ exports.retrieveAvailableListener = async (req, res) => {
 
     const matchedListener = availableListeners[Math.floor(Math.random() * availableListeners.length)];
 
+    if (callMode === "random") {
+      const consumed = await premium.consumeRandomMatch(userId);
+      if (consumed && consumed.quota) quota = consumed.quota;
+    }
+
     res.status(200).json({
       status: true,
       message: "Matched listener retrieved!",
       data: matchedListener,
+      quota,
     });
 
     await ListenerMatchHistory.findOneAndUpdate({ userId }, { lastListenerId: matchedListener._id }, { upsert: true, new: true });

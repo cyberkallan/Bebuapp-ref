@@ -24,6 +24,7 @@ const aiChat = require("./aiChat.route");
 const appearance = require("./appearance.route");
 const avatarStudio = require("./avatarStudio.route");
 const loginRewards = require("./loginRewards.route");
+const premium = require("./premium.route");
 const gift = require("./gift.route");
 const download = require("./download.route");
 
@@ -45,6 +46,7 @@ route.use("/aiChat", validateAdminAuth, aiChat);
 route.use("/appearance", validateAdminAuth, appearance);
 route.use("/avatarStudio", validateAdminAuth, avatarStudio);
 route.use("/loginRewards", validateAdminAuth, loginRewards);
+route.use("/premium", validateAdminAuth, premium);
 route.use("/gift", validateAdminAuth, gift);
 // Auth is applied per-route inside: /download/get is a signed public link.
 route.use("/download", download);

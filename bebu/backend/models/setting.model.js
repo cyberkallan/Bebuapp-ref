@@ -124,6 +124,41 @@ const settingSchema = new mongoose.Schema(
       },
     },
 
+    // bebu Pro: time-limited passes bought with coins (see docs/premium.md).
+    // When enabled is false nothing Pro-related is shown anywhere in the app.
+    premium: {
+      enabled: { type: Boolean, default: true },
+      name: { type: String, default: "bebu Pro" },
+      tagline: { type: String, default: "Unlimited matching, golden tick, exclusive looks." },
+      passes: {
+        type: [
+          {
+            key: { type: String, default: "" }, // stable id: week, month, year, lifetime
+            name: { type: String, default: "" },
+            days: { type: Number, default: 7 }, // 0 = lifetime
+            coins: { type: Number, default: 0 },
+            badge: { type: String, default: "" }, // "Best value", "Popular"
+            isActive: { type: Boolean, default: true },
+          },
+        ],
+        default: [
+          { key: "week", name: "1 week pass", days: 7, coins: 499, badge: "", isActive: true },
+          { key: "month", name: "1 month pass", days: 30, coins: 1499, badge: "Popular", isActive: true },
+          { key: "year", name: "1 year pass", days: 365, coins: 9999, badge: "Best value", isActive: true },
+        ],
+      },
+      features: {
+        unlimitedRandomMatch: { type: Boolean, default: true },
+        freeRandomMatchesPerDay: { type: Number, default: 5 }, // cap for non-Pro users; 0 = no cap for anyone
+        goldenTick: { type: Boolean, default: true }, // Pro users may show the golden verified tick
+        proAvatarItems: { type: Boolean, default: true }, // avatar items flagged includedInPro unlock free for Pro
+        proGifts: { type: Boolean, default: true }, // gifts flagged tier "pro" can only be sent by Pro users
+        styleStudio: { type: Boolean, default: true }, // fonts, wallpapers, chat themes, call templates
+        freeStyleItems: { type: Boolean, default: true }, // items flagged includedInPro cost 0 for Pro users
+      },
+      showBadgeToHosts: { type: Boolean, default: true }, // hosts see the tick on Pro users in chat / calls
+    },
+
     // Avatar Studio: 3D avatar + scene items users unlock with coins.
     // When disabled the app falls back to photo upload + 3 male / 3 female presets.
     avatarStudio: {

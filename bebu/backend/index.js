@@ -61,6 +61,9 @@ async function startServer() {
   // Bundled gift renders (Fluent Emoji 3D, MIT).
   app.use("/gifts", express.static(path.join(__dirname, "assets", "gifts"), { maxAge: "30d", immutable: true }));
   require("./util/gifts").seedGifts();
+  // Style Studio wallpapers (4K + thumbs); catalog seeded from assets/premium/manifest.json
+  app.use("/premium", express.static(path.join(__dirname, "assets", "premium"), { maxAge: "30d", immutable: true }));
+  require("./util/premium").seedPremiumItems();
 
   db.on("error", () => {
     console.log("Connection Error: ");

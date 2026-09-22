@@ -187,6 +187,7 @@ exports.getChatList = async (req, res) => {
             fullName: { $first: "$user.fullName" },
             profilePic: { $first: "$user.profilePic" },
             isOnline: { $first: "$user.isOnline" },
+            premium: { $first: "$user.premium" },
             chatTopicId: { $first: "$chat.chatTopicId" },
             senderId: { $first: "$chat.senderId" },
             message: { $first: "$chat.message" },
@@ -202,6 +203,7 @@ exports.getChatList = async (req, res) => {
             fullName: 1,
             profilePic: 1,
             isOnline: 1,
+            premium: 1,
             chatTopicId: 1,
             senderId: 1,
             messageType: 1,
@@ -262,6 +264,13 @@ exports.getChatList = async (req, res) => {
         { $limit: limit },
       ]),
     ]);
+
+    const premium = require("../../util/premium");
+    const cfg = premium.config();
+    for (const row of chatList) {
+      row.showBadge = cfg.showBadgeToHosts && premium.showsBadge(row, cfg);
+      delete row.premium;
+    }
 
     return res.status(200).json({ status: true, message: "Success", chatList });
   } catch (error) {

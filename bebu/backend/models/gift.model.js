@@ -10,6 +10,7 @@ const giftSchema = new mongoose.Schema(
     image: { type: String, default: "" }, // "gifts/rose.png" (bundled) or "storage/..." (uploaded)
     accent: { type: String, default: "#FF4D6D" }, // glow colour for the animation
     coins: { type: Number, default: 0 },
+    tier: { type: String, enum: ["standard", "pro"], default: "standard" }, // "pro" = only bebu Pro users can send it
     sortOrder: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     sentCount: { type: Number, default: 0 },

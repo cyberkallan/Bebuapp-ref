@@ -23,7 +23,17 @@ async function giftSettings() {
 }
 
 function publicGift(g) {
-  return { _id: g._id, key: g.key, name: g.name, tagline: g.tagline, image: g.image, accent: g.accent, coins: g.coins, sortOrder: g.sortOrder };
+  return { _id: g._id, key: g.key, name: g.name, tagline: g.tagline, image: g.image, accent: g.accent, coins: g.coins, tier: g.tier || "standard", sortOrder: g.sortOrder };
+}
+
+// Pro-tier gifts: which the caller may send right now.
+async function proGate(userId) {
+  const premium = require("../../util/premium");
+  const cfg = premium.config();
+  const gated = cfg.enabled && cfg.features.proGifts;
+  if (!gated) return { gated: false, pro: false, cfg };
+  const user = await User.findById(userId, premium.PROJECTION).lean();
+  return { gated: true, pro: premium.isPro(user, cfg), cfg };
 }
 
 // GET /api/user/gift/list — catalog + the flags the app needs to show/hide gift UI
@@ -34,7 +44,7 @@ exports.list = async (req, res) => {
       return res.status(200).json({ status: true, message: "Gifts are turned off.", data: { enabled: false, showInChat: false, showInCall: false, gifts: [] } });
     }
     await seedGifts();
-    const gifts = await Gift.find({ isActive: true }).sort({ sortOrder: 1, coins: 1 }).lean();
+    const [gifts, gate] = await Promise.all([Gift.find({ isActive: true }).sort({ sortOrder: 1, coins: 1 }).lean(), proGate(req.user.userId)]);
     return res.status(200).json({
       status: true,
       message: "Success",
@@ -43,6 +53,9 @@ exports.list = async (req, res) => {
         showInChat: settings.showInChat,
         showInCall: settings.showInCall,
         minBalanceHint: settings.minBalanceHint,
+        proGifts: gate.gated, // when true, tier "pro" gifts need bebu Pro
+        pro: gate.pro,
+        proName: gate.cfg.name,
         gifts: gifts.map(publicGift),
       },
     });
@@ -77,6 +90,12 @@ exports.send = async (req, res) => {
     ]);
 
     if (!gift) return res.status(200).json({ status: false, message: "This gift is no longer available." });
+    if (gift.tier === "pro") {
+      const gate = await proGate(userId);
+      if (gate.gated && !gate.pro) {
+        return res.status(200).json({ status: false, code: "PRO_REQUIRED", message: `${gate.cfg.name} members only — unlock it to send ${gift.name}.` });
+      }
+    }
     if (!listener) return res.status(200).json({ status: false, message: "Host not found." });
     if (!user || user.isBlock) return res.status(200).json({ status: false, message: "Account not allowed to send gifts." });
 
