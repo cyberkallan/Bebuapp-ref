@@ -232,6 +232,14 @@ exports.authenticateOrRegisterUser = async (req, res) => {
         }),
       ]);
 
+      // Invite code typed on the sign-in screen (optional).
+      if (req.body.referralCode) {
+        require("../../util/rewards")
+          .applyReferral(newUser._id, req.body.referralCode)
+          .then((r) => console.log("referral at sign-up:", r.message))
+          .catch((e) => console.log("referral at sign-up:", e.message));
+      }
+
       if (newUser?.fcmToken) {
         const payload = {
           token: newUser.fcmToken,
@@ -312,8 +320,17 @@ exports.updateUserProfile = async (req, res) => {
     user.country = req.body.country ? req.body.country.toLowerCase()?.trim() : user.country;
     await user.save();
 
+    // Profile-completion reward (once): granted here so the app can celebrate right after saving.
+    let reward = null;
+    try {
+      reward = await require("../../util/rewards").grantProfileReward(user);
+      if (reward && reward.balance !== null) user.coins = reward.balance;
+    } catch (e) {
+      console.log("profile reward:", e.message);
+    }
+
     // Respond only after the write so the app's follow-up profile fetch sees the new data.
-    return res.status(200).json({ status: true, message: "The user's profile has been modified.", user });
+    return res.status(200).json({ status: true, message: "The user's profile has been modified.", user, reward });
   } catch (error) {
     if (req.file) deleteFile(req.file);
     console.log(error);

@@ -101,6 +101,29 @@ const settingSchema = new mongoose.Schema(
       autoOpen: { type: Boolean, default: true }, // pop the reward sheet automatically on home when claimable
     },
 
+    // Extra coin rewards (see docs/rewards.md). All amounts admin-controlled;
+    // a disabled block hides its card in the app's Earn coins screen.
+    rewards: {
+      profile: {
+        enabled: { type: Boolean, default: true },
+        coins: { type: Number, default: 25 }, // once, when name + photo + gender + age + bio are filled
+      },
+      referral: {
+        enabled: { type: Boolean, default: true },
+        inviterCoins: { type: Number, default: 20 }, // when an invited user signs up with the code
+        inviteeCoins: { type: Number, default: 0 }, // optional bonus for the new user who enters a code
+        purchaseSharePercent: { type: Number, default: 40 }, // % of an invited user's purchased coins credited to the inviter
+        firstPurchaseOnly: { type: Boolean, default: true },
+        codeWindowDays: { type: Number, default: 7 }, // a new user may enter a code this long after signing up
+      },
+      avatarBonus: {
+        enabled: { type: Boolean, default: true },
+        percent: { type: Number, default: 5 }, // bonus = clamp(round(price * percent / 100), minCoins, maxCoins)
+        minCoins: { type: Number, default: 4 },
+        maxCoins: { type: Number, default: 10 },
+      },
+    },
+
     // Avatar Studio: 3D avatar + scene items users unlock with coins.
     // When disabled the app falls back to photo upload + 3 male / 3 female presets.
     avatarStudio: {

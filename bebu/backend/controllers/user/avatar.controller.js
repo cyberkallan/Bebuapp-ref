@@ -15,6 +15,8 @@ function studioSettings() {
   return {
     enabled: s.enabled !== false,
     allowPhotoUpload: s.allowPhotoUpload !== false,
+    // Coin bonus paid back on premium unlocks, so tiles can show "+N bonus" up front.
+    bonus: require("../../util/rewards").config().avatarBonus,
   };
 }
 
@@ -116,7 +118,20 @@ exports.unlockItem = async (req, res) => {
         : Promise.resolve(),
     ]);
 
-    return res.status(200).json({ status: true, message: "Unlocked.", coins: updated.coins, itemId: String(item._id), price });
+    // Premium-item bonus (settings → rewards.avatarBonus): a few coins back, scaled by price.
+    let bonus = 0;
+    let balance = updated.coins;
+    try {
+      const b = await require("../../util/rewards").onAvatarUnlock(userId, price);
+      if (b) {
+        bonus = b.bonus;
+        if (b.balance !== null) balance = b.balance;
+      }
+    } catch (e) {
+      console.log("avatar bonus:", e.message);
+    }
+
+    return res.status(200).json({ status: true, message: "Unlocked.", coins: balance, itemId: String(item._id), price, bonus });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });

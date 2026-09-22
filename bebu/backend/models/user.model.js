@@ -63,6 +63,20 @@ const userSchema = new mongoose.Schema(
       totalCoins: { type: Number, default: 0 },
     },
 
+    // Extra rewards (controllers/user/rewards.controller.js)
+    referralCode: { type: String, default: null }, // this user's own invite code (sparse unique index below)
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    referral: {
+      appliedAt: { type: Date, default: null }, // when this user entered someone's code
+      invited: { type: Number, default: 0 }, // people who signed up with this user's code
+      purchases: { type: Number, default: 0 }, // purchases by invited users that paid out
+      earnedCoins: { type: Number, default: 0 },
+    },
+    rewards: {
+      profileClaimedAt: { type: Date, default: null },
+      avatarBonusCoins: { type: Number, default: 0 },
+    },
+
     interests: {
       therapyType: { type: String, default: "" },
       gender: { type: String, default: "" },
@@ -85,5 +99,7 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ identity: 1, loginType: 1 });
 userSchema.index({ isBlock: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ referralCode: 1 }, { unique: true, partialFilterExpression: { referralCode: { $type: "string" } } });
+userSchema.index({ referredBy: 1 });
 
 module.exports = mongoose.model("User", userSchema);

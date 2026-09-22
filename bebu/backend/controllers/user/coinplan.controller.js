@@ -79,6 +79,11 @@ exports.recordPurchasedCoinPlan = async (req, res) => {
       }),
     ]);
 
+    // Invite reward: the inviter earns a share of this purchase (settings → rewards.referral).
+    require("../../util/rewards")
+      .onPurchase(user._id, totalCoins)
+      .catch((e) => console.log("referral purchase share:", e.message));
+
     res.status(200).json({
       status: true,
       message: "Coin plan history created successfully after user purchase.",
