@@ -98,6 +98,12 @@ class Sfx {
     return _ui ? _play(_p, 'audio/unlock.mp3', volume: 0.65) : Future.value();
   }
 
+  /// Random match found: heavy tap + the rising chime.
+  static Future<void> matchFound() {
+    _h(HapticFeedback.heavyImpact);
+    return _ui ? _play(_p, 'audio/unlock.mp3', volume: 0.5) : Future.value();
+  }
+
   // ---- chat tones (WhatsApp-style) ---------------------------------------
 
   /// My message left the phone: light tap + short rising "swoosh".

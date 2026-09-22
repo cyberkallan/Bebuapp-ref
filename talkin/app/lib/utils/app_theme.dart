@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:talk_in/custom/motion/presence_badge.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Design tokens for the redesigned user flow (home, explore, profile, ...).
@@ -733,12 +734,18 @@ class GlassCard extends StatelessWidget {
 
 /// Circular avatar with an optional online ring/dot.
 class BebuAvatar extends StatelessWidget {
-  const BebuAvatar({super.key, required this.child, this.size = 52, this.online, this.ring = false});
+  const BebuAvatar({super.key, required this.child, this.size = 52, this.online, this.ring = false, this.badgeBorder, this.pulse = false});
 
   final Widget child;
   final double size;
   final bool? online;
   final bool ring;
+
+  /// Colour behind the presence dot (defaults to the page background).
+  final Color? badgeBorder;
+
+  /// Animate the online dot with a breathing halo. Keep off in long lists.
+  final bool pulse;
 
   @override
   Widget build(BuildContext context) {
@@ -762,14 +769,11 @@ class BebuAvatar extends StatelessWidget {
             Positioned(
               right: 0,
               bottom: 0,
-              child: Container(
-                width: (size * 0.26).clamp(10.0, 18.0),
-                height: (size * 0.26).clamp(10.0, 18.0),
-                decoration: BoxDecoration(
-                  color: online! ? BebuTheme.green : BebuTheme.textFaint,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: BebuTheme.bg, width: 2),
-                ),
+              child: PresenceBadge(
+                presence: online! ? Presence.online : Presence.offline,
+                size: (size * 0.26).clamp(10.0, 18.0),
+                borderColor: badgeBorder ?? BebuTheme.bg,
+                pulse: pulse,
               ),
             ),
         ],
