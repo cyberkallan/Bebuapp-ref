@@ -12,8 +12,8 @@ server once you send the values.
 | Backend + admin on VPS        | Live at `https://bebu.145.223.79.74.sslip.io`                   | Your domain (`api.bebuapp.in`)         |
 | Landing + APK download        | Live at `https://ayushaura.in`                                  | Move to `bebuapp.in` when DNS is ready |
 | AI host replies               | Connected                                                       | –                                      |
-| Firebase (login, OTP, push)   | Still the **reference vendor's project** `talk-in-98cd8`         | Your own Firebase project              |
-| Android package name          | `com.incodes.talkin` (vendor's)                                 | `in.bebuapp.app`                       |
+| Firebase (login, OTP, push)   | **Done** — project `neocat-ceae7`, app + server + admin switched  | –                                      |
+| Android package name          | **Done** — `in.bebuapp.app` since 1.7.2                          | –                                      |
 | Voice/video calls (Zego)      | Vendor's demo App ID                                            | Your own Zego project                  |
 | Payments                      | Test keys / placeholders                                        | Razorpay live keys, Play billing later |
 | Privacy / Terms pages         | Placeholder text                                                | Real pages on bebuapp.in               |

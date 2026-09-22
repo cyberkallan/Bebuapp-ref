@@ -12,7 +12,20 @@
           "package_name": "in.bebuapp.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "582954571557-jc720ch6845ic1pc04nr0igrt88e4ik7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.bebuapp.app",
+            "certificate_hash": "8a147e45ff6c6c2436053a5c07f7e69244c7e25b"
+          }
+        },
+        {
+          "client_id": "582954571557-aple6hrvko26clivp8m6gi6pnf41cmfg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBJc5TToXZM5SaaNSQ3OMim8X132giWBiU"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582954571557-aple6hrvko26clivp8m6gi6pnf41cmfg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
