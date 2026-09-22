@@ -2,6 +2,11 @@
  "date": "2026-09-22",
  "items": [
   {
+   "type": "improved",
+   "title": "Random match, redesigned again",
+   "body": "The radar is gone. You now get one big card with a softly blurred reel of hosts who are live right now, how many are online, an Audio / Video switch that shows the coins per minute, and a single Start matching button with how many minutes your balance covers. While we search, the reel shuffles and you can cancel at any time."
+  },
+  {
    "type": "new",
    "title": "Sign in in one tap",
    "body": "A new sign-in screen: Continue with Google, phone code or just Try it now as a guest. The number and code steps live on the same screen with big digits, a country picker, SMS auto-fill and a resend timer. Which buttons appear, and which one is the big one, is now an admin setting."

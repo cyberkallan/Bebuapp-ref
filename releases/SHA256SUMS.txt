@@ -1,2 +1,2 @@
-d2d156b2d66a391aa854dc6bc8cafd1fd6a4f97deb31ba07d344a1a15d7e8d53  bebu-1.7.0-arm64-v8a.apk
-cf7db79d2bae2b9a4cb64d8b64ea6783533bd17a0b7ed74c58d67f0b0d076afd  bebu-1.7.0-armeabi-v7a.apk
+8a8bdb2bf6e5b567403787bc10d4880a3d6222996339ee886c9932aa7e57360c  bebu-1.7.1-arm64-v8a.apk
+6e99224bf0f1167f830f23cd7b5f16a9fc1f0671664ee982e49c63ca3d6dcef5  bebu-1.7.1-armeabi-v7a.apk
