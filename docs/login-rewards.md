@@ -1,8 +1,10 @@
-# Sign-in, onboarding and daily rewards
+# Sign-in, onboarding and rewards
 
-Three things the admin can shape from *Admin → Settings → Login & Rewards*:
-which sign-in buttons the app shows (and which one is the hero), the welcome
-bonus a new account gets, and the daily streak gift that brings people back.
+What the admin can shape from *Admin → Settings → Login & Rewards*: which
+sign-in buttons the app shows (and which one is the hero), the welcome bonus a
+new account gets, the daily streak gift that brings people back, and the extra
+rewards (profile completion, invite friends, premium avatar bonus) described
+at the end of this document.
 
 ## Sign-in methods (`setting.login`)
 
@@ -113,3 +115,73 @@ Per-user progress lives on `User.dailyReward`
 - Splash applies `LoginConfig.remember`, `RewardTeaser.remember` and
   `Appearance.applyServer` from `getAppConfiguration` before any screen is
   shown.
+
+
+## Extra rewards (`setting.rewards`)
+
+Defaults and normalisation live in `backend/util/rewards.js`; the app reads
+the rules from `GET /api/user/rewards/hub` (authenticated) and, for teasers,
+from the public `getAppConfiguration` (`rewards` block).
+
+| Block         | Field                  | Default | Meaning                                                                    |
+| ------------- | ---------------------- | ------- | -------------------------------------------------------------------------- |
+| `profile`     | `enabled`, `coins`     | on, 25  | One-time reward once every checklist step is done.                         |
+| `referral`    | `enabled`              | on      | Invite codes, sharing and payouts.                                         |
+|               | `inviterCoins`         | 20      | Paid to the inviter when a new user applies the code.                      |
+|               | `inviteeCoins`         | 0       | Optional welcome coins for the new user who applies a code.                |
+|               | `purchaseSharePercent` | 40      | Share of an invited user's purchased coins credited to the inviter.        |
+|               | `firstPurchaseOnly`    | true    | Pay the share once (first pack) or on every purchase.                      |
+|               | `codeWindowDays`       | 7       | A new user may apply a code this long after signing up (and before buying).|
+| `avatarBonus` | `enabled`              | on      | Coins back on premium Avatar Studio unlocks.                               |
+|               | `percent`, `minCoins`, `maxCoins` | 5, 4, 10 | `bonus = clamp(round(price × percent / 100), min, max)`.        |
+
+### Profile checklist
+
+`profileChecklist(user)`: name (`fullName` or `nickName`, 2+ chars), photo
+(non-default `profilePic` or an active studio avatar), gender, birthday
+(`birthDate`), country, bio (10+ chars). `PATCH /user/updateUserProfile`
+grants the reward as soon as the saved profile is complete and returns it as
+`reward: { type: "profile", coins, balance }`; the app plays the celebration
+from that response. `POST /user/rewards/profile/claim` covers users who
+completed their profile before this feature existed.
+
+### Invite flow
+
+1. `GET /user/rewards/hub` allocates the user's `referralCode` on first call
+   (6 chars from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`, unique partial index).
+2. The new user applies it with `POST /user/rewards/referral/apply { code }`
+   (also accepted as `referralCode` on `authenticateOrRegisterUser` for the
+   sign-up call). Guards: not already referred, not own code, within
+   `codeWindowDays`, no purchases yet, inviter not blocked. Sets `referredBy`,
+   credits `inviterCoins` (history type 12, push "Your invite worked!").
+3. `recordPurchasedCoinPlan` calls `rewards.onPurchase` after crediting the
+   buyer: if the buyer has `referredBy`, the inviter receives
+   `round(coins × purchaseSharePercent / 100)` (history type 12), once or every
+   time depending on `firstPurchaseOnly`.
+
+### Avatar bonus
+
+`POST /user/avatar/unlock` debits the price, then `rewards.onAvatarUnlock`
+credits the bonus (history type 13) and the response carries `bonus` plus the
+final `coins` balance. `GET /user/avatar/studio` includes the rule under
+`settings.bonus` so tiles can show "+N back" before purchase.
+
+### History types
+
+`11 PROFILE_REWARD`, `12 REFERRAL_REWARD`, `13 AVATAR_BONUS` — all income in
+`history.controller.js` (`isIncome`), labelled in the wallet, coin history and
+the admin user history views.
+
+### App surfaces
+
+- **Earn coins** (`/earnCoins`): daily streak, profile checklist with progress
+  ring and claim button, invite code + share + stats + "Have an invite code?",
+  premium bonus explainer. Entry points: Wallet → *Earn free coins* card (with
+  a pending-rewards badge) and Profile → *Earn coins* shortcut.
+- **RewardBlast** (`rewards/view/reward_blast.dart`): the shared "reward
+  unlocked" celebration — one `AnimationController`, rays + coin/star burst in
+  a single `CustomPainter` inside a `RepaintBoundary`, spinning `Coin3DPainter`,
+  count-up amount, haptic beats at land/count-end, reduced-motion fallback.
+  Overlays queue if two rewards arrive back to back.
+- Avatar Studio: `+N back` on tiles and in the unlock button, `_BonusChip`
+  in the unlock celebration.

@@ -115,7 +115,8 @@ option and details. Pay them outside the panel (bank/UPI/PayPal), then mark
 
 ### Coins & Rewards
 
-Shortcut to **Setting → Login & Rewards** (§5): welcome bonus and daily streak.
+Shortcut to **Setting → Login & Rewards** (§5): welcome bonus, daily streak,
+profile-completion reward, invite-friends rewards and the premium avatar bonus.
 
 ---
 
@@ -140,7 +141,33 @@ disables it and hides the teaser.
   7-day cycle). Add or remove days; the cycle loops after the last day.
 - **Day boundary timezone** — when "tomorrow" starts (Asia/Kolkata by default).
 
-Stats at the top show claims today, active streaks and coins given this week.
+**Complete your profile** — a one-time reward (default 25 coins) when name,
+photo (or studio avatar), gender, birthday, country and a 10+ character bio
+are all filled. The app grants it automatically the moment the profile is
+saved complete, or from *Earn coins → Claim*. Turning it off hides the card.
+
+**Invite friends** — every user has a 6-character invite code (*Wallet → Earn
+free coins → Invite friends*, with a Share button and a "Have an invite code?"
+entry for new users).
+
+- **Inviter gets per sign-up** (default 20) — paid when a new user enters the
+  code. Only users who joined within the **code entry window** (default 7
+  days) and have not bought coins yet can enter one.
+- **Purchase share %** (default 40) — when the invited user buys a coin pack,
+  this share of the pack's coins is credited to the inviter. **First purchase
+  only** (default on) pays it once; off pays on every purchase.
+- **New user gets** (default 0) — optional welcome coins for entering a code.
+
+**Premium avatar bonus** — coins paid straight back when a user unlocks a
+paid Avatar Studio item: `bonus = price × percent`, clamped between **Minimum**
+and **Maximum** (defaults 5 %, 4–10 coins). Studio tiles show "+N back" and the
+unlock celebration shows the bonus. Example chips under the fields preview the
+payout for typical prices.
+
+Every grant is a coin-history row (types *Profile Completion Reward*, *Invite
+Reward*, *Premium Avatar Bonus*) and a push notification, and shows up in the
+stats row at the top of the tab: profiles completed, invited users, invite
+coins paid, avatar bonuses.
 
 ---
 

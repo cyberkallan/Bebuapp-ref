@@ -3,6 +3,11 @@
  "items": [
   {
    "type": "new",
+   "title": "Earn coins: profile, invites and premium bonuses",
+   "body": "A new Earn coins screen (Wallet → Earn free coins, or Profile → Earn coins) puts every free-coin task in one place. Finish your profile — name, photo, gender, birthday, country and a short bio — and 25 coins land in your wallet the moment you save. Every user now has a 6-character invite code with a Share button: a friend who signs up with it earns you 20 coins, and when they buy their first coin pack you get 40% of those coins too. Unlocking a premium Avatar Studio item now pays 4–10 coins straight back, shown on the tile before you buy. Every reward plays a new cinematic unlock — a gold coin drops in and spins, rays and a coin burst bloom behind it, the amount counts up with haptics — built to stay smooth on budget phones. All amounts, percentages and on/off switches are in Admin → Settings → Login & Rewards."
+  },
+  {
+   "type": "new",
    "title": "Gifts: send a little something to your host",
    "body": "A new gift button sits beside the message box and in the voice and video call bars. Pick from ten 3D gifts (rose, heart, chocolate, teddy, cake, bouquet, ring, gem, crown, rocket), see exactly how many coins it costs against your balance, and send it with one tap. The gift lifts off the screen in a full-screen celebration with sound and haptics, lands in the chat as a gift bubble, and the host sees the same celebration the moment it arrives. AI hosts say thank you. Coins come straight from your wallet; if a gift costs more than you have, the button takes you to top up."
   },
