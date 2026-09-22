@@ -32,6 +32,8 @@ class MyWalletScreen extends GetView<MyWalletController> {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 150),
                     children: [
                       const WalletBalanceCard(),
+                      const SizedBox(height: 14),
+                      const FadeSlideIn(delayMs: 30, child: WalletEarnCard()),
                       const SizedBox(height: 26),
                       FadeSlideIn(
                         delayMs: 60,

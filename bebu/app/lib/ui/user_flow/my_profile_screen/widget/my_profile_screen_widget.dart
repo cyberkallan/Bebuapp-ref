@@ -5,7 +5,6 @@ import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/custom/theme_picker.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/avatar_studio/widget/avatar_stage.dart';
-import 'package:talk_in/ui/user_flow/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/controller/edit_profile_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/my_profile_screen/controller/my_profile_screen_controller.dart';
 import 'package:talk_in/utils/app_theme.dart';
@@ -475,12 +474,6 @@ class ProfileAppearanceSection extends StatelessWidget {
   }
 }
 
-/// Pops back to the tab bar and selects the Calls tab.
-void _openCallsTab() {
-  Get.until((r) => r.settings.name == AppRoutes.bottomBar || r.isFirst);
-  if (Get.isRegistered<BottomBarController>()) Get.find<BottomBarController>().onClick(4);
-}
-
 /// Four quick shortcuts in a row.
 class ProfileQuickActions extends StatelessWidget {
   const ProfileQuickActions({super.key});
@@ -489,7 +482,7 @@ class ProfileQuickActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (Icons.account_balance_wallet_rounded, EnumLocale.txtMyWallet.name.tr, BebuTheme.amber, () => Get.toNamed(AppRoutes.myWalletScreen)),
-      (Icons.call_rounded, 'Calls', BebuTheme.green, _openCallsTab),
+      (Icons.stars_rounded, 'Earn coins', BebuTheme.pink, () => Get.toNamed(AppRoutes.earnCoins)),
       (Icons.support_agent_rounded, EnumLocale.txtHelpCenter.name.tr, BebuTheme.blue, () => Get.toNamed(AppRoutes.helpCenterScreen)),
       (Icons.settings_rounded, EnumLocale.txtSettings.name.tr, BebuTheme.violet, () => Get.toNamed(AppRoutes.settingScreen)),
     ];

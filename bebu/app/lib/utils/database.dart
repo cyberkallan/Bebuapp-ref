@@ -81,6 +81,7 @@ class Database {
   static String get country => localStorage.read("country") ?? "";
   static String get countryFlag => localStorage.read("countryFlag") ?? "";
   static String get loginUserName => localStorage.read("loginUserName") ?? "";
+  static String get loginUserBio => localStorage.read("loginUserBio") ?? "";
   static String get loginUserNickName => localStorage.read("loginUserNickName") ?? "";
   static String get loginUserPhoneNumber => localStorage.read("loginUserPhoneNumber") ?? "";
   static String get loginUserBirthDate => localStorage.read("loginUserBirthDate") ?? "";
@@ -133,6 +134,7 @@ class Database {
   static onSetLoginUserCountryFlag(String countryFlag) async => localStorage.write("countryFlag", countryFlag);
   static onSetLoginUserCountry(String country) async => localStorage.write("country", country);
   static onSetLoginUserName(String loginUserName) async => localStorage.write("loginUserName", loginUserName);
+  static onSetLoginUserBio(String bio) async => localStorage.write("loginUserBio", bio);
   static onSetLoginUserNickName(String loginUserNickName) async => localStorage.write("loginUserNickName", loginUserNickName);
   static onSetLoginUserPhoneNumber(String loginUserPhoneNumber) async => localStorage.write("loginUserPhoneNumber", loginUserPhoneNumber);
   static onSetLoginUserBirthDate(String loginUserBirthDate) async => localStorage.write("loginUserBirthDate", loginUserBirthDate);

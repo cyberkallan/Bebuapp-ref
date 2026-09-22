@@ -249,7 +249,7 @@ class StudioGrid extends StatelessWidget {
                   key: ValueKey('${c.slot.name}-${items[i].id}'),
                   delayMs: (i % 9) * 30,
                   offset: 10,
-                  child: StudioItemCard(item: items[i], owned: c.owns(items[i]), onStage: c.isEquippedOnStage(items[i]), tryingOn: c.tryOn?.id == items[i].id, onTap: () => c.tapItem(items[i])),
+                  child: StudioItemCard(item: items[i], owned: c.owns(items[i]), onStage: c.isEquippedOnStage(items[i]), tryingOn: c.tryOn?.id == items[i].id, bonus: c.bonusFor(items[i]), onTap: () => c.tapItem(items[i])),
                 ),
               ),
           ],
@@ -281,8 +281,9 @@ class StudioGrid extends StatelessWidget {
 
 /// One catalog tile: rarity frame, 3D render, name and price / owned state.
 class StudioItemCard extends StatelessWidget {
-  const StudioItemCard({super.key, required this.item, required this.owned, required this.onStage, required this.tryingOn, required this.onTap});
+  const StudioItemCard({super.key, required this.item, required this.owned, required this.onStage, required this.tryingOn, required this.onTap, this.bonus = 0});
   final AvatarItem item;
+  final int bonus;
   final bool owned;
   final bool onStage;
   final bool tryingOn;
@@ -334,7 +335,7 @@ class StudioItemCard extends StatelessWidget {
                       children: [
                         Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: BebuTheme.label(size: 12)),
                         const SizedBox(height: 5),
-                        _Price(item: item, owned: owned, onStage: onStage),
+                        _Price(item: item, owned: owned, onStage: onStage, bonus: bonus),
                       ],
                     ),
                   ),
@@ -396,10 +397,11 @@ class _SceneSwatch extends StatelessWidget {
 }
 
 class _Price extends StatelessWidget {
-  const _Price({required this.item, required this.owned, required this.onStage});
+  const _Price({required this.item, required this.owned, required this.onStage, this.bonus = 0});
   final AvatarItem item;
   final bool owned;
   final bool onStage;
+  final int bonus;
 
   @override
   Widget build(BuildContext context) {
@@ -425,6 +427,10 @@ class _Price extends StatelessWidget {
           const Coin3D(size: 11),
           const SizedBox(width: 4),
           Text('${item.coins}', style: BebuTheme.label(size: 11, color: BebuTheme.isLight ? const Color(0xFF92400E) : BebuTheme.amber, weight: FontWeight.w800)),
+          if (bonus > 0) ...[
+            const SizedBox(width: 4),
+            Text('+$bonus back', style: BebuTheme.label(size: 9.5, color: BebuTheme.green, weight: FontWeight.w800)),
+          ],
         ],
       ),
     );
@@ -463,7 +469,9 @@ class StudioActionBar extends StatelessWidget {
                         gradient: canAfford ? t.rarity.gradient : const LinearGradient(colors: [Color(0xFFFFC44D), Color(0xFFF08A00)]),
                         glow: canAfford ? t.rarity.color : BebuTheme.amber,
                         icon: canAfford ? Icons.lock_open_rounded : Icons.add_rounded,
-                        label: canAfford ? 'Unlock for ${t.coins} coins' : 'Need ${t.coins - (c.data?.coins ?? 0)} more coins · Top up',
+                        label: canAfford
+                            ? 'Unlock for ${t.coins} coins${c.bonusFor(t) > 0 ? ' · +${c.bonusFor(t)} back' : ''}'
+                            : 'Need ${t.coins - (c.data?.coins ?? 0)} more coins · Top up',
                         onTap: onUnlock,
                       ),
                     ),
@@ -486,9 +494,12 @@ class StudioActionBar extends StatelessWidget {
 
 /// Full-screen celebration after a premium unlock.
 class UnlockCelebration extends StatelessWidget {
-  const UnlockCelebration({super.key, required this.item, required this.onDone});
+  const UnlockCelebration({super.key, required this.item, required this.onDone, this.bonus = 0});
   final AvatarItem item;
   final VoidCallback onDone;
+
+  /// Coins paid back for this unlock; shows a counting chip when > 0.
+  final int bonus;
 
   @override
   Widget build(BuildContext context) {
@@ -531,12 +542,58 @@ class UnlockCelebration extends StatelessWidget {
                   Text('${item.name} unlocked', style: BebuTheme.display(size: 28, color: Colors.white)),
                   const SizedBox(height: 6),
                   Text('It is on your stage. Tap anywhere to continue.', style: BebuTheme.body(size: 13.5, color: Colors.white.withValues(alpha: 0.75))),
+                  if (bonus > 0) ...[
+                    const SizedBox(height: 18),
+                    _BonusChip(bonus: bonus),
+                  ],
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// "+N coins back" pill that pops in and counts up after the unlock lands.
+class _BonusChip extends StatelessWidget {
+  const _BonusChip({required this.bonus});
+  final int bonus;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: BebuTheme.reducedMotion ? const Duration(milliseconds: 1) : const Duration(milliseconds: 900),
+      curve: Curves.easeOutBack,
+      builder: (_, v, __) {
+        final n = (bonus * Curves.easeOutCubic.transform(v.clamp(0, 1))).round();
+        return Transform.scale(
+          scale: 0.6 + 0.4 * v.clamp(0, 1.15),
+          child: Opacity(
+            opacity: v.clamp(0, 1),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [BebuTheme.green.withValues(alpha: 0.32), BebuTheme.amber.withValues(alpha: 0.28)]),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Coin3D(size: 20),
+                  const SizedBox(width: 8),
+                  Text('+$n coins back', style: BebuTheme.label(size: 14, color: Colors.white, weight: FontWeight.w800).copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+                  const SizedBox(width: 6),
+                  Text('premium bonus', style: BebuTheme.body(size: 12, color: Colors.white.withValues(alpha: 0.8))),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

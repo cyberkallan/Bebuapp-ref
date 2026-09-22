@@ -62,8 +62,9 @@ function profileChecklist(user) {
     { key: "name", label: "Add your name", done: String(u.fullName || u.nickName || "").trim().length >= 2 },
     { key: "photo", label: "Add a profile photo or avatar", done: !!hasPhoto },
     { key: "gender", label: "Choose your gender", done: ["male", "female", "other"].includes(String(u.gender || "").toLowerCase()) },
-    { key: "age", label: "Set your age", done: Number(u.age) >= 13 && Number(u.age) <= 100 && !!u.birthDate },
-    { key: "bio", label: "Write a short bio", done: String(u.bio || "").trim().length >= 10 },
+    { key: "birthday", label: "Add your birthday", done: String(u.birthDate || "").trim().length >= 6 },
+    { key: "country", label: "Pick your country", done: String(u.country || "").trim().length >= 2 },
+    { key: "bio", label: "Write a short bio (10+ characters)", done: String(u.bio || "").trim().length >= 10 },
   ];
 }
 

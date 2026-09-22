@@ -5,6 +5,7 @@ import 'package:talk_in/custom/custom_country_picker/country_picker.dart';
 import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/api/edit_profile_api.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/model/edit_profile_model.dart';
+import 'package:talk_in/ui/user_flow/rewards/controller/rewards_controller.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/api/fetch_login_user_profile_api.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/fetch_login_user_profile_model.dart';
 import 'package:talk_in/utils/app_asset.dart';
@@ -25,6 +26,7 @@ class EditProfileController extends GetxController {
   final dateController = TextEditingController();
   final nickNameCnt = TextEditingController();
   final nameCnt = TextEditingController();
+  final bioCnt = TextEditingController();
   final emailCnt = TextEditingController();
   final genderCnt = TextEditingController();
   final mobileNumberCnt = TextEditingController();
@@ -52,6 +54,7 @@ class EditProfileController extends GetxController {
   void load() {
     dateController.text = Database.loginUserBirthDate;
     nameCnt.text = Database.loginUserName;
+    bioCnt.text = Database.loginUserBio;
     emailCnt.text = Database.loginUserEmail;
     nickNameCnt.text = Database.loginUserNickName;
     genderCnt.text = Database.loginUserGender;
@@ -70,6 +73,7 @@ class EditProfileController extends GetxController {
       pickImage != null ||
       dateController.text != Database.loginUserBirthDate ||
       nameCnt.text != Database.loginUserName ||
+      bioCnt.text != Database.loginUserBio ||
       nickNameCnt.text != Database.loginUserNickName ||
       mobileNumberCnt.text != Database.loginUserPhoneNumber ||
       countryController.text != Database.country ||
@@ -188,6 +192,7 @@ class EditProfileController extends GetxController {
       gender: selectedGenderText,
       phoneNumber: mobileNumberCnt.text.trim(),
       fullName: nameCnt.text.trim(),
+      bio: bioCnt.text.trim(),
     );
 
     if (editProfileModel?.status != true) {
@@ -203,6 +208,7 @@ class EditProfileController extends GetxController {
     if (u != null) {
       await Database.onSetLoginUserProfilePic(u.profilePic ?? '');
       await Database.onSetLoginUserName(u.fullName ?? '');
+      await Database.onSetLoginUserBio(u.bio ?? bioCnt.text.trim());
       await Database.onSetLoginUserNickName(u.nickName ?? '');
       await Database.onSetLoginUserEmail(u.email ?? '');
       await Database.onSetLoginUserCountry(u.country ?? '');
@@ -216,6 +222,7 @@ class EditProfileController extends GetxController {
       await Database.onSetLoginUserGender(selectedGenderText);
       await Database.onSetLoginUserNickName(nickNameCnt.text.trim());
       await Database.onSetLoginUserName(nameCnt.text.trim());
+      await Database.onSetLoginUserBio(bioCnt.text.trim());
       await Database.onSetLoginUserBirthDate(dateController.text);
       await Database.onSetLoginUserPhoneNumber(mobileNumberCnt.text.trim());
       final pic = editProfileModel?.user?.profilePic;
@@ -223,7 +230,14 @@ class EditProfileController extends GetxController {
     }
     profilePic = Database.loginUserProfilePic;
     pickImage = null;
-    Sfx.select();
+    final reward = editProfileModel?.reward;
+    if (reward != null) {
+      // Profile just became complete: the server granted the coins in the same call.
+      final ctx = Get.context;
+      if (ctx != null && ctx.mounted) RewardsController.to.celebrate(ctx, reward);
+    } else {
+      Sfx.select();
+    }
     update([Constant.idProfile, idForm]);
     return true;
   }

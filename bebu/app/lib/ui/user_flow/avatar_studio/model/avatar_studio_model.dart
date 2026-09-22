@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talk_in/ui/user_flow/rewards/model/rewards_hub_model.dart';
 
 /// The slots a look is made of. Order = tab order in the studio.
 enum StudioSlot { avatar, background, accessory, pet, vehicle, home, sky }
@@ -117,12 +118,18 @@ class AvatarItem {
 }
 
 class StudioSettings {
-  const StudioSettings({this.enabled = true, this.allowPhotoUpload = true});
+  const StudioSettings({this.enabled = true, this.allowPhotoUpload = true, this.bonus = AvatarBonusRule.off});
   final bool enabled;
   final bool allowPhotoUpload;
 
-  factory StudioSettings.fromJson(Map<String, dynamic>? j) =>
-      StudioSettings(enabled: j?['enabled'] != false, allowPhotoUpload: j?['allowPhotoUpload'] != false);
+  /// Coins paid back on premium unlocks (admin → Rewards → Avatar bonus).
+  final AvatarBonusRule bonus;
+
+  factory StudioSettings.fromJson(Map<String, dynamic>? j) => StudioSettings(
+        enabled: j?['enabled'] != false,
+        allowPhotoUpload: j?['allowPhotoUpload'] != false,
+        bonus: j?['bonus'] is Map ? AvatarBonusRule.fromJson(Map<String, dynamic>.from(j!['bonus'] as Map)) : AvatarBonusRule.off,
+      );
 }
 
 /// Everything `/api/user/avatar/studio` returns.

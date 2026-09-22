@@ -312,7 +312,7 @@ exports.updateUserProfile = async (req, res) => {
     user.email = req.body.email ? req.body.email : user.email;
     user.birthDate = req.body.birthDate ? req.body.birthDate : user.birthDate;
     user.gender = req.body.gender ? req.body.gender?.toLowerCase()?.trim() : user.gender;
-    user.bio = req.body.bio ? req.body.bio : user.bio;
+    user.bio = req.body.bio !== undefined ? String(req.body.bio).trim().slice(0, 160) : user.bio;
     user.age = req.body.age ? req.body.age : user.age;
     user.countryCode = req.body.countryCode ? req.body.countryCode : user.countryCode;
     user.phoneNumber = req.body.phoneNumber ? req.body.phoneNumber : user.phoneNumber;

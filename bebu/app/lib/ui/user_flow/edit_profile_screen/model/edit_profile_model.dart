@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:talk_in/ui/user_flow/rewards/model/rewards_hub_model.dart';
+
 EditProfileModel editProfileModelFromJson(String str) => EditProfileModel.fromJson(json.decode(str));
 
 class EditProfileModel {
@@ -9,12 +11,16 @@ class EditProfileModel {
   /// The saved user (the server now responds after writing).
   final EditedUser? user;
 
-  EditProfileModel({this.status, this.message, this.user});
+  /// Coin reward granted by this save (profile completed), if any.
+  final GrantedReward? reward;
+
+  EditProfileModel({this.status, this.message, this.user, this.reward});
 
   factory EditProfileModel.fromJson(Map<String, dynamic> json) => EditProfileModel(
         status: json["status"],
         message: json["message"],
         user: json["user"] is Map ? EditedUser.fromJson(Map<String, dynamic>.from(json["user"])) : null,
+        reward: GrantedReward.fromJson(json["reward"]),
       );
 
   Map<String, dynamic> toJson() => {"status": status, "message": message};

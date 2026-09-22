@@ -161,6 +161,8 @@ class EditField extends StatelessWidget {
     this.trailing,
     this.last = false,
     this.onChanged,
+    this.maxLines = 1,
+    this.maxLength,
   });
   final String label;
   final TextEditingController controller;
@@ -172,6 +174,8 @@ class EditField extends StatelessWidget {
   final Widget? trailing;
   final bool last;
   final ValueChanged<String>? onChanged;
+  final int maxLines;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -193,6 +197,10 @@ class EditField extends StatelessWidget {
                       onTap: onTap,
                       keyboardType: keyboardType,
                       onChanged: onChanged,
+                      minLines: 1,
+                      maxLines: maxLines,
+                      maxLength: maxLength,
+                      buildCounter: maxLength == null ? null : (_, {required currentLength, required isFocused, maxLength}) => isFocused ? Text('$currentLength/$maxLength', style: BebuTheme.body(size: 10.5, color: BebuTheme.textFaint)) : null,
                       style: BebuTheme.label(size: 15, color: readOnly && onTap == null ? BebuTheme.textMuted : BebuTheme.text),
                       cursorColor: BebuTheme.pink,
                       decoration: InputDecoration(

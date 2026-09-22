@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:talk_in/custom/motion/coin_3d.dart';
 import 'package:talk_in/custom/motion/coin_pill.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/rewards/controller/rewards_controller.dart';
 import 'package:talk_in/ui/user_flow/coin_history_screen/model/coin_history_model.dart';
 import 'package:talk_in/ui/user_flow/my_wallet_screen/controller/my_wallet_controller.dart';
 import 'package:talk_in/utils/app_theme.dart';
@@ -341,7 +343,7 @@ class WalletActivityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final type = item.type ?? 0;
-    final income = item.isIncome ?? (type == 1 || type == 2 || type == 9);
+    final income = item.isIncome ?? (type == 1 || type == 2 || type == 9 || type >= 11);
     final (icon, color, title) = switch (type) {
       1 => (Icons.card_giftcard_rounded, BebuTheme.violet, 'Welcome bonus'),
       2 => (Icons.add_card_rounded, BebuTheme.amber, 'Coins purchased'),
@@ -352,6 +354,9 @@ class WalletActivityRow extends StatelessWidget {
       8 => (Icons.auto_awesome_rounded, BebuTheme.violet, 'Avatar item unlocked'),
       9 => (Icons.redeem_rounded, BebuTheme.amber, 'Daily streak gift'),
       10 => (Icons.card_giftcard_rounded, BebuTheme.pink, 'Gift sent'),
+      11 => (Icons.person_pin_rounded, BebuTheme.violet, 'Profile completed'),
+      12 => (Icons.group_add_rounded, BebuTheme.pink, 'Invite reward'),
+      13 => (Icons.auto_awesome_rounded, BebuTheme.green, 'Premium avatar bonus'),
       _ => (Icons.swap_horiz_rounded, BebuTheme.blue, 'Coins'),
     };
     final who = (type >= 3 && (item.receiverName ?? '').isNotEmpty) ? ' · ${item.receiverName}' : '';
@@ -403,6 +408,105 @@ class WalletActivityRow extends StatelessWidget {
     if (diff.inDays == 1) return 'Yesterday';
     if (diff.inDays < 7) return '${diff.inDays} days ago';
     return DateFormat('d MMM').format(d);
+  }
+}
+
+/// Entry to the Earn coins hub: what is waiting right now, one tap to open.
+class WalletEarnCard extends StatefulWidget {
+  const WalletEarnCard({super.key});
+
+  @override
+  State<WalletEarnCard> createState() => _WalletEarnCardState();
+}
+
+class _WalletEarnCardState extends State<WalletEarnCard> {
+  final RewardsController c = RewardsController.to;
+
+  @override
+  void initState() {
+    super.initState();
+    if (c.hub == null) c.load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<RewardsController>(
+      id: RewardsController.idHub,
+      init: c,
+      builder: (c) {
+        final hub = c.hub;
+        final pending = c.pendingCount;
+        var waiting = 0;
+        if (hub != null) {
+          if (hub.daily?.canClaim == true) waiting += hub.daily!.coins;
+          if (hub.profile.enabled && hub.profile.canClaim) waiting += hub.profile.coins;
+        }
+        final subtitle = hub == null
+            ? 'Daily streak, profile, invites and more.'
+            : pending > 0
+                ? '$pending reward${pending == 1 ? '' : 's'} waiting · +${formatCoins(waiting)} coins'
+                : [
+                    if (hub.referral.enabled && hub.referral.inviterCoins > 0) 'Invite friends: +${hub.referral.inviterCoins} each',
+                    if (hub.profile.enabled && !hub.profile.claimed) 'Finish your profile: +${hub.profile.coins}',
+                    if (hub.daily?.enabled ?? false) 'Keep your daily streak going',
+                  ].take(2).join(' · ');
+        return PressScale(
+          scale: 0.985,
+          onTap: () {
+            Sfx.lightTap();
+            Get.toNamed(AppRoutes.earnCoins);
+          },
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [BebuTheme.amber.withValues(alpha: BebuTheme.isLight ? 0.2 : 0.26), BebuTheme.pink.withValues(alpha: 0.16)]),
+              borderRadius: BorderRadius.circular(BebuTheme.radiusLg),
+              border: Border.all(color: pending > 0 ? BebuTheme.amber.withValues(alpha: 0.55) : BebuTheme.border),
+            ),
+            child: Row(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(color: BebuTheme.surface.withValues(alpha: 0.8), borderRadius: BorderRadius.circular(BebuTheme.radiusSm)),
+                      child: const Center(child: SpinningCoin(size: 28, period: Duration(milliseconds: 7000))),
+                    ),
+                    if (pending > 0)
+                      Positioned(
+                        right: -5,
+                        top: -5,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: BebuTheme.pink, shape: BoxShape.circle, border: Border.all(color: BebuTheme.bg, width: 2)),
+                          child: Text('$pending', style: BebuTheme.label(size: 10.5, color: Colors.white, weight: FontWeight.w800)),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Earn free coins', style: BebuTheme.title(size: 15.5)),
+                      const SizedBox(height: 2),
+                      Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: BebuTheme.body(size: 12.5, color: BebuTheme.textMuted)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Icon(Icons.chevron_right_rounded, color: BebuTheme.textMuted),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

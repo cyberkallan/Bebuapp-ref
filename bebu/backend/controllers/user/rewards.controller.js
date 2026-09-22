@@ -8,7 +8,7 @@ const PUBLIC_URL = () => (process.env.PUBLIC_URL || "").replace(/\/$/, "");
 exports.hub = async (req, res) => {
   try {
     const cfg = rewards.config();
-    const user = await User.findById(req.user.userId).select("coins dailyReward fullName nickName profilePic avatar gender age birthDate bio referralCode referredBy referral rewards createdAt coinsRecharged").lean();
+    const user = await User.findById(req.user.userId).select("coins dailyReward fullName nickName profilePic avatar gender age birthDate bio country referralCode referredBy referral rewards createdAt coinsRecharged").lean();
     if (!user) return res.status(200).json({ status: false, message: "User not found." });
 
     const daily = computeStatus(user.dailyReward, normalizeReward(global.settingJSON && global.settingJSON.dailyReward));
@@ -60,7 +60,7 @@ exports.hub = async (req, res) => {
 // POST /api/user/rewards/profile/claim
 exports.claimProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select("coins fullName nickName profilePic avatar gender age birthDate bio rewards").lean();
+    const user = await User.findById(req.user.userId).select("coins fullName nickName profilePic avatar gender age birthDate bio country rewards").lean();
     if (!user) return res.status(200).json({ status: false, message: "User not found." });
     const cfg = rewards.config().profile;
     if (!cfg.enabled) return res.status(200).json({ status: false, message: "This reward is turned off right now." });

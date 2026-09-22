@@ -22,6 +22,7 @@ class EditProfileApi {
     String? image,
     String? fullName,
     String? email,
+    String? bio,
   }) async {
     Utils.showLog("Edit Profile Api Calling...");
     final token = await FirebaseAccessToken.onGet();
@@ -52,6 +53,7 @@ class EditProfileApi {
         ApiParams.countryCode: countryCode ?? '',
         ApiParams.country: country ?? '',
         ApiParams.countryFlag: countryFlag ?? '',
+        'bio': bio ?? '',
       });
 
       if (image != null) {

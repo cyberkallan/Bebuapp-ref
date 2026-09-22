@@ -141,7 +141,7 @@ class _AvatarStudioScreenState extends State<AvatarStudioScreen> {
                   Positioned(left: 0, right: 0, bottom: 0, child: StudioActionBar(onUnlock: () => _unlock(c), onSave: () => _save(c))),
                 if (_celebrating != null)
                   Positioned.fill(
-                    child: UnlockCelebration(item: _celebrating!, onDone: () => setState(() => _celebrating = null)),
+                    child: UnlockCelebration(item: _celebrating!, bonus: c.lastBonus, onDone: () => setState(() => _celebrating = null)),
                   ),
               ],
             ),

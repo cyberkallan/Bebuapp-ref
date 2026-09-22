@@ -118,7 +118,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             title: 'Basics',
                             children: [
                               EditField(label: EnumLocale.txtNickName.name.tr, controller: c.nickNameCnt, hint: EnumLocale.txtAddYourNickName.name.tr, icon: Icons.badge_outlined, onChanged: (_) => c.update([EditProfileController.idForm])),
-                              EditField(label: EnumLocale.txtFullName.name.tr, controller: c.nameCnt, hint: EnumLocale.txtAddYOurFullName.name.tr, icon: Icons.person_outline_rounded, last: true, onChanged: (_) => c.update([EditProfileController.idForm])),
+                              EditField(label: EnumLocale.txtFullName.name.tr, controller: c.nameCnt, hint: EnumLocale.txtAddYOurFullName.name.tr, icon: Icons.person_outline_rounded, onChanged: (_) => c.update([EditProfileController.idForm])),
+                              EditField(label: 'About you', controller: c.bioCnt, hint: 'A line or two people see on your profile', icon: Icons.short_text_rounded, keyboardType: TextInputType.multiline, maxLines: 3, maxLength: 160, last: true, onChanged: (_) => c.update([EditProfileController.idForm])),
                             ],
                           ),
                         ),

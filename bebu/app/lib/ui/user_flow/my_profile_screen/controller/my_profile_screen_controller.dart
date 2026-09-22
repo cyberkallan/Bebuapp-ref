@@ -60,6 +60,7 @@ class MyProfileScreenController extends GetxController {
       if ((u.profilePic ?? '').isNotEmpty) Database.onSetLoginUserProfilePic(u.profilePic!);
       if ((u.nickName ?? '').isNotEmpty) Database.onSetLoginUserNickName(u.nickName!);
       if ((u.fullName ?? '').isNotEmpty) Database.onSetLoginUserName(u.fullName!);
+      Database.onSetLoginUserBio(u.bio ?? '');
       Database.onSetUserCoin((u.coins ?? 0).toString());
     }
     await refreshLook();

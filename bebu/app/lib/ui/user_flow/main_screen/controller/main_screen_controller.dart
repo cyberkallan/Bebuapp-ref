@@ -271,6 +271,7 @@ class MainScreenController extends GetxController {
         Database.onSetLoginUserProfilePic(fetchLoginUserProfileModel?.user?.profilePic ?? "");
         Database.onSetLoginUserName(fetchLoginUserProfileModel!.user!.fullName!);
         Database.onSetLoginUserNickName(fetchLoginUserProfileModel?.user?.nickName ?? "");
+        Database.onSetLoginUserBio(fetchLoginUserProfileModel?.user?.bio ?? "");
         Database.onSetLoginUserEmail(fetchLoginUserProfileModel!.user!.email!);
         Database.onSetLoginUserCountry(fetchLoginUserProfileModel!.user!.country!);
         Database.onSetLoginUserCountryFlag(fetchLoginUserProfileModel!.user!.countryFlag!);

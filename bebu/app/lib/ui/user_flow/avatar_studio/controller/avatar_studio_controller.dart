@@ -24,6 +24,12 @@ class AvatarStudioController extends GetxController {
   bool saving = false;
   bool unlocking = false;
 
+  /// Bonus coins the last successful unlock paid back (0 when none).
+  int lastBonus = 0;
+
+  /// Coins the user gets back for unlocking [item] (0 for free/owned items).
+  int bonusFor(AvatarItem item) => owns(item) ? 0 : (data?.settings.bonus.bonusFor(item.coins) ?? 0);
+
   StudioSlot slot = StudioSlot.avatar;
   String genderFilter = 'male';
   final Map<StudioSlot, String?> draft = {};
@@ -176,6 +182,7 @@ class AvatarStudioController extends GetxController {
     unlocking = false;
     if (r.ok) {
       data!.unlocked.add(item.id);
+      lastBonus = r.data?['bonus'] is num ? (r.data!['bonus'] as num).toInt() : 0;
       if (r.coins != null) _setCoins(r.coins!);
       draft[item.slot] = item.id;
       tryOn = null;
