@@ -72,6 +72,18 @@ const HistoryTables = () => {
           return 'Coin Plan Purchase'
         case TRANSACTION_TYPES.LOGIN_BONUS:
           return 'Login Bonus'
+        case TRANSACTION_TYPES.AVATAR_UNLOCK:
+          return 'Avatar Item Unlock'
+        case TRANSACTION_TYPES.DAILY_REWARD:
+          return 'Daily Streak Reward'
+        case TRANSACTION_TYPES.GIFT:
+          return 'Gift'
+        case TRANSACTION_TYPES.PROFILE_REWARD:
+          return 'Profile Completion Reward'
+        case TRANSACTION_TYPES.REFERRAL_REWARD:
+          return 'Invite Reward'
+        case TRANSACTION_TYPES.AVATAR_BONUS:
+          return 'Premium Avatar Bonus'
 
         default:
           return 'Other'

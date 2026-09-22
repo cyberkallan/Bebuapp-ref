@@ -60,6 +60,7 @@ const loginRewardsSlice = createSlice({
     login: null,
     preset: 'custom',
     dailyReward: null,
+    rewards: null,
     welcomeCoins: 0,
     options: { methods: [], presets: [] },
     stats: null
@@ -79,6 +80,7 @@ const loginRewardsSlice = createSlice({
         state.login = p.login
         state.preset = p.preset
         state.dailyReward = p.dailyReward
+        state.rewards = p.rewards || state.rewards
         state.welcomeCoins = p.welcomeCoins
         state.options = p.options
         state.stats = p.stats
@@ -97,6 +99,7 @@ const loginRewardsSlice = createSlice({
         state.login = p.login
         state.preset = p.preset
         state.dailyReward = p.dailyReward
+        state.rewards = p.rewards || state.rewards
         state.welcomeCoins = p.welcomeCoins
       })
       .addCase(updateLoginRewards.rejected, state => {

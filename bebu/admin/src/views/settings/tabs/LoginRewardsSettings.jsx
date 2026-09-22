@@ -32,6 +32,14 @@ const METHODS = [
   { id: 'email', label: 'Email + password', hint: 'Classic form with register / forgot-password screens.', glyph: '@' }
 ]
 
+const DEFAULT_REWARDS = {
+  profile: { enabled: true, coins: 25 },
+  referral: { enabled: true, inviterCoins: 20, inviteeCoins: 0, purchaseSharePercent: 40, firstPurchaseOnly: true, codeWindowDays: 7 },
+  avatarBonus: { enabled: true, percent: 5, minCoins: 4, maxCoins: 10 }
+}
+
+const bonusFor = (price, a) => (!a.enabled || price <= 0 ? 0 : Math.min(a.maxCoins, Math.max(a.minCoins, Math.round((price * a.percent) / 100))))
+
 const TIMEZONES = ['Asia/Kolkata', 'Asia/Dubai', 'Asia/Singapore', 'Europe/London', 'America/New_York', 'UTC']
 
 const Section = ({ title, subtitle, children, action }) => (
@@ -197,7 +205,7 @@ const StreakPreview = ({ coins }) => (
 
 const LoginRewardsSettings = () => {
   const dispatch = useDispatch()
-  const { loading, saving, error, login, preset, dailyReward, welcomeCoins, options, stats } = useSelector(s => s.loginRewards)
+  const { loading, saving, error, login, preset, dailyReward, rewards, welcomeCoins, options, stats } = useSelector(s => s.loginRewards)
   const [draft, setDraft] = useState(null)
 
   useEffect(() => {
@@ -205,10 +213,10 @@ const LoginRewardsSettings = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (login && dailyReward) setDraft({ login, dailyReward, welcomeCoins })
-  }, [login, dailyReward, welcomeCoins])
+    if (login && dailyReward) setDraft({ login, dailyReward, rewards: rewards || DEFAULT_REWARDS, welcomeCoins })
+  }, [login, dailyReward, rewards, welcomeCoins])
 
-  const server = useMemo(() => ({ login, dailyReward, welcomeCoins }), [login, dailyReward, welcomeCoins])
+  const server = useMemo(() => ({ login, dailyReward, rewards: rewards || DEFAULT_REWARDS, welcomeCoins }), [login, dailyReward, rewards, welcomeCoins])
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(server), [draft, server])
 
   const presets = useMemo(() => options?.presets || [], [options?.presets])
@@ -222,6 +230,8 @@ const LoginRewardsSettings = () => {
 
   const setLogin = patch => setDraft(d => ({ ...d, login: { ...d.login, ...patch } }))
   const setReward = patch => setDraft(d => ({ ...d, dailyReward: { ...d.dailyReward, ...patch } }))
+  const setExtra = (block, patch) => setDraft(d => ({ ...d, rewards: { ...d.rewards, [block]: { ...d.rewards[block], ...patch } } }))
+  const num = (v, lo = 0, hi = 1000000) => Math.min(hi, Math.max(lo, Math.round(Number(v) || 0)))
 
   const applyPreset = p => setLogin(p.login)
 
@@ -259,6 +269,7 @@ const LoginRewardsSettings = () => {
       updateLoginRewards({
         login: draft.login,
         dailyReward: draft.dailyReward,
+        rewards: draft.rewards,
         welcomeCoins: draft.welcomeCoins
       })
     )
@@ -293,6 +304,14 @@ const LoginRewardsSettings = () => {
             <Stat label='Active streaks' value={stats.activeStreaks} hint='3+ days and still going' />
             <Stat label='Claims · 7 days' value={stats.weekClaims} />
             <Stat label='Coins given · 7 days' value={stats.weekCoins.toLocaleString()} />
+          </Box>
+        )}
+        {stats && stats.profileClaims !== undefined && (
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 4 }}>
+            <Stat label='Profiles completed' value={stats.profileClaims} hint={`${(stats.profileCoins || 0).toLocaleString()} coins paid`} />
+            <Stat label='Invited users' value={stats.referredUsers} hint={`${stats.referralPurchases || 0} went on to buy coins`} />
+            <Stat label='Invite coins paid' value={(stats.referralCoins || 0).toLocaleString()} hint='sign-ups + purchase shares' />
+            <Stat label='Avatar bonuses' value={stats.avatarBonusUnlocks} hint={`${(stats.avatarBonusCoins || 0).toLocaleString()} coins paid back`} />
           </Box>
         )}
 
@@ -519,6 +538,183 @@ const LoginRewardsSettings = () => {
               </Typography>
             </Grid>
           </Grid>
+        </Section>
+
+        <Section
+          title='Complete your profile'
+          subtitle='One-time reward when name, photo, gender, birthday, country and a short bio are all filled. Granted automatically on save, or from the Earn coins screen.'
+          action={<Chip size='small' color={draft.rewards.profile.enabled ? 'success' : 'default'} label={draft.rewards.profile.enabled ? 'On' : 'Off'} />}
+        >
+          <Grid container spacing={3} alignItems='center'>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <FormControlLabel
+                control={<Switch checked={draft.rewards.profile.enabled} onChange={e => setExtra('profile', { enabled: e.target.checked })} />}
+                label={
+                  <Box>
+                    <Typography>Reward profile completion</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      Off hides the card in the app. Users who already claimed keep their coins.
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Coins'
+                value={draft.rewards.profile.coins}
+                disabled={!draft.rewards.profile.enabled}
+                onChange={e => setExtra('profile', { coins: num(e.target.value) })}
+              />
+            </Grid>
+          </Grid>
+        </Section>
+
+        <Section
+          title='Invite friends'
+          subtitle='Every user gets a 6-character invite code (Earn coins → Invite friends). The inviter is paid when the friend signs up with it and again when that friend buys coins.'
+          action={<Chip size='small' color={draft.rewards.referral.enabled ? 'success' : 'default'} label={draft.rewards.referral.enabled ? 'On' : 'Off'} />}
+        >
+          <FormControlLabel
+            sx={{ mb: 2 }}
+            control={<Switch checked={draft.rewards.referral.enabled} onChange={e => setExtra('referral', { enabled: e.target.checked })} />}
+            label={
+              <Box>
+                <Typography>Enable invite rewards</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Off hides codes, sharing and payouts. Existing links between users are kept.
+                </Typography>
+              </Box>
+            }
+          />
+          <Grid container spacing={3}>
+            <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Inviter gets per sign-up'
+                helperText='Coins when a new user enters the code'
+                value={draft.rewards.referral.inviterCoins}
+                disabled={!draft.rewards.referral.enabled}
+                onChange={e => setExtra('referral', { inviterCoins: num(e.target.value) })}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='New user gets'
+                helperText='Optional welcome coins for entering a code'
+                value={draft.rewards.referral.inviteeCoins}
+                disabled={!draft.rewards.referral.enabled}
+                onChange={e => setExtra('referral', { inviteeCoins: num(e.target.value) })}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Purchase share %'
+                helperText='% of the coins an invited user buys, paid to the inviter'
+                value={draft.rewards.referral.purchaseSharePercent}
+                disabled={!draft.rewards.referral.enabled}
+                onChange={e => setExtra('referral', { purchaseSharePercent: num(e.target.value, 0, 100) })}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Code entry window (days)'
+                helperText='How long after joining a code can be entered'
+                value={draft.rewards.referral.codeWindowDays}
+                disabled={!draft.rewards.referral.enabled}
+                onChange={e => setExtra('referral', { codeWindowDays: num(e.target.value, 1, 365) })}
+              />
+            </Grid>
+          </Grid>
+          <FormControlLabel
+            sx={{ mt: 1 }}
+            control={<Switch checked={draft.rewards.referral.firstPurchaseOnly} disabled={!draft.rewards.referral.enabled} onChange={e => setExtra('referral', { firstPurchaseOnly: e.target.checked })} />}
+            label={
+              <Box>
+                <Typography>First purchase only</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  On = the share is paid once, on the friend&apos;s first coin pack. Off = on every purchase they ever make.
+                </Typography>
+              </Box>
+            }
+          />
+          <Alert severity='info' icon={false} sx={{ mt: 2 }}>
+            Example: a friend joins with a code → inviter gets <b>{draft.rewards.referral.inviterCoins}</b> coins. The friend buys a 500-coin pack → inviter gets{' '}
+            <b>{Math.round((500 * draft.rewards.referral.purchaseSharePercent) / 100)}</b> more. Codes cannot be used by users who already bought coins.
+          </Alert>
+        </Section>
+
+        <Section
+          title='Premium avatar bonus'
+          subtitle='Coins paid straight back when a user unlocks a paid Avatar Studio item, scaled by the item price: bonus = price × percent, clamped to the range.'
+          action={<Chip size='small' color={draft.rewards.avatarBonus.enabled ? 'success' : 'default'} label={draft.rewards.avatarBonus.enabled ? 'On' : 'Off'} />}
+        >
+          <FormControlLabel
+            sx={{ mb: 2 }}
+            control={<Switch checked={draft.rewards.avatarBonus.enabled} onChange={e => setExtra('avatarBonus', { enabled: e.target.checked })} />}
+            label={
+              <Box>
+                <Typography>Enable unlock bonus</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Shows &quot;+N back&quot; on studio tiles and a bonus chip in the unlock celebration.
+                </Typography>
+              </Box>
+            }
+          />
+          <Grid container spacing={3}>
+            <Grid item size={{ xs: 12, sm: 4 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Percent of price'
+                value={draft.rewards.avatarBonus.percent}
+                disabled={!draft.rewards.avatarBonus.enabled}
+                onChange={e => setExtra('avatarBonus', { percent: num(e.target.value, 0, 100) })}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 4 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Minimum coins'
+                value={draft.rewards.avatarBonus.minCoins}
+                disabled={!draft.rewards.avatarBonus.enabled}
+                onChange={e => setExtra('avatarBonus', { minCoins: num(e.target.value) })}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, sm: 4 }}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Maximum coins'
+                value={draft.rewards.avatarBonus.maxCoins}
+                disabled={!draft.rewards.avatarBonus.enabled}
+                onChange={e => setExtra('avatarBonus', { maxCoins: num(e.target.value) })}
+              />
+            </Grid>
+          </Grid>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
+            {[40, 80, 120, 200, 350].map(price => (
+              <Chip key={price} size='small' variant='outlined' label={`${price}-coin item → +${bonusFor(price, draft.rewards.avatarBonus)} back`} />
+            ))}
+          </Box>
         </Section>
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
