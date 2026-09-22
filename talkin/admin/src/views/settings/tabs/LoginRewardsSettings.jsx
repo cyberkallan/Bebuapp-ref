@@ -211,7 +211,7 @@ const LoginRewardsSettings = () => {
   const server = useMemo(() => ({ login, dailyReward, welcomeCoins }), [login, dailyReward, welcomeCoins])
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(server), [draft, server])
 
-  const presets = options?.presets || []
+  const presets = useMemo(() => options?.presets || [], [options?.presets])
 
   const currentPreset = useMemo(() => {
     if (!draft) return 'custom'

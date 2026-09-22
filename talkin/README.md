@@ -198,6 +198,26 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### Sign-in, 20-second onboarding, daily rewards (`1.7.0`)
+
+- `sign_in_screen/` replaces the old login stack as the entry route
+  (`AppRoutes.main`). `SignInController` runs Google, phone OTP and one-tap
+  guest end to end (email delegates to the legacy `MainScreenController`);
+  `SignInScreen` is one screen with three panels (methods → phone → OTP) and
+  renders only the methods the admin enabled, with the admin's choice as the
+  hero button. Welcome-bonus teaser, live-hosts pill, consent line or checkbox.
+  Old `MainScreen` still reachable at `/legacyLogin`.
+- `fill_profile_screen/` rebuilt: progress bar, optional photo, pre-filled
+  display name with a shuffle button, gender cards, 18+ birthday picker with
+  age chip, auto-detected country. CTA unlocks as steps complete.
+- `daily_reward/` — controller, API, `DailyRewardSheet` (3D coin stage,
+  streak strip, claim burst, countdown) and `GiftBadge` on the Home coin pill.
+- `lib/utils/login_config.dart` — `LoginConfig` / `RewardTeaser` cached from
+  `getAppConfiguration` on splash so the sign-in screen is right on first paint.
+- Backend: `setting.login`, `setting.dailyReward`, `User.dailyReward`,
+  `user/dailyReward/status|claim`, `admin/loginRewards`, history type `9`.
+  Admin: *Settings → Login & Rewards* tab. See `docs/login-rewards.md`.
+
 ### New logo (`1.6.3`)
 
 The supplied bebu mark (pink B with a face profile and heart) replaces the

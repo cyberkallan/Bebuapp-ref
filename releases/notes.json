@@ -1,205 +1,225 @@
 {
-  "date": "2026-09-22",
-  "items": [
-    {
-      "type": "new",
-      "title": "New bebu logo",
-      "body": "The B-with-a-face mark is now the launcher icon (adaptive on Android 8+, iOS set included), the splash logo, the notification icon and the website brand."
-    },
-    {
-      "type": "improved",
-      "title": "Random match, redesigned",
-      "body": "The match screen is now a layered proximity radar over a faint city map: hosts drift on the rings, anonymous chips fill the gaps, and the black/white core in the middle is the button — tap it (or Match now) to find someone. Audio / Video are quick chips under the radar, and the status pill shows how many hosts are live with an Edit shortcut. Built for both dark and light themes."
-    },
-    {
-      "type": "improved",
-      "title": "Better match preview",
-      "body": "When someone is found you get a full-bleed portrait card with an Online now pill, the per-minute rate, rating, calls taken, languages and topics on the photo, plus how many minutes your balance covers. Skip asks for another host without leaving the screen; Say hello and Call are unchanged."
-    },
-    {
-      "type": "improved",
-      "title": "A proper online indicator",
-      "body": "The flat green dot is replaced everywhere by a presence badge: a glowing dot with a matching border, a breathing halo when live, an amber bar when the host is on a call, and grey when offline. The same badge powers the new Online now / On a call pills."
-    },
-    {
-      "type": "fixed",
-      "title": "Messages reach the host now",
-      "body": "Texts typed while the connection was still waking up looked sent but never left your phone. Messages are now queued and delivered the moment the connection is back, with a clock while pending, one tick when the server has it and blue ticks when read. If something really can't be sent you see Not sent · tap to retry."
-    },
-    {
-      "type": "fixed",
-      "title": "Malayalam, Tamil, Hindi and emoji messages",
-      "body": "Anything that wasn't plain English used to be silently emptied before sending. Every language and emoji now goes through as typed."
-    },
-    {
-      "type": "fixed",
-      "title": "Voice notes record on the first hold",
-      "body": "The first long-press only asked for the microphone and then did nothing. Recording now starts as soon as you allow it; if the mic is blocked we take you to the phone settings."
-    },
-    {
-      "type": "new",
-      "title": "WhatsApp-style recording",
-      "body": "Hold the mic to record with a live level meter and timer, slide left to cancel, release to send. Voice notes get a proper waveform bubble with play, pause and seek."
-    },
-    {
-      "type": "new",
-      "title": "Chat tones and haptics",
-      "body": "Soft tones for sent and received messages and for recording, plus light vibration on every action. Turn tones off in Settings → Conversation tones; the admin can switch tones and haptics off app-wide."
-    },
-    {
-      "type": "new",
-      "title": "Avatar Studio",
-      "body": "Build a 3D look instead of a photo: pick an avatar, then a scene, a pet, a ride, a home, something in the sky and a worn accessory. The stage tilts when you drag it and everything on it idles gently. Free items are yours right away; premium ones unlock with coins from your wallet, with a burst, sound and haptics when they do. Nothing changes until you tap Save my look."
-    },
-    {
-      "type": "new",
-      "title": "Try before you unlock",
-      "body": "Tap a locked item to see it on your stage first. The button tells you exactly what it costs or how many more coins you need, and jumps to the wallet when you are short."
-    },
-    {
-      "type": "fixed",
-      "title": "My profile works again",
-      "body": "The profile page could fail to lay out after the theme picker was added and showed a blank or broken body. It is rebuilt: 3D-look hero or photo hero, a Complete your profile checklist, wallet card with recharge and history, quick actions, appearance, host promo and grouped account links."
-    },
-    {
-      "type": "fixed",
-      "title": "Edit profile keeps what you typed",
-      "body": "Fields load fresh every time you open the screen, gender no longer changes until you save, the birthday picker matches the theme, and the Save button only lights up when something changed. Leaving with unsaved edits asks first."
-    },
-    {
-      "type": "improved",
-      "title": "Settings and photo picker on the design system",
-      "body": "Settings uses the same grouped rows as the profile. If the admin turns Avatar Studio off, the photo picker offers camera, gallery and three male / three female preset pictures."
-    },
-    {
-      "type": "improved",
-      "title": "Admin: Avatar Studio tab",
-      "body": "Settings → Avatar Studio: switch the feature on or off, allow or block real photo uploads, see how many users have a 3D look and how many unlocks happened, and manage the catalog by category: add or edit items with an image, price, rarity and gender, hide, show or delete."
-    },
-    {
-      "type": "new",
-      "title": "A coin you could pick up",
-      "body": "The coin is now drawn as a real gold disc: visible edge, bevelled rim, embossed star and a moving highlight. It rests at a slight angle so you see its thickness, breathes gently and turns one full revolution with a light sweep every few seconds instead of flipping flat. Same coin everywhere: Home balance pill, wallet, receipts and the purchase celebration."
-    },
-    {
-      "type": "improved",
-      "title": "Coin packs you can compare",
-      "body": "Packs are full-width rows now: a coin pile that grows with the pack, the coin count, minutes of voice calls it buys, price per coin, a SAVE tag and the Most popular / Best value ribbons. The selected row lights up and its price turns into the Pay button."
-    },
-    {
-      "type": "new",
-      "title": "New audio / video chooser",
-      "body": "The sheet that opens when you call a host is rebuilt: the host's photo and name on top, your coin balance with the minutes it buys and a Top up shortcut, then Audio call and Video call cards showing coins per minute and how long your balance lasts, and a free Messages row. Themed for dark and light."
-    },
-    {
-      "type": "new",
-      "title": "History, rebuilt",
-      "body": "Coin and payment history are grouped by day (Today, Yesterday, weekday) with a Coin / Payment switch, an All time / date-range filter chip, copyable receipt ids and proper loading and empty states."
-    },
-    {
-      "type": "improved",
-      "title": "Dialogs on the design system",
-      "body": "Log out, exit, delete account, restart, clear notifications, host request sent and the maintenance notice all use one themed card with a tinted icon, gradient primary action and ghost cancel."
-    },
-    {
-      "type": "new",
-      "title": "Choosing a host feels like choosing",
-      "body": "Tap Call (or swipe right) on the Home deck and that host stays right there: the card snaps to centre, lifts with a subtle 3D tilt, a light sweeps across the photo and an accent ring runs around the frame while the call chooser slides up over it. A soft chime and haptics confirm the pick. The card settles back when you close the chooser, and only Skip moves to the next host."
-    },
-    {
-      "type": "fixed",
-      "title": "No more wrong face behind the call sheet",
-      "body": "Previously the chosen card flew away and the next host's photo showed behind the audio/video chooser. The chooser now always sits over the host you picked."
-    },
-    {
-      "type": "improved",
-      "title": "Sound effects under admin control",
-      "body": "Settings → Appearance gains a Sound effects toggle for the new UI chime."
-    },
-    {
-      "type": "new",
-      "title": "A wallet worth opening",
-      "body": "My wallet is rebuilt on the design system: a glowing balance card that also tells you how many minutes of voice calls you have, coin packs in a two-column grid with Most popular and Best value ribbons and Save % tags, and a docked Get coins button so checkout is one tap away."
-    },
-    {
-      "type": "new",
-      "title": "Coins rain when you buy",
-      "body": "Every successful purchase lands on a celebration screen: the coin drops in with a bounce, coins and confetti burst across the screen, +N coins counts up, your new balance rolls over, and a receipt with a copyable transaction ID sits underneath. Then one tap to start talking."
-    },
-    {
-      "type": "new",
-      "title": "Recent activity on the wallet",
-      "body": "Your last purchases, bonuses and calls show right under the packs with clear +/− amounts and relative times, with a link to the full history."
-    },
-    {
-      "type": "improved",
-      "title": "Cleaner checkout",
-      "body": "The payment sheet shows what you are buying, explains each gateway in one line, pre-selects the only option when there is one, and the Pay button stays disabled until a method is chosen. Works in dark and light themes."
-    },
-    {
-      "type": "new",
-      "title": "Dark or light, your call",
-      "body": "Pick System, Dark or Light from My profile or during onboarding. Everything—Home, Explore, chats, calls, profile—switches instantly, with no restart."
-    },
-    {
-      "type": "new",
-      "title": "My profile, redesigned",
-      "body": "A gradient avatar ring, your coin balance with recharged / spent stats and one-tap recharge, an appearance picker, quick shortcuts and grouped links in the same dark, photo-first style as the rest of the app."
-    },
-    {
-      "type": "new",
-      "title": "Calls that tell a story",
-      "body": "Call history is grouped by day, filterable by missed / incoming / outgoing, shows duration and coins per call, and the call button rings when that host is online right now."
-    },
-    {
-      "type": "improved",
-      "title": "Controlled from the admin panel",
-      "body": "Admins set the default theme, allow or lock user choice, pick the brand accent, corner style and motion level, and toggle glows, ringing buttons and the coin animation."
-    },
-    {
-      "type": "improved",
-      "title": "Tidier Home header",
-      "body": "For You / Live, the coin balance and the bell now share one height and sit clear of the caller cards. The cards behind the deck peek out evenly instead of creeping into the header."
-    },
-    {
-      "type": "new",
-      "title": "A coin that feels like money",
-      "body": "The coin in your balance does a slow 3D flip with a glossy sweep, and the number counts up when coins arrive."
-    },
-    {
-      "type": "new",
-      "title": "Ringing call buttons",
-      "body": "When a caller is live, the call button on Explore tiles and the big deck action wiggle like an incoming call with soft expanding rings, so you can spot who is ready right now."
-    },
-    {
-      "type": "improved",
-      "title": "Faster scrolling",
-      "body": "Explore tiles no longer blur the photo behind each button and decode images at tile size, so the grid scrolls smoothly on mid-range phones."
-    },
-    {
-      "type": "new",
-      "title": "Random match, reimagined",
-      "body": "A live radar shows callers who are online right now orbiting around you. Pick audio or video, tap Random Match and meet someone in seconds. The match screen shows their intro, topics and rate before you call."
-    },
-    {
-      "type": "new",
-      "title": "Chats that feel alive",
-      "body": "Search, presence dots, photo / voice / call previews, relative times and unread badges in a clean dark list."
-    },
-    {
-      "type": "new",
-      "title": "A better conversation",
-      "body": "Gradient bubbles, day dividers, call history inline, a one-tap card to start a call, and a frosted composer with photo, hold-to-record voice notes and send."
-    },
-    {
-      "type": "new",
-      "title": "Welcome and onboarding",
-      "body": "A new animated splash and a three-step onboarding for first-time users, with Skip and a single Get started action."
-    },
-    {
-      "type": "improved",
-      "title": "Smoother everywhere",
-      "body": "Shimmer loading, entrance animations and press feedback across the new screens. The app launches straight into dark, with no white flash."
-    }
-  ]
+ "date": "2026-09-22",
+ "items": [
+  {
+   "type": "new",
+   "title": "Sign in in one tap",
+   "body": "A new sign-in screen: Continue with Google, phone code or just Try it now as a guest. The number and code steps live on the same screen with big digits, a country picker, SMS auto-fill and a resend timer. Which buttons appear, and which one is the big one, is now an admin setting."
+  },
+  {
+   "type": "new",
+   "title": "Daily gift with a streak",
+   "body": "Every day you open bebu there is a coin gift waiting: tap the hopping gift on your balance (or let it pop up) to claim it. Come back tomorrow and the gift grows along a 7-day streak, with a countdown to the next one so you know exactly when to return. Your welcome coins arrive the same way after your first sign-in."
+  },
+  {
+   "type": "improved",
+   "title": "Profile setup in about 20 seconds",
+   "body": "We only ask for a display name (already filled in, shuffle if you like), who you are and your birthday. Photo and country are optional. A progress bar and the button label show what is left, and the coins you are about to unlock stay in view."
+  },
+  {
+   "type": "improved",
+   "title": "Admin: Login & Rewards",
+   "body": "New settings tab with presets (Recommended, Phone only, Google only, Phone + Google, Social, Everything), per-method toggles, hero button, welcome coins, consent style and headline, plus the daily reward schedule editor, timezone and claim statistics."
+  },
+  {
+   "type": "new",
+   "title": "New bebu logo",
+   "body": "The B-with-a-face mark is now the launcher icon (adaptive on Android 8+, iOS set included), the splash logo, the notification icon and the website brand."
+  },
+  {
+   "type": "improved",
+   "title": "Random match, redesigned",
+   "body": "The match screen is now a layered proximity radar over a faint city map: hosts drift on the rings, anonymous chips fill the gaps, and the black/white core in the middle is the button — tap it (or Match now) to find someone. Audio / Video are quick chips under the radar, and the status pill shows how many hosts are live with an Edit shortcut. Built for both dark and light themes."
+  },
+  {
+   "type": "improved",
+   "title": "Better match preview",
+   "body": "When someone is found you get a full-bleed portrait card with an Online now pill, the per-minute rate, rating, calls taken, languages and topics on the photo, plus how many minutes your balance covers. Skip asks for another host without leaving the screen; Say hello and Call are unchanged."
+  },
+  {
+   "type": "improved",
+   "title": "A proper online indicator",
+   "body": "The flat green dot is replaced everywhere by a presence badge: a glowing dot with a matching border, a breathing halo when live, an amber bar when the host is on a call, and grey when offline. The same badge powers the new Online now / On a call pills."
+  },
+  {
+   "type": "fixed",
+   "title": "Messages reach the host now",
+   "body": "Texts typed while the connection was still waking up looked sent but never left your phone. Messages are now queued and delivered the moment the connection is back, with a clock while pending, one tick when the server has it and blue ticks when read. If something really can't be sent you see Not sent · tap to retry."
+  },
+  {
+   "type": "fixed",
+   "title": "Malayalam, Tamil, Hindi and emoji messages",
+   "body": "Anything that wasn't plain English used to be silently emptied before sending. Every language and emoji now goes through as typed."
+  },
+  {
+   "type": "fixed",
+   "title": "Voice notes record on the first hold",
+   "body": "The first long-press only asked for the microphone and then did nothing. Recording now starts as soon as you allow it; if the mic is blocked we take you to the phone settings."
+  },
+  {
+   "type": "new",
+   "title": "WhatsApp-style recording",
+   "body": "Hold the mic to record with a live level meter and timer, slide left to cancel, release to send. Voice notes get a proper waveform bubble with play, pause and seek."
+  },
+  {
+   "type": "new",
+   "title": "Chat tones and haptics",
+   "body": "Soft tones for sent and received messages and for recording, plus light vibration on every action. Turn tones off in Settings → Conversation tones; the admin can switch tones and haptics off app-wide."
+  },
+  {
+   "type": "new",
+   "title": "Avatar Studio",
+   "body": "Build a 3D look instead of a photo: pick an avatar, then a scene, a pet, a ride, a home, something in the sky and a worn accessory. The stage tilts when you drag it and everything on it idles gently. Free items are yours right away; premium ones unlock with coins from your wallet, with a burst, sound and haptics when they do. Nothing changes until you tap Save my look."
+  },
+  {
+   "type": "new",
+   "title": "Try before you unlock",
+   "body": "Tap a locked item to see it on your stage first. The button tells you exactly what it costs or how many more coins you need, and jumps to the wallet when you are short."
+  },
+  {
+   "type": "fixed",
+   "title": "My profile works again",
+   "body": "The profile page could fail to lay out after the theme picker was added and showed a blank or broken body. It is rebuilt: 3D-look hero or photo hero, a Complete your profile checklist, wallet card with recharge and history, quick actions, appearance, host promo and grouped account links."
+  },
+  {
+   "type": "fixed",
+   "title": "Edit profile keeps what you typed",
+   "body": "Fields load fresh every time you open the screen, gender no longer changes until you save, the birthday picker matches the theme, and the Save button only lights up when something changed. Leaving with unsaved edits asks first."
+  },
+  {
+   "type": "improved",
+   "title": "Settings and photo picker on the design system",
+   "body": "Settings uses the same grouped rows as the profile. If the admin turns Avatar Studio off, the photo picker offers camera, gallery and three male / three female preset pictures."
+  },
+  {
+   "type": "improved",
+   "title": "Admin: Avatar Studio tab",
+   "body": "Settings → Avatar Studio: switch the feature on or off, allow or block real photo uploads, see how many users have a 3D look and how many unlocks happened, and manage the catalog by category: add or edit items with an image, price, rarity and gender, hide, show or delete."
+  },
+  {
+   "type": "new",
+   "title": "A coin you could pick up",
+   "body": "The coin is now drawn as a real gold disc: visible edge, bevelled rim, embossed star and a moving highlight. It rests at a slight angle so you see its thickness, breathes gently and turns one full revolution with a light sweep every few seconds instead of flipping flat. Same coin everywhere: Home balance pill, wallet, receipts and the purchase celebration."
+  },
+  {
+   "type": "improved",
+   "title": "Coin packs you can compare",
+   "body": "Packs are full-width rows now: a coin pile that grows with the pack, the coin count, minutes of voice calls it buys, price per coin, a SAVE tag and the Most popular / Best value ribbons. The selected row lights up and its price turns into the Pay button."
+  },
+  {
+   "type": "new",
+   "title": "New audio / video chooser",
+   "body": "The sheet that opens when you call a host is rebuilt: the host's photo and name on top, your coin balance with the minutes it buys and a Top up shortcut, then Audio call and Video call cards showing coins per minute and how long your balance lasts, and a free Messages row. Themed for dark and light."
+  },
+  {
+   "type": "new",
+   "title": "History, rebuilt",
+   "body": "Coin and payment history are grouped by day (Today, Yesterday, weekday) with a Coin / Payment switch, an All time / date-range filter chip, copyable receipt ids and proper loading and empty states."
+  },
+  {
+   "type": "improved",
+   "title": "Dialogs on the design system",
+   "body": "Log out, exit, delete account, restart, clear notifications, host request sent and the maintenance notice all use one themed card with a tinted icon, gradient primary action and ghost cancel."
+  },
+  {
+   "type": "new",
+   "title": "Choosing a host feels like choosing",
+   "body": "Tap Call (or swipe right) on the Home deck and that host stays right there: the card snaps to centre, lifts with a subtle 3D tilt, a light sweeps across the photo and an accent ring runs around the frame while the call chooser slides up over it. A soft chime and haptics confirm the pick. The card settles back when you close the chooser, and only Skip moves to the next host."
+  },
+  {
+   "type": "fixed",
+   "title": "No more wrong face behind the call sheet",
+   "body": "Previously the chosen card flew away and the next host's photo showed behind the audio/video chooser. The chooser now always sits over the host you picked."
+  },
+  {
+   "type": "improved",
+   "title": "Sound effects under admin control",
+   "body": "Settings → Appearance gains a Sound effects toggle for the new UI chime."
+  },
+  {
+   "type": "new",
+   "title": "A wallet worth opening",
+   "body": "My wallet is rebuilt on the design system: a glowing balance card that also tells you how many minutes of voice calls you have, coin packs in a two-column grid with Most popular and Best value ribbons and Save % tags, and a docked Get coins button so checkout is one tap away."
+  },
+  {
+   "type": "new",
+   "title": "Coins rain when you buy",
+   "body": "Every successful purchase lands on a celebration screen: the coin drops in with a bounce, coins and confetti burst across the screen, +N coins counts up, your new balance rolls over, and a receipt with a copyable transaction ID sits underneath. Then one tap to start talking."
+  },
+  {
+   "type": "new",
+   "title": "Recent activity on the wallet",
+   "body": "Your last purchases, bonuses and calls show right under the packs with clear +/− amounts and relative times, with a link to the full history."
+  },
+  {
+   "type": "improved",
+   "title": "Cleaner checkout",
+   "body": "The payment sheet shows what you are buying, explains each gateway in one line, pre-selects the only option when there is one, and the Pay button stays disabled until a method is chosen. Works in dark and light themes."
+  },
+  {
+   "type": "new",
+   "title": "Dark or light, your call",
+   "body": "Pick System, Dark or Light from My profile or during onboarding. Everything—Home, Explore, chats, calls, profile—switches instantly, with no restart."
+  },
+  {
+   "type": "new",
+   "title": "My profile, redesigned",
+   "body": "A gradient avatar ring, your coin balance with recharged / spent stats and one-tap recharge, an appearance picker, quick shortcuts and grouped links in the same dark, photo-first style as the rest of the app."
+  },
+  {
+   "type": "new",
+   "title": "Calls that tell a story",
+   "body": "Call history is grouped by day, filterable by missed / incoming / outgoing, shows duration and coins per call, and the call button rings when that host is online right now."
+  },
+  {
+   "type": "improved",
+   "title": "Controlled from the admin panel",
+   "body": "Admins set the default theme, allow or lock user choice, pick the brand accent, corner style and motion level, and toggle glows, ringing buttons and the coin animation."
+  },
+  {
+   "type": "improved",
+   "title": "Tidier Home header",
+   "body": "For You / Live, the coin balance and the bell now share one height and sit clear of the caller cards. The cards behind the deck peek out evenly instead of creeping into the header."
+  },
+  {
+   "type": "new",
+   "title": "A coin that feels like money",
+   "body": "The coin in your balance does a slow 3D flip with a glossy sweep, and the number counts up when coins arrive."
+  },
+  {
+   "type": "new",
+   "title": "Ringing call buttons",
+   "body": "When a caller is live, the call button on Explore tiles and the big deck action wiggle like an incoming call with soft expanding rings, so you can spot who is ready right now."
+  },
+  {
+   "type": "improved",
+   "title": "Faster scrolling",
+   "body": "Explore tiles no longer blur the photo behind each button and decode images at tile size, so the grid scrolls smoothly on mid-range phones."
+  },
+  {
+   "type": "new",
+   "title": "Random match, reimagined",
+   "body": "A live radar shows callers who are online right now orbiting around you. Pick audio or video, tap Random Match and meet someone in seconds. The match screen shows their intro, topics and rate before you call."
+  },
+  {
+   "type": "new",
+   "title": "Chats that feel alive",
+   "body": "Search, presence dots, photo / voice / call previews, relative times and unread badges in a clean dark list."
+  },
+  {
+   "type": "new",
+   "title": "A better conversation",
+   "body": "Gradient bubbles, day dividers, call history inline, a one-tap card to start a call, and a frosted composer with photo, hold-to-record voice notes and send."
+  },
+  {
+   "type": "new",
+   "title": "Welcome and onboarding",
+   "body": "A new animated splash and a three-step onboarding for first-time users, with Skip and a single Get started action."
+  },
+  {
+   "type": "improved",
+   "title": "Smoother everywhere",
+   "body": "Shimmer loading, entrance animations and press feedback across the new screens. The app launches straight into dark, with no white flash."
+  }
+ ]
 }

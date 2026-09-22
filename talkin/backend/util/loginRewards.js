@@ -103,7 +103,8 @@ function tzOffsetMs(date, timezone) {
   }).formatToParts(date);
   const get = (t) => Number(parts.find((p) => p.type === t).value);
   const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
-  return asUtc - date.getTime();
+  // formatToParts is second-granular; drop the ms so midnight comes out exact.
+  return asUtc - Math.floor(date.getTime() / 1000) * 1000;
 }
 
 /** Start of the next calendar day in `timezone`, as a Date. */
