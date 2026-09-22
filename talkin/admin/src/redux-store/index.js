@@ -44,6 +44,7 @@ import aiChatReducer from '@/redux-store/slices/aiChat'
 import appearanceReducer from '@/redux-store/slices/appearance'
 import avatarStudioReducer from '@/redux-store/slices/avatarStudio'
 import loginRewardsReducer from '@/redux-store/slices/loginRewards'
+import giftCatalogReducer from '@/redux-store/slices/giftCatalog'
 
 export const store = configureStore({
   reducer: {
@@ -71,6 +72,7 @@ export const store = configureStore({
     appearance: appearanceReducer,
     avatarStudio: avatarStudioReducer,
     loginRewards: loginRewardsReducer,
+    giftCatalog: giftCatalogReducer,
 
     // posts: postsReducer,
     faqs: faqsReducer,

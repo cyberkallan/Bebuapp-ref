@@ -146,16 +146,7 @@ export const toolTipData = {
         </a> */}
         
         <Divider sx={{ my: 1 }} />
-        For detailed instructions, see: <br/>
-        {/* <p className="fw-semibold">Admin Panel / Setup Notification (FCM)</p> */}
-        <a
-          href='https://docs.codderlab.com/Talkin/#privateKey'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-blue-500'
-        >
-         Admin Panel / Setup Notification (FCM)
-        </a>
+        Firebase Console → Project settings → Service accounts → Generate new private key. Paste the downloaded JSON here.
       </>
     )
   },

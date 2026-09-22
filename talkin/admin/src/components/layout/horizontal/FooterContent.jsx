@@ -20,34 +20,23 @@ const FooterContent = () => {
     <div
       className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}
     >
-      {/* <p>
-        <span className='text-textSecondary'>{`© ${new Date().getFullYear()}, Made with `}</span>
-        <span>{`❤️`}</span>
-        <span className='text-textSecondary'>{` by `}</span>
-        <Link href='https://pixinvent.com/' target='_blank' className='text-primary uppercase'>
-          Pixinvent
+      <p>
+        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} `}</span>
+        <Link href='https://bebuapp.in' target='_blank' className='text-primary font-medium'>
+          bebu
         </Link>
+        <span className='text-textSecondary'>{' · Elevanza Ltd. All rights reserved.'}</span>
       </p>
       {!isBreakpointReached && (
         <div className='flex items-center gap-4'>
-          <Link href='https://themeforest.net/licenses/standard' target='_blank' className='text-primary'>
-            License
+          <Link href='https://bebuapp.in' target='_blank' className='text-primary'>
+            bebuapp.in
           </Link>
-          <Link href='https://themeforest.net/user/pixinvent/portfolio' target='_blank' className='text-primary'>
-            More Themes
-          </Link>
-          <Link
-            href='https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation'
-            target='_blank'
-            className='text-primary'
-          >
-            Documentation
-          </Link>
-          <Link href='https://pixinvent.ticksy.com' target='_blank' className='text-primary'>
+          <Link href='mailto:support@bebuapp.in' className='text-primary'>
             Support
           </Link>
         </div>
-      )} */}
+      )}
     </div>
   )
 }

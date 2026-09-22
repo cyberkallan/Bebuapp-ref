@@ -351,7 +351,7 @@ const Registration = ({ mode }) => {
       <div className='flex justify-center items-center bs-full bg-backgroundPaper p-6 md:px-16 w-full md:is-[50dvw]'>
         <div className='flex flex-col gap-3 is-[55%]'>
           <div className='flex'>
-            <img src='/images/logo/talkin-logo.png' alt={projectName || ''} className='h-20' />
+            <img src='/images/logo/bebu-logo.png' alt={projectName || ''} className='h-20' />
           </div>
           <Typography variant='h3' className='font-bold'>
             Sign Up to your account

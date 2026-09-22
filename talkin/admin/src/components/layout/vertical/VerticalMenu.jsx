@@ -141,6 +141,12 @@ const VerticalMenu = ({ scrollMenu }) => {
             activeUrl='/coin-plan-history' icon={<i className='tabler-history' />}>
             Coin Plan History 
           </MenuItem>
+          <MenuItem href='/gifts' icon={<i className='tabler-gift' />}>
+            Gifts
+          </MenuItem>
+          <MenuItem href='/settings?tab=login-rewards' icon={<i className='tabler-coin' />}>
+            Coins &amp; Rewards
+          </MenuItem>
          
           {/* Finance */}
           <MenuItem disabled>FINANCIAL</MenuItem>

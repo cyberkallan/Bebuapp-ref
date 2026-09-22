@@ -3,7 +3,7 @@ import { projectName } from "@/config"
 const themeConfig = {
   templateName: projectName ||'',
   homePageUrl: '/dashboard',
-  settingsCookieName: 'vuexy-mui-next-demo-1',
+  settingsCookieName: 'bebu-admin-settings',
   mode: 'system', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'
   semiDark: false, // true, false
