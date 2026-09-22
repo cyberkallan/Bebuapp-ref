@@ -3,34 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>bebu — Real conversations, one tap away</title>
+    <title>bebu — Real conversations. One tap away.</title>
     <meta
       name="description"
-      content="bebu connects you with verified callers for private 1-to-1 voice and video calls. Pay per minute with coins, no subscriptions. Download for Android."
+      content="bebu is a voice and video calling app for real conversations with verified hosts. Random match, private chat, a 3D avatar studio and simple coin billing. Free for Android."
     />
-    <meta name="theme-color" content="#6d28d9" />
-    <meta property="og:title" content="bebu — Real conversations, one tap away" />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:title" content="bebu — Real conversations. One tap away." />
     <meta
       property="og:description"
-      content="Private 1-to-1 voice and video calls with verified callers. Pay per minute with coins. Download for Android."
+      content="Voice and video calls with verified hosts. Random match, chat, Avatar Studio. Free for Android."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link rel="preload" as="image" href="/screens/home_dark.webp" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header" data-header>
+    <header class="site-header site-header--dark" data-header>
       <div class="container nav">
-        <a class="brand" href="#top" aria-label="bebu home">
+        <a class="brand" href="/" aria-label="bebu home">
           <span class="brand__mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path
@@ -38,28 +40,20 @@
               />
             </svg>
           </span>
-          <span class="brand__name">bebu</span>
+          <span>bebu</span>
         </a>
 
         <nav class="nav__links" id="nav-links" aria-label="Primary">
           <a href="#features">Features</a>
-          <a href="#how">How it works</a>
-          <a href="#callers">For callers</a>
+          <a href="#match">Random match</a>
+          <a href="#studio">Avatar Studio</a>
+          <a href="#hosts">For hosts</a>
           <a href="#faq">FAQ</a>
         </nav>
 
         <div class="nav__actions">
-          <a class="btn btn--primary btn--sm" href="/download">
-            <svg
-              class="icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-            </svg>
-            Download
+          <a class="btn btn--light btn--sm" href="/download.html" data-download-primary>
+            <span data-download-primary-label>Download</span>
           </a>
           <button
             class="nav__toggle"
@@ -79,429 +73,444 @@
     <main id="main">
       <!-- Hero -->
       <section class="hero" id="top">
-        <div class="hero__glow hero__glow--a" aria-hidden="true"></div>
-        <div class="hero__glow hero__glow--b" aria-hidden="true"></div>
-        <div class="container hero__grid">
-          <div class="hero__copy">
-            <p class="eyebrow">
-              <span class="eyebrow__dot"></span>
-              Now in early access for Android
-            </p>
-            <h1>Real conversations.<br /><span class="text-gradient">One tap away.</span></h1>
-            <p class="lead">
-              bebu connects you with verified callers for private 1-to-1 voice and video calls. Pay
-              only for the minutes you talk — no subscriptions, no surprises.
-            </p>
-            <div class="hero__cta">
-              <a class="btn btn--primary btn--lg" href="/download" data-primary-download>
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path
-                    d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.637.637 0 0 0-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67a.643.643 0 0 0-.87-.2c-.28.18-.37.54-.22.83L6.4 9.48A10.81 10.81 0 0 0 1 18h22a10.81 10.81 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"
-                  />
-                </svg>
-                Download for Android
-              </a>
-              <a class="btn btn--ghost btn--lg" href="#how">See how it works</a>
-            </div>
-            <ul class="hero__proof" aria-label="Highlights">
-              <li>
-                <strong>Per-minute</strong>
-                <span>coin billing</span>
-              </li>
-              <li>
-                <strong>Verified</strong>
-                <span>callers only</span>
-              </li>
-              <li>
-                <strong>Private</strong>
-                <span>1-to-1 calls</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="hero__visual" aria-hidden="true">
-            <div class="phone">
-              <div class="phone__notch"></div>
-              <div class="phone__screen">
-                <div class="call">
-                  <div class="call__status">
-                    <span class="call__badge">Video · HD</span>
-                    <span class="call__timer" data-timer>04:32</span>
-                  </div>
-                  <div class="call__avatar">
-                    <span>A</span>
-                    <i class="call__ring"></i>
-                    <i class="call__ring call__ring--2"></i>
-                  </div>
-                  <p class="call__name">Ananya</p>
-                  <p class="call__meta">Verified caller · 4.9 ★</p>
-                  <div class="call__coins">
-                    <span class="call__coin"></span>
-                    <span>20 coins / min</span>
-                  </div>
-                  <div class="call__controls">
-                    <span class="ctrl"></span>
-                    <span class="ctrl"></span>
-                    <span class="ctrl ctrl--end"></span>
-                    <span class="ctrl"></span>
-                    <span class="ctrl"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="float float--a">
-              <span class="float__icon float__icon--green">✓</span>
-              <div>
-                <strong>Balance protected</strong>
-                <small>Server checks every 10 s</small>
-              </div>
-            </div>
-            <div class="float float--b">
-              <span class="float__icon float__icon--violet">₹</span>
-              <div>
-                <strong>Callers earn 70%</strong>
-                <small>Weekly payouts</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Trust strip -->
-      <section class="strip" aria-label="Trust">
-        <div class="container strip__grid">
-          <div class="strip__item">
-            <svg
-              class="icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6l-8-3Z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            <span>Server-verified billing. Your balance can never go negative.</span>
-          </div>
-          <div class="strip__item">
-            <svg
-              class="icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <rect x="4" y="10" width="16" height="10" rx="2" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-            </svg>
-            <span>Encrypted media over Agora's global real-time network.</span>
-          </div>
-          <div class="strip__item">
-            <svg
-              class="icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 7v5l3 2" />
-            </svg>
-            <span>Billed per started minute. Stop any time, keep the rest.</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Features -->
-      <section class="section" id="features">
+        <div class="hero__glow" aria-hidden="true"></div>
         <div class="container">
-          <div class="section__head">
-            <p class="kicker">Why bebu</p>
-            <h2>Built for real talk, not endless scrolling</h2>
-            <p class="section__lead">
-              Every part of bebu is designed around one thing: a great conversation with a real
-              person, whenever you want it.
+          <div class="hero__copy">
+            <p class="eyebrow" data-reveal>
+              <span>bebu for Android</span>
+              <span aria-hidden="true">·</span>
+              <span>Version <b data-version>—</b></span>
+            </p>
+            <h1 class="display" data-reveal style="--d: 60ms">
+              Real conversations.<br />
+              <span class="text-gradient">One tap away.</span>
+            </h1>
+            <p class="lede" data-reveal style="--d: 120ms">
+              Voice and video calls with verified hosts who are online right now. Match with
+              someone new, chat first, and pay only for the minutes you talk.
+            </p>
+            <div class="hero__actions" data-reveal style="--d: 180ms">
+              <a class="btn btn--primary btn--lg" href="/download.html">Download for Android</a>
+              <a class="link link--pink" href="#features">
+                See what's inside
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
+              </a>
+            </div>
+            <p class="hero__meta" data-reveal style="--d: 240ms">
+              <span><b>Free</b> to install</span>
+              <span><b>Signed</b> release build</span>
+              <span><b>Android 6.0+</b></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="hero__stage" aria-hidden="true">
+          <figure class="device hero__device hero__device--left" data-reveal style="--d: 320ms">
+            <div class="device__screen">
+              <img src="/screens/radar_dark.webp" width="780" height="1688" alt="" loading="eager" />
+            </div>
+          </figure>
+          <figure class="device hero__device hero__device--center" data-reveal style="--d: 260ms">
+            <div class="device__screen">
+              <img
+                src="/screens/home_dark.webp"
+                width="780"
+                height="1688"
+                alt="bebu home screen with a host card"
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+          </figure>
+          <figure class="device hero__device hero__device--right" data-reveal style="--d: 380ms">
+            <div class="device__screen">
+              <img src="/screens/chat_dark.webp" width="780" height="1688" alt="" loading="eager" />
+            </div>
+          </figure>
+          <div class="hero__fade"></div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="band--night" aria-label="At a glance">
+        <div class="container">
+          <div class="stats on-dark">
+            <div class="stat" data-reveal>
+              <b>&lt; 1 min</b><span>From download to your first call</span>
+            </div>
+            <div class="stat" data-reveal style="--d: 60ms">
+              <b>Per minute</b><span>Coins only while you're connected</span>
+            </div>
+            <div class="stat" data-reveal style="--d: 120ms">
+              <b>Verified</b><span>Every host completes ID checks</span>
+            </div>
+            <div class="stat" data-reveal style="--d: 180ms">
+              <b>6 languages</b><span>Malayalam, Tamil, Hindi, Kannada, Telugu, English</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature bento -->
+      <section class="band band--paper2" id="features">
+        <div class="container">
+          <div class="band__head">
+            <p class="eyebrow" data-reveal>Inside bebu</p>
+            <h2 class="headline" data-reveal style="--d: 60ms">Built for real talk.<br />Not endless scrolling.</h2>
+            <p class="lede" data-reveal style="--d: 120ms">
+              Every screen is designed around one thing: a great conversation with a real person,
+              whenever you want it.
             </p>
           </div>
 
-          <div class="grid grid--3">
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path
-                    d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
-                  />
-                </svg>
+          <div class="bento">
+            <article class="tile tile--dark tile--wide" data-reveal>
+              <div class="tile__copy">
+                <p class="eyebrow">Home</p>
+                <h3 class="title">Swipe through hosts who are live right now.</h3>
+                <p>
+                  Photo-first cards with topics, languages and rates. One tap to call, one tap to
+                  chat, and a ringing call button when someone is available this second.
+                </p>
               </div>
-              <h3>Crystal-clear voice</h3>
-              <p>
-                Low-latency audio that stays stable on 4G. Reconnects automatically if your network
-                blips.
-              </p>
-            </article>
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="6" width="13" height="12" rx="2" />
-                  <path d="m16 10 5-3v10l-5-3" />
-                </svg>
+              <div class="tile__art tile__art--pair">
+                <div class="tile__glow"></div>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/home_light.webp" width="780" height="1688" alt="Home screen, light theme" loading="lazy" />
+                  </div>
+                </figure>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/home_dark.webp" width="780" height="1688" alt="Home screen, dark theme" loading="lazy" />
+                  </div>
+                </figure>
               </div>
-              <h3>HD video calls</h3>
-              <p>
-                Face-to-face when you want it. Switch between voice and video with one tap,
-                mid-call.
-              </p>
             </article>
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6l-8-3Z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
+
+            <article class="tile tile--third" data-reveal style="--d: 80ms">
+              <div class="tile__copy">
+                <p class="eyebrow">Chat</p>
+                <h3 class="title">Say hello first.</h3>
+                <p>Delivery ticks, voice notes with a live waveform, and a one-tap card to start the call.</p>
               </div>
-              <h3>Verified callers</h3>
-              <p>
-                Every caller completes identity verification before going live. Ratings after every
-                call.
-              </p>
-            </article>
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="8" />
-                  <path d="M12 8v8m-3-5.5h4.5a1.5 1.5 0 0 1 0 3H9" />
-                </svg>
+              <div class="tile__art tile__art--row">
+                <div class="tile__glow tile__glow--light"></div>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/chat_dark.webp" width="780" height="1688" alt="Chat with a host" loading="lazy" />
+                  </div>
+                </figure>
               </div>
-              <h3>Coins, not subscriptions</h3>
-              <p>
-                Top up once, spend per minute. Your balance and every charge are visible in your
-                wallet.
-              </p>
             </article>
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 12a8 8 0 1 1 16 0v5a3 3 0 0 1-3 3h-2" />
-                  <rect x="3" y="12" width="4" height="6" rx="1" />
-                  <rect x="17" y="12" width="4" height="6" rx="1" />
-                </svg>
+
+            <article class="tile tile--third" data-reveal>
+              <div class="tile__copy">
+                <p class="eyebrow">Wallet</p>
+                <h3 class="title">Coins, not subscriptions.</h3>
+                <p>Top up once, spend per minute. Your balance is shown as talk time, every charge is listed.</p>
               </div>
-              <h3>Match instantly</h3>
-              <p>
-                Pick a caller you like or hit Random to be connected with someone available right
-                now.
-              </p>
-            </article>
-            <article class="card">
-              <div class="card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-                </svg>
+              <div class="tile__art tile__art--row">
+                <div class="tile__glow tile__glow--light"></div>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/wallet_dark.webp" width="780" height="1688" alt="My wallet with coin packs" loading="lazy" />
+                  </div>
+                </figure>
               </div>
-              <h3>Never miss a moment</h3>
-              <p>
-                Get a nudge when your favourite caller comes online — only when you want it, never
-                spammy.
-              </p>
             </article>
+
+            <article class="tile tile--dark tile--wide" data-reveal style="--d: 80ms">
+              <div class="tile__copy">
+                <p class="eyebrow">It's a match</p>
+                <h3 class="title">Meet someone new in seconds.</h3>
+                <p>
+                  When a host is found you see their photo, rate, rating, languages and how many
+                  minutes your balance covers. Not the right vibe? Skip to the next.
+                </p>
+              </div>
+              <div class="tile__art tile__art--pair">
+                <div class="tile__glow tile__glow--pink"></div>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/radar_dark.webp" width="780" height="1688" alt="Random match radar" loading="lazy" />
+                  </div>
+                </figure>
+                <figure class="device device--sm">
+                  <div class="device__screen">
+                    <img src="/screens/match_dark.webp" width="780" height="1688" alt="Match found preview" loading="lazy" />
+                  </div>
+                </figure>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Random match spotlight -->
+      <section class="band band--night" id="match">
+        <div class="container">
+          <div class="spot">
+            <div class="spot__copy on-dark">
+              <p class="eyebrow" data-reveal>Random match</p>
+              <h2 class="headline" data-reveal style="--d: 60ms">Tap the core.<br />Someone's ready to talk.</h2>
+              <p data-reveal style="--d: 120ms">
+                A live radar of hosts around you. Choose audio or video, tap the centre, and bebu
+                connects you with someone available right now — with their rate shown before you
+                say a word.
+              </p>
+              <ul class="spot__list" data-reveal style="--d: 180ms">
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>Audio or video</strong><span>Switch with one tap. Rates are per minute and always visible.</span></div>
+                </li>
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>Skip anytime</strong><span>Not feeling it? Ask for another host without leaving the screen.</span></div>
+                </li>
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>Dark or light</strong><span>The whole app follows your taste — pick it in onboarding or later.</span></div>
+                </li>
+              </ul>
+            </div>
+            <div class="spot__art spot__art--pair" data-reveal style="--d: 120ms">
+              <div class="spot__halo" aria-hidden="true"></div>
+              <figure class="device">
+                <div class="device__screen">
+                  <img src="/screens/radar_light.webp" width="780" height="1688" alt="Random match radar, light theme" loading="lazy" />
+                </div>
+              </figure>
+              <figure class="device">
+                <div class="device__screen">
+                  <img src="/screens/radar_dark.webp" width="780" height="1688" alt="Random match radar, dark theme" loading="lazy" />
+                </div>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Avatar studio spotlight -->
+      <section class="band" id="studio">
+        <div class="container">
+          <div class="spot spot--flip">
+            <div class="spot__copy">
+              <p class="eyebrow" data-reveal>Avatar Studio</p>
+              <h2 class="headline" data-reveal style="--d: 60ms">Your look.<br />Your stage.</h2>
+              <p data-reveal style="--d: 120ms">
+                Build a 3D look from avatars, scenes, pets, rides, homes and accessories. Free
+                items are yours instantly; premium ones unlock with coins and land on your stage
+                with a celebration.
+              </p>
+              <ul class="spot__list" data-reveal style="--d: 180ms">
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>81 items across 7 slots</strong><span>Avatar, scene, style, pet, ride, home and sky.</span></div>
+                </li>
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>Try before you buy</strong><span>Put anything on the stage first, unlock only what you love.</span></div>
+                </li>
+                <li>
+                  <span class="dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 7" /></svg>
+                  </span>
+                  <div><strong>Or just use a photo</strong><span>Upload your own picture whenever you prefer.</span></div>
+                </li>
+              </ul>
+            </div>
+            <div class="spot__art" data-reveal style="--d: 120ms">
+              <div class="spot__halo" aria-hidden="true"></div>
+              <figure class="device">
+                <div class="device__screen">
+                  <img src="/screens/studio_dark.webp" width="780" height="1688" alt="Avatar Studio" loading="lazy" />
+                </div>
+              </figure>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- How it works -->
-      <section class="section section--alt" id="how">
+      <section class="band band--paper2" id="how">
         <div class="container">
-          <div class="section__head">
-            <p class="kicker">How it works</p>
-            <h2>From download to your first call in under a minute</h2>
+          <div class="band__head">
+            <p class="eyebrow" data-reveal>How it works</p>
+            <h2 class="headline" data-reveal style="--d: 60ms">Download to first call<br />in under a minute.</h2>
           </div>
-          <ol class="steps">
-            <li class="step">
-              <span class="step__num">1</span>
-              <h3>Install and sign in</h3>
-              <p>
-                Download the app, sign in with Google or your phone number. No forms, no waiting.
-              </p>
+          <ol class="steps" style="list-style: none; padding: 0; margin: 0">
+            <li class="step" data-reveal>
+              <span class="step__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+              </span>
+              <h3>Install the APK</h3>
+              <p>Signed by us, checksums published. Android asks once to allow the install.</p>
             </li>
-            <li class="step">
-              <span class="step__num">2</span>
-              <h3>Add coins</h3>
-              <p>
-                Choose a coin pack. New accounts get a welcome bonus so you can try your first call.
-              </p>
+            <li class="step" data-reveal style="--d: 80ms">
+              <span class="step__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+              </span>
+              <h3>Sign in, pick your look</h3>
+              <p>Quick login, choose dark or light, and a starter coin bonus so the first call is on us.</p>
             </li>
-            <li class="step">
-              <span class="step__num">3</span>
-              <h3>Pick a caller and talk</h3>
-              <p>
-                Browse who's online, see their rate and rating, and start a voice or video call
-                instantly.
-              </p>
+            <li class="step" data-reveal style="--d: 160ms">
+              <span class="step__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+              </span>
+              <h3>Call or match</h3>
+              <p>Pick a host from the deck or tap the radar core. Coins are charged per minute, only while connected.</p>
             </li>
           </ol>
         </div>
       </section>
 
-      <!-- For callers -->
-      <section class="section" id="callers">
-        <div class="container split">
-          <div class="split__copy">
-            <p class="kicker">For callers</p>
-            <h2>Turn your time into income</h2>
-            <p class="section__lead">
+      <!-- For hosts -->
+      <section class="band band--night" id="hosts">
+        <div class="container">
+          <div class="band__head on-dark">
+            <p class="eyebrow" data-reveal>For hosts</p>
+            <h2 class="headline" data-reveal style="--d: 60ms">Turn your time into income.</h2>
+            <p class="lede" data-reveal style="--d: 120ms">
               Set your own per-minute rate for voice and video, go online whenever suits you, and
               get paid for every minute you talk. bebu handles billing, safety and payouts.
             </p>
-            <ul class="checklist">
-              <li>Keep 70% of every minute, tracked to the second in your earnings wallet</li>
-              <li>Instant availability toggle — online in one tap, offline in one tap</li>
-              <li>Block and report tools, with a moderation team behind you</li>
-              <li>Weekly payouts to your bank or UPI once you reach the minimum</li>
-            </ul>
-            <a class="btn btn--primary" href="#download">Apply inside the app</a>
           </div>
-          <div class="split__visual" aria-hidden="true">
-            <div class="earn">
-              <div class="earn__head">
-                <span>This week</span>
-                <span class="earn__pill">Online</span>
-              </div>
-              <p class="earn__total">₹ 8,420</p>
-              <p class="earn__sub">1,203 minutes · 74 calls</p>
-              <div class="earn__bars">
-                <i style="--h: 40%"></i><i style="--h: 65%"></i><i style="--h: 55%"></i
-                ><i style="--h: 90%"></i><i style="--h: 70%"></i><i style="--h: 85%"></i
-                ><i style="--h: 60%"></i>
-              </div>
-              <div class="earn__row">
-                <span>Voice rate</span>
-                <strong>10 coins / min</strong>
-              </div>
-              <div class="earn__row">
-                <span>Video rate</span>
-                <strong>20 coins / min</strong>
-              </div>
-              <div class="earn__row">
-                <span>Next payout</span>
-                <strong>Monday</strong>
-              </div>
+          <div class="host-grid on-dark">
+            <div class="host-card" data-reveal>
+              <b>70%</b>
+              <strong>of every minute is yours</strong>
+              <span>Tracked to the second in your earnings wallet.</span>
+            </div>
+            <div class="host-card" data-reveal style="--d: 80ms">
+              <b>1 tap</b>
+              <strong>to go online or offline</strong>
+              <span>Instant availability toggle, no schedules to keep.</span>
+            </div>
+            <div class="host-card" data-reveal style="--d: 160ms">
+              <b>Weekly</b>
+              <strong>payouts to bank or UPI</strong>
+              <span>Block and report tools, with a moderation team behind you.</span>
             </div>
           </div>
+          <p style="text-align: center; margin-top: 36px" data-reveal>
+            <a class="btn btn--light" href="/download.html">Apply inside the app</a>
+          </p>
         </div>
       </section>
 
       <!-- Download -->
-      <section class="section section--download" id="download">
+      <section class="band band--paper2" id="download">
         <div class="container">
-          <div class="download">
-            <div class="download__copy">
-              <p class="kicker kicker--light">Download</p>
-              <h2>Get bebu for Android</h2>
+          <div class="getit" data-reveal>
+            <div class="getit__copy">
+              <p class="eyebrow">Get bebu for Android</p>
+              <h2 class="headline">Ready when you are.</h2>
               <p>
-                Early-access build, signed and ready to install. Version
-                <span data-version>—</span>. Requires Android 6.0 or newer.
+                A signed Android build, straight from us. Version <b data-version>—</b>. Download,
+                tap install, and you're talking to real people over voice and video.
               </p>
-              <div class="download__buttons" data-download-buttons>
-                <a class="btn btn--light btn--lg" href="#" data-download-primary>
-                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path
-                      d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.637.637 0 0 0-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67a.643.643 0 0 0-.87-.2c-.28.18-.37.54-.22.83L6.4 9.48A10.81 10.81 0 0 0 1 18h22a10.81 10.81 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"
-                    />
-                  </svg>
+              <div class="getit__actions" data-download-buttons>
+                <a class="btn btn--primary btn--lg" href="/download.html" data-download-primary>
                   <span data-download-primary-label>Download APK</span>
                 </a>
-                <a class="btn btn--outline-light btn--lg" href="/download">
-                  All builds &amp; install guide
+                <a class="link" href="/download.html#builds">
+                  All builds and checksums
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6" /></svg>
                 </a>
               </div>
-              <p class="download__note">
-                Not on the Play Store yet. When Android asks, allow installs from your browser or
-                file manager.
+              <p class="getit__copy" data-download-empty hidden>
+                The Android build is being prepared. Check back in a few minutes.
               </p>
+              <ul class="getit__facts">
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z" /><path d="m9 12 2 2 4-4" /></svg>
+                  Signed release
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h10M4 17h16" /></svg>
+                  SHA-256 published
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="3" /><path d="M11 18h2" /></svg>
+                  Android 6.0+
+                </li>
+              </ul>
             </div>
-
-            <div class="download__builds" data-builds hidden>
-              <table class="builds">
-                <thead>
-                  <tr>
-                    <th>Build</th>
-                    <th>Best for</th>
-                    <th>Size</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody data-builds-body></tbody>
-              </table>
-              <details class="checksums">
-                <summary>Verify your download (SHA-256)</summary>
-                <ul data-checksums></ul>
-              </details>
-            </div>
-
-            <div class="download__empty" data-download-empty hidden>
-              <p>The Android build is being prepared. Check back shortly.</p>
+            <div class="getit__art" aria-hidden="true">
+              <figure class="device">
+                <div class="device__screen">
+                  <img src="/screens/match_dark.webp" width="780" height="1688" alt="" loading="lazy" />
+                </div>
+              </figure>
             </div>
           </div>
-
-          <ol class="install">
-            <li><strong>Download</strong> the APK on your phone.</li>
-            <li><strong>Open</strong> it and allow installing from this source if prompted.</li>
-            <li><strong>Launch bebu</strong> and sign in. That's it.</li>
-          </ol>
         </div>
       </section>
 
       <!-- FAQ -->
-      <section class="section" id="faq">
+      <section class="band" id="faq">
         <div class="container container--narrow">
-          <div class="section__head">
-            <p class="kicker">FAQ</p>
-            <h2>Questions, answered</h2>
+          <div class="band__head">
+            <p class="eyebrow" data-reveal>FAQ</p>
+            <h2 class="headline" data-reveal style="--d: 60ms">Questions, answered.</h2>
           </div>
-          <div class="faq">
-            <details class="faq__item">
+          <div class="faq" data-reveal>
+            <details>
               <summary>How much does a call cost?</summary>
               <p>
-                Each caller sets a per-minute rate for voice and video, shown before you call. You
+                Each host sets a per-minute rate for voice and video, shown before you call. You
                 are charged per started minute from the moment you connect, and only while you're
-                connected.
+                on the call.
               </p>
             </details>
-            <details class="faq__item">
+            <details>
               <summary>What happens if my coins run out during a call?</summary>
               <p>
                 The app warns you when you're close to the limit. If your balance runs out, the call
                 ends gracefully — you're never charged more than you have.
               </p>
             </details>
-            <details class="faq__item">
+            <details>
               <summary>Why isn't bebu on the Play Store yet?</summary>
               <p>
                 We're in early access while we finish store review. The APK here is signed by us;
-                verify the SHA-256 checksum above if you want to be sure it hasn't been altered.
+                verify the SHA-256 checksum on the download page if you want to be sure it hasn't
+                been altered.
               </p>
             </details>
-            <details class="faq__item">
-              <summary>Is my number or identity shared with callers?</summary>
+            <details>
+              <summary>Is my number or identity shared with hosts?</summary>
               <p>
-                No. Calls run through our servers using temporary session tokens. Callers see your
-                display name only, and you can block or report anyone at any time.
+                No. Calls run through our servers using temporary session tokens. Hosts see your
+                display name and avatar only, and you can block or report anyone at any time.
               </p>
             </details>
-            <details class="faq__item">
-              <summary>How do I become a caller?</summary>
+            <details>
+              <summary>How do I become a host?</summary>
               <p>
-                Open the app, go to your profile and tap "Become a caller". You'll complete a short
+                Open the app, go to your profile and tap “Become a host”. You'll complete a short
                 verification, set your rates, and can go online as soon as you're approved.
               </p>
             </details>
-            <details class="faq__item">
+            <details>
               <summary>Can I get a refund?</summary>
               <p>
                 Unused coins are refundable within the terms of our
-                <a href="https://bebuapp.in/refunds" rel="noopener">refund policy</a>. Minutes
-                already talked are not refundable, since the caller has already been paid for them.
+                <a class="link" href="https://bebuapp.in/refunds" rel="noopener">refund policy</a>.
+                Minutes already spent on calls are not refundable.
               </p>
             </details>
           </div>
@@ -509,45 +518,54 @@
       </section>
 
       <!-- Final CTA -->
-      <section class="cta">
-        <div class="container cta__inner">
-          <h2>Someone's ready to talk right now.</h2>
-          <p>Download bebu and start your first conversation today.</p>
-          <a class="btn btn--primary btn--lg" href="#download">Download for Android</a>
+      <section class="band band--night-2">
+        <div class="container">
+          <div class="finale on-dark">
+            <h2 class="headline" data-reveal>Someone's ready to talk<br />right now.</h2>
+            <p data-reveal style="--d: 60ms">
+              Free to install. Coins only while you're connected. Version <b data-version>—</b>.
+            </p>
+            <a class="btn btn--light btn--lg" href="/download.html" data-reveal style="--d: 120ms">Download for Android</a>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="container footer__grid">
+    <footer class="site-footer site-footer--dark">
+      <div class="container site-footer__grid">
         <div>
-          <a class="brand" href="#top">
+          <a class="brand" href="/" aria-label="bebu home">
             <span class="brand__mark" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path
-                  d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
-                />
+                <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
               </svg>
             </span>
-            <span class="brand__name">bebu</span>
+            <span>bebu</span>
           </a>
-          <p class="footer__tag">Real conversations, one tap away.</p>
+          <p class="site-footer__tagline">Real conversations, one tap away.</p>
         </div>
-        <nav aria-label="Legal">
-          <h4>Legal</h4>
-          <a href="https://bebuapp.in/privacy" rel="noopener">Privacy policy</a>
-          <a href="https://bebuapp.in/terms" rel="noopener">Terms of service</a>
-          <a href="https://bebuapp.in/refunds" rel="noopener">Refund policy</a>
+        <nav aria-label="Product">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#match">Random match</a>
+          <a href="#studio">Avatar Studio</a>
+          <a href="#hosts">For hosts</a>
         </nav>
-        <nav aria-label="Support">
-          <h4>Support</h4>
-          <a href="https://bebuapp.in/support" rel="noopener">Help centre</a>
+        <nav aria-label="Download">
+          <h4>Download</h4>
+          <a href="/download.html">Android APK</a>
+          <a href="/download.html#builds">All builds</a>
+          <a href="/download.html#verify">Checksums</a>
+        </nav>
+        <nav aria-label="Company">
+          <h4>Company</h4>
+          <a href="mailto:hello@bebuapp.in">Contact</a>
           <a href="#faq">FAQ</a>
-          <a href="/admin">Operator console</a>
+          <a href="/admin/">Admin</a>
         </nav>
       </div>
-      <div class="container footer__bottom">
-        <span>© <span data-year>2026</span> bebu. All rights reserved.</span>
+      <div class="container site-footer__bottom">
+        <span>© <span data-year></span> bebu. All rights reserved.</span>
         <span>Made in India</span>
       </div>
     </footer>

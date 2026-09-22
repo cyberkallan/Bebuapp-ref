@@ -1,5 +1,7 @@
 import qrcode from 'qrcode-generator';
 
+import { setupHeader, setupReveal, setupYear } from './reveal';
+
 type Abi = 'arm64-v8a' | 'armeabi-v7a' | 'x86_64' | 'universal';
 
 interface Build {
@@ -11,7 +13,7 @@ interface Build {
 }
 
 interface ReleaseNote {
-  type: 'new' | 'improved' | 'fix';
+  type: 'new' | 'improved' | 'fix' | 'fixed';
   title: string;
   body?: string;
 }
@@ -92,50 +94,6 @@ function guessAbi(builds: Build[]): Build | undefined {
 
 function downloadHref(build: Build): string {
   return `/downloads/${encodeURIComponent(build.file)}`;
-}
-
-function setupHeader(): void {
-  const header = $<HTMLElement>('[data-header]');
-  const toggle = $<HTMLButtonElement>('[data-nav-toggle]');
-  const links = $<HTMLElement>('#nav-links');
-  if (!header || !toggle || !links) return;
-
-  const onScroll = (): void => {
-    header.classList.toggle('is-scrolled', window.scrollY > 8);
-  };
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
-
-  toggle.addEventListener('click', () => {
-    const open = links.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', String(open));
-  });
-  links.addEventListener('click', (event) => {
-    if ((event.target as HTMLElement).tagName === 'A') {
-      links.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-    }
-  });
-}
-
-function setupTilt(): void {
-  const stage = $<HTMLElement>('[data-tilt]');
-  const phone = stage ? $<HTMLElement>('.dl-phone', stage) : null;
-  if (!stage || !phone) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!window.matchMedia('(pointer: fine)').matches) return;
-
-  stage.addEventListener('pointermove', (event) => {
-    const rect = stage.getBoundingClientRect();
-    const px = (event.clientX - rect.left) / rect.width - 0.5;
-    const py = (event.clientY - rect.top) / rect.height - 0.5;
-    phone.style.setProperty('--ry', `${(-14 + px * 26).toFixed(2)}deg`);
-    phone.style.setProperty('--rx', `${(6 - py * 18).toFixed(2)}deg`);
-  });
-  stage.addEventListener('pointerleave', () => {
-    phone.style.removeProperty('--ry');
-    phone.style.removeProperty('--rx');
-  });
 }
 
 function setupTabs(): void {
@@ -272,7 +230,7 @@ function renderBuilds(builds: Build[], primary: Build | undefined): void {
         <p class="dl-build__for">${escapeHtml(info.bestFor)}</p>
         <div class="dl-build__foot">
           <span class="dl-build__size">${formatBytes(b.bytes)}<small>v${escapeHtml(b.version ?? '—')}</small></span>
-          <a class="btn ${recommended ? 'btn--primary' : 'btn--ghost-dark'}" href="${downloadHref(b)}" download="${escapeHtml(b.file)}">Download</a>
+          <a class="btn ${recommended ? 'btn--primary' : 'btn--ghost'}" href="${downloadHref(b)}" download="${escapeHtml(b.file)}">Download</a>
         </div>
       </article>`;
     })
@@ -324,11 +282,12 @@ function renderNotes(manifest: Manifest): void {
     new: 'New',
     improved: 'Improved',
     fix: 'Fixed',
+    fixed: 'Fixed',
   };
   list.innerHTML = items
     .map(
       (n) => `<li>
-        <span class="dl-notes__tag dl-notes__tag--${n.type}">${labels[n.type]}</span>
+        <span class="dl-notes__tag dl-notes__tag--${n.type}">${labels[n.type] ?? 'Update'}</span>
         <span><b>${escapeHtml(n.title)}</b>${n.body ? ` — ${escapeHtml(n.body)}` : ''}</span>
       </li>`,
     )
@@ -345,14 +304,9 @@ async function loadManifest(): Promise<Manifest> {
   }
 }
 
-function setupYear(): void {
-  const el = $<HTMLElement>('[data-year]');
-  if (el) el.textContent = String(new Date().getFullYear());
-}
-
 async function main(): Promise<void> {
   setupHeader();
-  setupTilt();
+  setupReveal();
   setupTabs();
   setupSticky();
   setupYear();
