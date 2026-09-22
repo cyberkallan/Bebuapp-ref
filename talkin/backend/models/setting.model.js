@@ -67,6 +67,29 @@ const settingSchema = new mongoose.Schema(
       haptics: { type: Boolean, default: true }, // vibration feedback on taps, sends, unlocks
     },
 
+    // Sign-in methods offered by the app and which one is the hero button.
+    // Presets in the admin panel just write these flags (see docs/login-rewards.md).
+    login: {
+      quick: { type: Boolean, default: true }, // anonymous one-tap login
+      google: { type: Boolean, default: true },
+      phone: { type: Boolean, default: true }, // Firebase phone OTP
+      email: { type: Boolean, default: false }, // email + password
+      primary: { type: String, default: "google" }, // google | phone | quick | email
+      showWelcomeBonus: { type: Boolean, default: true }, // "Get X free coins" teaser on the sign-in screen
+      requireConsentCheckbox: { type: Boolean, default: false }, // false = implicit "By continuing you agree"
+      headline: { type: String, default: "" }, // optional override for the sign-in headline
+    },
+
+    // Daily streak reward: claimed once per calendar day (timezone below).
+    // coins[i] is the reward on streak day i+1; the schedule loops after the last day.
+    dailyReward: {
+      enabled: { type: Boolean, default: true },
+      coins: { type: [Number], default: [10, 15, 20, 25, 30, 40, 60] },
+      resetStreakOnMiss: { type: Boolean, default: true },
+      timezone: { type: String, default: "Asia/Kolkata" },
+      autoOpen: { type: Boolean, default: true }, // pop the reward sheet automatically on home when claimable
+    },
+
     // Avatar Studio: 3D avatar + scene items users unlock with coins.
     // When disabled the app falls back to photo upload + 3 male / 3 female presets.
     avatarStudio: {

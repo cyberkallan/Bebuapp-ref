@@ -1,3 +1,6 @@
+const { normalizeLogin, normalizeReward } = require("../../util/loginRewards");
+const { normalizeAppearance } = require("../admin/appearance.controller");
+
 //get setting
 exports.fetchAppSettingsData = async (req, res) => {
   try {
@@ -8,6 +11,8 @@ exports.fetchAppSettingsData = async (req, res) => {
 
     const data = typeof setting.toObject === "function" ? setting.toObject() : { ...setting };
     delete data.aiChat; // provider API keys never leave the server
+    data.login = normalizeLogin(data.login);
+    data.dailyReward = normalizeReward(data.dailyReward);
 
     return res.status(200).json({ status: true, message: "Success", data });
   } catch (error) {
@@ -16,7 +21,7 @@ exports.fetchAppSettingsData = async (req, res) => {
   }
 };
 
-//get setting
+//get setting (public, fetched before login: powers the sign-in screen)
 exports.getAppConfiguration = async (req, res) => {
   try {
     const setting = settingJSON ? settingJSON : null;
@@ -24,9 +29,14 @@ exports.getAppConfiguration = async (req, res) => {
       return res.status(200).json({ status: false, message: "Setting does not found." });
     }
 
+    const dailyReward = normalizeReward(setting.dailyReward);
     const filteredData = {
       userPrivacyPolicyUrl: setting.userPrivacyPolicyUrl,
       isApplicationLive: setting.isApplicationLive,
+      login: normalizeLogin(setting.login),
+      appearance: normalizeAppearance(setting.appearance),
+      welcomeCoins: Number(setting.dailyLoginBonusCoins) || 0,
+      dailyReward: { enabled: dailyReward.enabled, coins: dailyReward.coins },
     };
 
     return res.status(200).json({ status: true, message: "Success", data: filteredData });

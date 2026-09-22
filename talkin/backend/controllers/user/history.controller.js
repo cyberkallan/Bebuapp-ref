@@ -63,7 +63,7 @@ exports.getCoinWalletRecords = async (req, res) => {
             receiverImage: { $ifNull: ["$listener.image", ""] },
             isIncome: {
               $cond: {
-                if: { $in: ["$type", [1, 2]] },
+                if: { $in: ["$type", [1, 2, 9]] },
                 then: true,
                 else: {
                   $cond: {

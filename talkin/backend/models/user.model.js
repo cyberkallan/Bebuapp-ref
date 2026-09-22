@@ -54,6 +54,15 @@ const userSchema = new mongoose.Schema(
     lastlogin: { type: String, default: "" },
     date: { type: String, default: "" },
 
+    // Daily streak reward progress (see controllers/user/dailyReward.controller.js).
+    dailyReward: {
+      lastClaimDate: { type: String, default: "" }, // YYYY-MM-DD in the configured timezone
+      streak: { type: Number, default: 0 },
+      bestStreak: { type: Number, default: 0 },
+      totalClaims: { type: Number, default: 0 },
+      totalCoins: { type: Number, default: 0 },
+    },
+
     interests: {
       therapyType: { type: String, default: "" },
       gender: { type: String, default: "" },
