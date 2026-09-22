@@ -11,6 +11,7 @@ import 'package:talk_in/custom/listeners/listener_actions.dart';
 import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/gifts/controller/gift_controller.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/controller/personal_chat_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/model/personal_chat_model.dart';
 import 'package:talk_in/utils/api.dart';
@@ -438,6 +439,16 @@ class _InputBar extends StatelessWidget {
               c.showImagePickerDialog();
             },
             tooltip: 'Send a photo',
+          ),
+          GetBuilder<GiftController>(
+            id: GiftController.idCatalog,
+            init: GiftController.to,
+            builder: (g) => g.showInChat
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: _GiftButton(onTap: () => c.openGiftSheet(context)),
+                  )
+                : const SizedBox.shrink(),
           ),
           Expanded(
             child: TextField(
@@ -870,4 +881,61 @@ class _WavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WavePainter o) => o.progress != progress || o.on != on || o.shape != shape;
+}
+
+
+/// Gradient gift button in the composer; a slow shimmer keeps it discoverable
+/// without shouting.
+class _GiftButton extends StatefulWidget {
+  const _GiftButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  State<_GiftButton> createState() => _GiftButtonState();
+}
+
+class _GiftButtonState extends State<_GiftButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2800));
+
+  @override
+  void initState() {
+    super.initState();
+    if (!BebuTheme.reducedMotion) _c.repeat();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Send a gift',
+      child: PressScale(
+        onTap: widget.onTap,
+        scale: 0.9,
+        child: RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: _c,
+            builder: (_, __) {
+              final t = _c.value;
+              final wiggle = t < 0.12 ? math.sin(t / 0.12 * math.pi * 3) * 0.16 : 0.0;
+              return Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: BebuTheme.pinkGradient,
+                  boxShadow: [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.28 + 0.12 * math.sin(t * math.pi * 2)), blurRadius: 12, offset: const Offset(0, 4))],
+                ),
+                child: Transform.rotate(angle: wiggle, child: const Icon(Icons.card_giftcard_rounded, size: 20, color: Colors.white)),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }

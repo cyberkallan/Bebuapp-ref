@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/custom/custom_profile/custom_profile_image.dart';
 import 'package:talk_in/socket/socket_emit.dart';
+import 'package:talk_in/ui/user_flow/gifts/view/call_gift_button.dart';
 import 'package:talk_in/ui/user_flow/voice_call_screen/controller/voice_call_controller.dart';
 import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_color.dart';
@@ -290,6 +291,16 @@ class VoiceCallView1 extends StatelessWidget {
                           },
                         );
                       }),
+                  CallGiftButton(
+                    callerId: controller.callerId,
+                    receiverId: controller.receiverId,
+                    callerRole: controller.callerRole,
+                    receiverRole: controller.receiverRole,
+                    otherName: controller.receiverName,
+                    otherImage: controller.receiverImage,
+                    callId: controller.callId,
+                    label: 'Gift',
+                  ),
                   buildControlButton(
                     text: EnumLocale.txtEndCall.name.tr,
                     icon: AppAsset.callCut,

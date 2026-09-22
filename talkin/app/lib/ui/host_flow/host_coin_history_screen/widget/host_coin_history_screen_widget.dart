@@ -299,7 +299,9 @@ class HostCoinHistoryScreenTabBarScreen extends StatelessWidget {
                                                                             ? AppAsset.callIcon
                                                                             : item.type == 6
                                                                                 ? AppAsset.videoCallIcon
-                                                                                : AppAsset.loginBonusIcon,
+                                                                                : item.type == 10
+                                                                                    ? AppAsset.coinPurchaseIcon
+                                                                                    : AppAsset.loginBonusIcon,
                                                             color: AppColors.historyCallType,
                                                             height: 12,
                                                             width: 12,
@@ -316,12 +318,14 @@ class HostCoinHistoryScreenTabBarScreen extends StatelessWidget {
                                                                             ? "Random audio call"
                                                                             : item.type == 6
                                                                                 ? "Random video call"
-                                                                                : "Log In Bonus",
+                                                                                : item.type == 10
+                                                                                    ? "Gift received"
+                                                                                    : "Log In Bonus",
                                                             style: AppFontStyle.fontStyleW500(fontSize: 11, fontColor: AppColors.historyCallType),
                                                           ).paddingOnly(right: 6),
                                                           Text(
                                                             textAlign: TextAlign.center,
-                                                            item.type == 1 || item.type == 2
+                                                            item.type == 1 || item.type == 2 || item.type == 10
                                                                 ? ""
                                                                 : item.duration == null
                                                                     ? ''

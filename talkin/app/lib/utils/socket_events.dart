@@ -41,4 +41,7 @@ class SocketEvents {
   /// coin cut call
   static const callCoinsDeducted = "callCoinsDeducted";
   static const notEnoughCoins = "notEnoughCoins";
+
+  /// a user sent me (host) a gift — payload is the gift chat message
+  static const giftReceived = "giftReceived";
 }

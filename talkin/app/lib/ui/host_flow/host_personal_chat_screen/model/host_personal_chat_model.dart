@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:talk_in/ui/user_flow/gifts/model/gift_model.dart';
+
 HostPersonalChatModel hostPersonalChatModelFromJson(String str) => HostPersonalChatModel.fromJson(json.decode(str));
 
 String hostPersonalChatModelToJson(HostPersonalChatModel data) => json.encode(data.toJson());
@@ -52,6 +54,9 @@ class ListenerChat {
   DateTime? createdAt;
   DateTime? updatedAt;
 
+  /// Present on messageType 6 (gift received from a user).
+  GiftSnapshot? gift;
+
   ListenerChat({
     this.id,
     this.chatTopicId,
@@ -67,6 +72,7 @@ class ListenerChat {
     this.callType,
     this.createdAt,
     this.updatedAt,
+    this.gift,
   });
 
   factory ListenerChat.fromJson(Map<String, dynamic> json) => ListenerChat(
@@ -84,6 +90,7 @@ class ListenerChat {
         callType: json["callType"],
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        gift: GiftSnapshot.tryParse(json),
       );
 
   Map<String, dynamic> toJson() => {

@@ -57,6 +57,14 @@ class Utils {
     }
   }
 
+  /// 950 → "950", 1200 → "1.2K", 25000 → "25K", 1_500_000 → "1.5M".
+  static String formatCompact(int n) {
+    if (n.abs() < 1000) return n.toString();
+    String trim(double v) => v.toStringAsFixed(v.truncateToDouble() == v || v >= 100 ? 0 : 1);
+    if (n.abs() < 1000000) return '${trim(n / 1000)}K';
+    return '${trim(n / 1000000)}M';
+  }
+
   static String formatDateToApi(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
   }

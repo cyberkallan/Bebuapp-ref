@@ -13,6 +13,7 @@ import 'package:record/record.dart';
 import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/socket/socket_emit.dart';
 import 'package:talk_in/socket/socket_service.dart';
+import 'package:talk_in/ui/user_flow/gifts/controller/gift_controller.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/api/personal_chat_api.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/api/send_image_audio_api.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/model/personal_chat_model.dart';
@@ -328,6 +329,30 @@ class PersonalChatScreenController extends GetxController {
         SocketEmit.sendMessage(_payload(messageType: 1, localId: msg.localId!, message: msg.message ?? ''));
     }
     _armAck(msg.localId!);
+  }
+
+  /// Gift picker for this conversation. The server writes the gift message
+  /// and echoes it over the socket; we insert the returned copy right away so
+  /// the bubble is there when the sheet closes, and dedupe the echo by id.
+  Future<void> openGiftSheet(BuildContext context) async {
+    if (receiverId == null || receiverId!.isEmpty) return;
+    Sfx.tick();
+    await GiftController.to.open(
+      context,
+      GiftTarget(listenerId: receiverId!, listenerName: receiverName ?? '', listenerImage: receiverImage ?? '', chatTopicId: chatTopicId, context: 'chat'),
+      onSent: (gift, result) {
+        chatTopicId ??= result.chatTopicId;
+        if (chatTopicId != null && chatTopicId!.isNotEmpty) chatRoomId = chatTopicId;
+        final m = result.chatMessage;
+        if (m == null) return;
+        final msg = PersonalChat.fromJson(m);
+        msg.id = m['messageId']?.toString() ?? msg.id;
+        if (msg.id != null && oldChat.any((x) => x.id == msg.id)) return;
+        oldChat.insert(0, msg);
+        update([Constant.idGetOldChat]);
+        onScrollDown();
+      },
+    );
   }
 
   /// Called by [SocketListen] for every `messageDispatched` in this topic.

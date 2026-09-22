@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:talk_in/socket/socket_emit.dart';
+import 'package:talk_in/ui/user_flow/gifts/view/call_gift_button.dart';
 import 'package:talk_in/ui/user_flow/video_call_screen/controller/video_call_controller.dart';
 import 'package:talk_in/utils/app_asset.dart';
 import 'package:talk_in/utils/app_color.dart';
@@ -142,6 +143,15 @@ class VideoCallView1 extends StatelessWidget {
                           onTap: () {
                             logic.onCameraTurn();
                           },
+                        ),
+                        CallGiftButton(
+                          callerId: logic.callerId,
+                          receiverId: logic.receiverId,
+                          callerRole: logic.callerRole,
+                          receiverRole: logic.receiverRole,
+                          otherName: logic.receiverName,
+                          otherImage: logic.receiverImage,
+                          callId: logic.callId,
                         ),
                         ControlButton(
                           icon: AppAsset.callCut,

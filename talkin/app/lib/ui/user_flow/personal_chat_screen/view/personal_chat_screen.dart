@@ -5,6 +5,8 @@ import 'package:talk_in/ui/user_flow/personal_chat_screen/controller/personal_ch
 import 'package:talk_in/ui/user_flow/personal_chat_screen/model/personal_chat_model.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/widget/personal_chat_dark_widgets.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/widget/personal_chat_screen_widget.dart';
+import 'package:talk_in/ui/user_flow/gifts/view/gift_bubble.dart';
+import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
@@ -94,6 +96,18 @@ class PersonalChatScreen extends StatelessWidget {
         return _aligned(msg, ChatImageWidget(msg: msg, controller: controller, isRead: msg.isRead ?? false));
       case 3:
         return DarkVoiceBubble(key: ValueKey(msg.localId ?? msg.id ?? msg.audio), msg: msg, controller: controller, isRead: msg.isRead ?? false, showAvatar: showAvatar);
+      case 6:
+        if (msg.gift == null) return const SizedBox.shrink();
+        final mine = msg.senderId == Database.loginUserId;
+        return GiftBubble(
+          key: ValueKey(msg.id ?? msg.localId),
+          gift: msg.gift!,
+          mine: mine,
+          time: controller.formatTimeFromDate(msg.date),
+          otherName: controller.receiverName ?? '',
+          avatar: showAvatar ? ClipOval(child: ListenerPhoto(image: controller.receiverImage, scrim: false)) : null,
+          trailing: mine ? DeliveryTicks(msg: msg, isRead: msg.isRead ?? false) : null,
+        );
       default:
         return const SizedBox.shrink();
     }

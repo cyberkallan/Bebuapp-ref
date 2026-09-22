@@ -12,6 +12,8 @@ import 'package:talk_in/ui/host_flow/host_home_screen/model/listener_coin_model.
 import 'package:talk_in/ui/host_flow/host_personal_chat_screen/controller/host_personal_chat_screen_controller.dart';
 import 'package:talk_in/ui/host_flow/host_personal_chat_screen/model/host_personal_chat_model.dart';
 import 'package:talk_in/ui/user_flow/call_cut_screen/controller/call_cut_controller.dart';
+import 'package:talk_in/ui/user_flow/gifts/controller/gift_controller.dart';
+import 'package:talk_in/ui/user_flow/gifts/model/gift_model.dart';
 import 'package:talk_in/ui/user_flow/home_screen/api/user_coin_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/user_coin_model.dart';
 import 'package:talk_in/ui/user_flow/personal_chat_screen/controller/personal_chat_screen_controller.dart';
@@ -65,6 +67,7 @@ class SocketListen {
     bind(SocketEvents.notEnoughCoins, handleNotEnoughCoins);
     bind(SocketEvents.callCoinsDeducted, handleCallCoinsDeducted);
     bind(SocketEvents.callCutData, handleCallCutData);
+    bind(SocketEvents.giftReceived, handleGiftReceived);
   }
 
   static void handleSendMessage(dynamic message) {
@@ -466,6 +469,32 @@ class SocketListen {
   static void handleRandomCallRinging(dynamic data) {
     Utils.showLog("Socket Listen => random call incomingRingingStarted (error or status): $data");
     Utils.showToast(Get.context!, data['message']);
+  }
+
+  /// Host side: a user sent me a gift. Play the celebration wherever I am
+  /// (chat, call, home) and refresh my earnings pill.
+  static Future<void> handleGiftReceived(dynamic message) async {
+    Utils.showLog("Socket Listen => giftReceived: $message");
+    try {
+      final data = Map<String, dynamic>.from(message as Map);
+      final myListenerId = Database.fetchListenerProfileModel?.data?.id ?? Database.fetchLoginUserProfileModel?.user?.listenerId;
+      if (myListenerId == null || data['receiverId']?.toString() != myListenerId) return;
+      final gift = GiftSnapshot.tryParse(data);
+      if (gift == null) return;
+      final ctx = Get.overlayContext ?? Get.context;
+      if (ctx != null) {
+        final earned = int.tryParse(data['hostCoins']?.toString() ?? '') ?? gift.coins;
+        GiftController.to.celebrateIncoming(ctx, GiftSnapshot(id: gift.id, name: gift.name, image: gift.image, accent: gift.accent, coins: earned), fromName: data['name']?.toString() ?? '');
+      }
+      if (Get.isRegistered<HostHomeScreenController>()) {
+        final host = Get.find<HostHomeScreenController>();
+        final listenerCoinModel = await HostCoinApi.callApi();
+        if (listenerCoinModel != null) Database.onSetListenerCoin(listenerCoinModel.coin.toString());
+        host.update([Constant.idCoinUpdate]);
+      }
+    } catch (e) {
+      Utils.showLog("giftReceived handler error: $e");
+    }
   }
 
   static void handleNotEnoughCoins(dynamic data) {

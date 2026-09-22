@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:talk_in/ui/user_flow/gifts/model/gift_model.dart';
+
 PersonalChatModel personalChatModelFromJson(String str) => PersonalChatModel.fromJson(json.decode(str));
 
 String personalChatModelToJson(PersonalChatModel data) => json.encode(data.toJson());
@@ -52,6 +54,9 @@ class PersonalChat {
   DateTime? createdAt;
   DateTime? updatedAt;
 
+  /// Present on messageType 6 (gift).
+  GiftSnapshot? gift;
+
   /// Local-only delivery state for my own messages (never serialised).
   /// `pending` = optimistic, waiting for the server echo; `failed` = no echo
   /// within the timeout, tap to retry.
@@ -77,6 +82,7 @@ class PersonalChat {
     this.callType,
     this.createdAt,
     this.updatedAt,
+    this.gift,
     this.pending = false,
     this.failed = false,
     this.localId,
@@ -98,6 +104,7 @@ class PersonalChat {
         createdAt: json["createdAt"] == null ? null : DateTime.tryParse(json["createdAt"].toString()),
         updatedAt: json["updatedAt"] == null ? null : DateTime.tryParse(json["updatedAt"].toString()),
         localId: json["localId"]?.toString(),
+        gift: GiftSnapshot.tryParse(json),
       );
 
   Map<String, dynamic> toJson() => {

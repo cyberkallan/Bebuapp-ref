@@ -104,6 +104,23 @@ class Sfx {
     return _ui ? _play(_p, 'audio/unlock.mp3', volume: 0.5) : Future.value();
   }
 
+  // ---- gifts -------------------------------------------------------------
+
+  /// Gift launched: a heavy tap, a quick second thump as it lands, then a
+  /// whoosh into a rising sparkle chord.
+  static Future<void> giftSend() {
+    _h(HapticFeedback.heavyImpact);
+    Future.delayed(const Duration(milliseconds: 260), () => _h(HapticFeedback.mediumImpact));
+    Future.delayed(const Duration(milliseconds: 780), () => _h(HapticFeedback.lightImpact));
+    return _ui ? _play(_p, 'audio/gift_send.mp3', volume: 0.7) : Future.value();
+  }
+
+  /// A gift arrived for me (host side): medium tap + soft bell.
+  static Future<void> giftReceived() {
+    mediumTap();
+    return _ui ? _play(_p, 'audio/gift_in.mp3', volume: 0.6) : Future.value();
+  }
+
   // ---- chat tones (WhatsApp-style) ---------------------------------------
 
   /// My message left the phone: light tap + short rising "swoosh".

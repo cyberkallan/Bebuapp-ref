@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:talk_in/custom/listeners/listener_photo_card.dart';
+import 'package:talk_in/ui/user_flow/gifts/view/gift_bubble.dart';
 import 'package:get/get.dart';
 import 'package:talk_in/custom/custom_audio_time/custom_format_audio_time.dart';
 import 'package:talk_in/ui/host_flow/host_personal_chat_screen/controller/host_personal_chat_screen_controller.dart';
@@ -84,7 +86,16 @@ class HostPersonalChatScreen extends StatelessWidget {
                                                                   id: msg.id ?? "",
                                                                   chat: msg,
                                                                 )
-                                                          : SizedBox();
+                                                          : msg.messageType == 6 && msg.gift != null
+                                                              ? GiftBubble(
+                                                                  key: ValueKey(msg.id),
+                                                                  gift: msg.gift!,
+                                                                  mine: msg.senderId == Database.fetchLoginUserProfileModel?.user?.listenerId,
+                                                                  time: controller.formatTimeFromDate(msg.date),
+                                                                  otherName: controller.receiverName ?? '',
+                                                                  avatar: ClipOval(child: ListenerPhoto(image: controller.receiverImage, scrim: false)),
+                                                                )
+                                                              : SizedBox();
 
                                       // Widget messageWidget;
                                       //
