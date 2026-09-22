@@ -3,6 +3,16 @@
  "items": [
   {
    "type": "new",
+   "title": "Gifts: send a little something to your host",
+   "body": "A new gift button sits beside the message box and in the voice and video call bars. Pick from ten 3D gifts (rose, heart, chocolate, teddy, cake, bouquet, ring, gem, crown, rocket), see exactly how many coins it costs against your balance, and send it with one tap. The gift lifts off the screen in a full-screen celebration with sound and haptics, lands in the chat as a gift bubble, and the host sees the same celebration the moment it arrives. AI hosts say thank you. Coins come straight from your wallet; if a gift costs more than you have, the button takes you to top up."
+  },
+  {
+   "type": "improved",
+   "title": "Admin controls every coin",
+   "body": "Admin → Gifts is a full gift catalog: turn gifting on or off for the whole app (users then see nothing gift-related), set how much of each gift the host earns, show or hide the button in chat and in calls, and add, edit, reorder, hide or price each gift with your own artwork. Admin → Coins & Rewards sets the welcome bonus and the day-by-day daily streak coins."
+  },
+  {
+   "type": "new",
    "title": "Login now works: Google, phone OTP, guest",
    "body": "The app moved to bebu's own Firebase project and the new package name in.bebuapp.app, so Continue with Google, phone codes and one-tap guest sign-in are live, and push notifications come from our own server. This is a fresh install: uninstall any older bebu build first."
   },

@@ -5,13 +5,26 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.7.2-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
-| `bebu-1.7.2-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
+| `bebu-1.8.0-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
+| `bebu-1.8.0-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.8.0` adds gifts. A gift button sits beside the message box and in the voice
+/ video call bars; the sheet shows ten 3D gifts (rose 5 · heart 10 · chocolate
+20 · teddy 50 · cake 100 · bouquet 200 · ring 500 · gem 1,000 · crown 2,000 ·
+rocket 5,000 coins by default) against the live wallet balance. Sending plays a
+full-screen celebration with sound and haptics, drops a gift bubble into the
+chat, credits the host their share and shows the same celebration on the
+host's phone; AI hosts reply with a thank-you. Admin → Gifts is the master
+switch (off hides everything gift-related in the app), host share %, chat /
+call visibility and the catalog itself (add, edit, price, reorder, hide, own
+artwork). Admin → Coins & Rewards holds the welcome bonus and daily streak
+coins. The admin panel is fully rebranded to bebu by Elevanza Ltd. Installs
+over `1.7.2`.
 
 `1.7.2` is the first build on bebu's own Firebase project (`neocat-ceae7`) and
 package name **`in.bebuapp.app`**: Google sign-in, phone OTP (with two free
