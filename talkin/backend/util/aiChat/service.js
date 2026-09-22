@@ -113,6 +113,7 @@ function historyToMessages(chats, listenerId) {
     if (c.messageType === 2) content = "[sent a photo]";
     else if (c.messageType === 3) content = "[sent a voice note]";
     else if (c.messageType === 4 || c.messageType === 5) content = `[${c.messageType === 5 ? "video" : "voice"} call]`;
+    else if (c.messageType === 6) content = `[sent you a gift: ${c.gift?.name || "gift"} worth ${c.gift?.coins || 0} coins]`;
     return { role, content: content || "…" };
   });
 }
@@ -265,7 +266,7 @@ async function onIncomingMessage(ctx) {
     const tone = profile?.tone || cfg.tone || "warm";
 
     const [chats, messageCount] = await Promise.all([
-      Chat.find({ chatTopicId: ctx.chatTopic._id, messageType: { $in: [1, 2, 3, 4, 5] } })
+      Chat.find({ chatTopicId: ctx.chatTopic._id, messageType: { $in: [1, 2, 3, 4, 5, 6] } })
         .sort({ createdAt: -1 })
         .limit(Math.max(2, Number(cfg.memoryMessages || 12)))
         .lean(),
@@ -274,6 +275,8 @@ async function onIncomingMessage(ctx) {
     let history = historyToMessages(chats, listener._id);
     // Ensure the triggering message is present even if the save raced us.
     const latestText = ctx.messageType === 2 ? "[sent a photo]" : ctx.messageType === 3 ? "[sent a voice note]" : ctx.message || "";
+    // A gift always deserves a reaction, even right after the user's own text.
+    if (ctx.messageType === 6 && history[history.length - 1]?.content !== latestText) history.push({ role: "user", content: latestText });
     if (!history.length || history[history.length - 1].role !== "user") history.push({ role: "user", content: latestText || "…" });
 
     let texts;

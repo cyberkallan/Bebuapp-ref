@@ -80,6 +80,17 @@ const settingSchema = new mongoose.Schema(
       headline: { type: String, default: "" }, // optional override for the sign-in headline
     },
 
+    // Virtual gifts users send hosts from chat or during a call (see docs/gifts.md).
+    // Hidden everywhere in the app when enabled is false.
+    gift: {
+      enabled: { type: Boolean, default: true },
+      hostSharePercent: { type: Number, default: 70 }, // % of the gift's coins credited to the host; the rest is platform revenue
+      showInChat: { type: Boolean, default: true },
+      showInCall: { type: Boolean, default: true },
+      aiThankYou: { type: Boolean, default: true }, // AI-powered fake hosts reply to a gift
+      minBalanceHint: { type: Boolean, default: true }, // show "top up" nudge on gifts the user can't afford yet
+    },
+
     // Daily streak reward: claimed once per calendar day (timezone below).
     // coins[i] is the reward on streak day i+1; the schedule loops after the last day.
     dailyReward: {

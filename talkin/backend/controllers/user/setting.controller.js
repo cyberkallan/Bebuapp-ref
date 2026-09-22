@@ -1,4 +1,5 @@
 const { normalizeLogin, normalizeReward } = require("../../util/loginRewards");
+const { normalizeGiftSettings } = require("../../util/gifts");
 const { normalizeAppearance } = require("../admin/appearance.controller");
 
 //get setting
@@ -13,6 +14,7 @@ exports.fetchAppSettingsData = async (req, res) => {
     delete data.aiChat; // provider API keys never leave the server
     data.login = normalizeLogin(data.login);
     data.dailyReward = normalizeReward(data.dailyReward);
+    data.gift = normalizeGiftSettings(data.gift);
 
     return res.status(200).json({ status: true, message: "Success", data });
   } catch (error) {

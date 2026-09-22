@@ -1,0 +1,84 @@
+{
+  "items": [
+    {
+      "key": "rose",
+      "name": "Rose",
+      "coins": 5,
+      "accent": "#FF4D6D",
+      "tagline": "A little red rose to say hi",
+      "sortOrder": 1
+    },
+    {
+      "key": "heart",
+      "name": "Heart",
+      "coins": 10,
+      "accent": "#FF3B8D",
+      "tagline": "Because they made you smile",
+      "sortOrder": 2
+    },
+    {
+      "key": "chocolate",
+      "name": "Chocolate",
+      "coins": 20,
+      "accent": "#B5651D",
+      "tagline": "Sweet treat, sweeter chat",
+      "sortOrder": 3
+    },
+    {
+      "key": "teddy",
+      "name": "Teddy",
+      "coins": 50,
+      "accent": "#F2A65A",
+      "tagline": "A warm hug in bear form",
+      "sortOrder": 4
+    },
+    {
+      "key": "cake",
+      "name": "Cake",
+      "coins": 100,
+      "accent": "#FFB86B",
+      "tagline": "Make the moment a party",
+      "sortOrder": 5
+    },
+    {
+      "key": "bouquet",
+      "name": "Bouquet",
+      "coins": 200,
+      "accent": "#FF6FB5",
+      "tagline": "Flowers for a lovely voice",
+      "sortOrder": 6
+    },
+    {
+      "key": "ring",
+      "name": "Ring",
+      "coins": 500,
+      "accent": "#8FD3FF",
+      "tagline": "A sparkle they won't forget",
+      "sortOrder": 7
+    },
+    {
+      "key": "gem",
+      "name": "Gem",
+      "coins": 1000,
+      "accent": "#3FA9FF",
+      "tagline": "Rare, like this conversation",
+      "sortOrder": 8
+    },
+    {
+      "key": "crown",
+      "name": "Crown",
+      "coins": 2000,
+      "accent": "#FFC93C",
+      "tagline": "Crown your favourite host",
+      "sortOrder": 9
+    },
+    {
+      "key": "rocket",
+      "name": "Rocket",
+      "coins": 5000,
+      "accent": "#FF6B6B",
+      "tagline": "Send them to the moon",
+      "sortOrder": 10
+    }
+  ]
+}

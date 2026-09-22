@@ -21,6 +21,7 @@ exports.HISTORY_TYPE = {
   WITHDRAWAL_BY_LISTENER: 7,
   AVATAR_UNLOCK: 8,
   DAILY_REWARD: 9,
+  GIFT: 10,
 };
 
 exports.MESSAGE_TYPE = {
@@ -29,6 +30,7 @@ exports.MESSAGE_TYPE = {
   AUDIO: 3,
   AUDIO_CALL: 4,
   VIDEO_CALL: 5,
+  GIFT: 6,
 };
 
 exports.CALL_TYPE = {
