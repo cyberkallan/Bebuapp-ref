@@ -73,6 +73,9 @@ import 'package:talk_in/ui/user_flow/incoming_call_screen/binding/incoming_call_
 import 'package:talk_in/ui/user_flow/incoming_call_screen/view/incoming_call_screen.dart';
 import 'package:talk_in/ui/user_flow/main_screen/binding/main_screen_binding.dart';
 import 'package:talk_in/ui/user_flow/main_screen/view/main_screen.dart';
+import 'package:talk_in/ui/user_flow/sign_in_screen/binding/sign_in_binding.dart';
+import 'package:talk_in/ui/user_flow/sign_in_screen/view/email_sign_in_screen.dart';
+import 'package:talk_in/ui/user_flow/sign_in_screen/view/sign_in_screen.dart';
 import 'package:talk_in/ui/user_flow/mobile_number_screen/binding/mobile_number_binding.dart';
 import 'package:talk_in/ui/user_flow/mobile_number_screen/view/mobile_number_screen.dart';
 import 'package:talk_in/ui/user_flow/avatar_studio/binding/avatar_studio_binding.dart';
@@ -134,6 +137,16 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.main,
+      page: () => const SignInScreen(),
+      binding: SignInBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.emailSignIn,
+      page: () => const EmailSignInScreen(),
+      binding: MainScreenBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.legacyLogin,
       page: () => const MainScreen(),
       binding: MainScreenBinding(),
     ),

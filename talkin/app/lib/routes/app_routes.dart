@@ -5,6 +5,8 @@ class AppRoutes {
   static const String fillProfileScreen = '/fillProfileScreen';
   static const String onBoarding = '/onBoarding';
   static const String main = '/main';
+  static const String emailSignIn = '/emailSignIn';
+  static const String legacyLogin = '/legacyLogin';
   static const String register = '/register';
   static const String mobileLogIn = '/mobileLogIn';
   static const String verifyOtp = '/verifyOtp';

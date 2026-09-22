@@ -4,19 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:talk_in/custom/custom_country_picker/country_picker.dart';
+import 'package:talk_in/custom/motion/sfx.dart';
 import 'package:talk_in/custom/progress_indicator/progress_dialog.dart';
+import 'package:talk_in/custom/random_name/random_name.dart';
 import 'package:talk_in/routes/app_routes.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/api/edit_profile_api.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/model/edit_profile_model.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/api/fetch_login_user_profile_api.dart';
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/fetch_login_user_profile_model.dart';
 import 'package:talk_in/utils/app_asset.dart';
-import 'package:talk_in/utils/app_color.dart';
+import 'package:country_code_picker/country_code_picker.dart';
+import 'package:talk_in/utils/app_theme.dart';
 import 'package:talk_in/utils/constant.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/enums.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
-import 'package:talk_in/utils/font_style.dart';
+import 'package:talk_in/utils/login_config.dart';
 import 'package:talk_in/utils/utils.dart';
 
 class FillProfileScreenController extends GetxController {
@@ -65,9 +68,60 @@ class FillProfileScreenController extends GetxController {
     numberController.text = Database.fetchLoginUserProfileModel?.user?.phoneNumber ?? '';
     photo = Database.fetchLoginUserProfileModel?.user?.profilePic ?? '';
     dialCode = Database.dialCode;
+    // Guests get a random display name; Google users their account name.
+    nickNameController.text = (Database.fetchLoginUserProfileModel?.user?.nickName ?? '').isNotEmpty ? Database.fetchLoginUserProfileModel!.user!.nickName! : (nameController.text.split(' ').firstOrNull ?? '');
+    if (nickNameController.text.trim().isEmpty) nickNameController.text = CustomFetchRandomName.onGet();
+    nickNameController.addListener(() => update([idForm]));
+    _prefillCountry();
 
     super.onInit();
   }
+
+  static const idForm = 'fillProfileForm';
+
+  /// Suggest a fresh display name; a tap beats typing on a first-run screen.
+  void shuffleName() {
+    Sfx.tick();
+    nickNameController.text = CustomFetchRandomName.onGet();
+    nickNameController.selection = TextSelection.collapsed(offset: nickNameController.text.length);
+    update([idForm]);
+  }
+
+  /// Steps done out of the three we ask for; drives the progress bar.
+  int get completedSteps => (nickNameController.text.trim().length >= 2 ? 1 : 0) + 1 /* gender always has a value */ + (birthDate != null ? 1 : 0);
+
+  /// Welcome coins the user will unlock the moment the profile is saved (0 hides the teaser).
+  int get welcomeCoins => LoginConfig.current.showWelcomeBonus ? RewardTeaser.current.welcomeCoins : 0;
+
+  /// Country comes from the IP lookup done on the splash screen; the user can still change it.
+  void _prefillCountry() {
+    if (countryController.text.isNotEmpty) return;
+    final code = Database.selectedCountryCode.isEmpty ? 'IN' : Database.selectedCountryCode.toUpperCase();
+    try {
+      countryController.text = CountryCode.fromCountryCode(code).name ?? '';
+    } catch (_) {
+      countryController.text = '';
+    }
+    flagController.text = code.length == 2 ? String.fromCharCodes(code.codeUnits.map((u) => 0x1F1E6 + (u - 65))) : '';
+  }
+
+  /// Age in whole years for the picked birth date, or null.
+  int? get age {
+    final d = birthDate;
+    if (d == null) return null;
+    final now = DateTime.now();
+    var a = now.year - d.year;
+    if (now.month < d.month || (now.month == d.month && now.day < d.day)) a--;
+    return a;
+  }
+
+  DateTime? birthDate;
+
+  bool get canSubmit => nickNameController.text.trim().length >= 2 && dateController.text.trim().isNotEmpty;
+
+  /// The picked file if any, else the photo we already have (Google / guest), else empty.
+  String get displayPhoto => pickImage ?? photo ?? '';
+  bool get hasPhoto => displayPhoto.isNotEmpty;
 
   List<Map<String, dynamic>> gender = [
     {
@@ -91,35 +145,33 @@ class FillProfileScreenController extends GetxController {
 
     log("Database.loginUserGender :: ${Database.loginUserGender}");
 
-    update([Constant.idGenderSelect]);
-    // update();
+    Sfx.tick();
+    update([Constant.idGenderSelect, idForm]);
   }
 
   /// select date
   Future<void> selectDate(BuildContext context) async {
+    final now = DateTime.now();
+    final adult = DateTime(now.year - 18, now.month, now.day);
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 3650)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: birthDate ?? DateTime(now.year - 22, now.month, now.day),
+      firstDate: DateTime(1940),
+      lastDate: adult,
+      helpText: 'Your birthday',
       builder: (context, child) {
+        final light = BebuTheme.isLight;
+        final scheme = (light ? const ColorScheme.light() : const ColorScheme.dark()).copyWith(
+          primary: BebuTheme.pink,
+          onPrimary: Colors.white,
+          surface: BebuTheme.surface,
+          onSurface: BebuTheme.text,
+        );
         return Theme(
           data: Theme.of(context).copyWith(
-            dividerColor: Colors.transparent,
-            colorScheme: ColorScheme.light(
-              primary: AppColors.appColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.appColor,
-                textStyle: AppFontStyle.fontStyleW600(
-                  fontSize: 14,
-                  fontColor: AppColors.appColor,
-                ),
-              ),
-            ),
+            colorScheme: scheme,
+            dialogTheme: DialogThemeData(backgroundColor: BebuTheme.surface, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(BebuTheme.radiusLg))),
+            textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: BebuTheme.pink)),
           ),
           child: child!,
         );
@@ -127,9 +179,66 @@ class FillProfileScreenController extends GetxController {
     );
 
     if (picked != null) {
+      birthDate = picked;
       dateController.text = "${picked.day.toString().padLeft(2, '0')} / ${picked.month.toString().padLeft(2, '0')} / ${picked.year}";
-      update(); // For GetBuilder to update
+      Sfx.lightTap();
+      update();
     }
+  }
+
+  /// Camera / gallery chooser styled like the rest of the app.
+  void choosePhoto(BuildContext context) {
+    Sfx.tick();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SafeArea(
+        child: Container(
+          margin: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(8, 14, 8, 8),
+          decoration: BoxDecoration(color: BebuTheme.surface, borderRadius: BorderRadius.circular(BebuTheme.radiusLg), border: Border.all(color: BebuTheme.border)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 36, height: 4, decoration: BoxDecoration(color: BebuTheme.borderStrong, borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 12),
+              Text('Profile photo', style: BebuTheme.title(size: 16)),
+              const SizedBox(height: 6),
+              _photoOption(Icons.photo_camera_rounded, 'Take a photo', () {
+                Get.back();
+                takePhoto();
+              }),
+              _photoOption(Icons.photo_library_rounded, 'Choose from gallery', () {
+                Get.back();
+                getImageFromGallery();
+              }),
+              if (hasPhoto)
+                _photoOption(Icons.delete_outline_rounded, 'Remove photo', () {
+                  Get.back();
+                  pickImage = '';
+                  photo = '';
+                  update();
+                }, danger: true),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _photoOption(IconData icon, String label, VoidCallback onTap, {bool danger = false}) {
+    final color = danger ? BebuTheme.red : BebuTheme.text;
+    return ListTile(
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(BebuTheme.radiusSm)),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(color: BebuTheme.surface2, shape: BoxShape.circle),
+        child: Icon(icon, size: 20, color: color),
+      ),
+      title: Text(label, style: BebuTheme.label(size: 15, color: color)),
+    );
   }
 
   /// Get image from gallery
@@ -156,18 +265,15 @@ class FillProfileScreenController extends GetxController {
   Future<void> onSaveProfile() async {
     Utils.showLog("Click On Save Profile => ${Database.loginUserId}");
 
-    if (photo == "" && pickImage == null) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseSelectProfileImage.name.tr);
-    } else if (nickNameController.text.trim().isEmpty) {
+    if (nickNameController.text.trim().length < 2) {
       Utils.showToast(Get.context!, EnumLocale.txtPleaseEnterNickName.name.tr);
     } else if (dateController.text.trim().isEmpty) {
       Utils.showToast(Get.context!, EnumLocale.txtPleaseSelectBirthDate.name.tr);
-    } else if (numberController.text.trim().isEmpty) {
-      Utils.showToast(Get.context!, EnumLocale.txtPleaseEnterMobileNumber.name.tr);
     } else {
       Get.dialog(const LoadingWidget(), barrierDismissible: false); // Start Loading...
 
       await callEditApi();
+      if (Get.isDialogOpen ?? false) Get.back();
       Database.onSetFillProfile(true);
     }
   }
@@ -215,9 +321,9 @@ class FillProfileScreenController extends GetxController {
       update();
 
       if (Database.fetchLoginUserProfileModel?.user?.isListener == true) {
-        Get.toNamed(AppRoutes.hostBottomBar);
+        Get.offAllNamed(AppRoutes.hostBottomBar);
       } else {
-        Get.toNamed(AppRoutes.bottomBar);
+        Get.offAllNamed(AppRoutes.bottomBar);
       }
     } else {
       Utils.showToast(Get.context!, EnumLocale.txtSomeThingWentWrong.name.tr);
