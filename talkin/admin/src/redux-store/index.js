@@ -43,6 +43,7 @@ import listenerReducer from '@/redux-store/slices/listener'
 import aiChatReducer from '@/redux-store/slices/aiChat'
 import appearanceReducer from '@/redux-store/slices/appearance'
 import avatarStudioReducer from '@/redux-store/slices/avatarStudio'
+import loginRewardsReducer from '@/redux-store/slices/loginRewards'
 
 export const store = configureStore({
   reducer: {
@@ -69,6 +70,7 @@ export const store = configureStore({
     aiChat: aiChatReducer,
     appearance: appearanceReducer,
     avatarStudio: avatarStudioReducer,
+    loginRewards: loginRewardsReducer,
 
     // posts: postsReducer,
     faqs: faqsReducer,

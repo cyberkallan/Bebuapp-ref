@@ -31,6 +31,7 @@ import ProfileManagement from './tabs/ProfileManageMent'
 import AiChatSettings from './tabs/AiChatSettings'
 import AppearanceSettings from './tabs/AppearanceSettings'
 import AvatarStudioSettings from './tabs/AvatarStudioSettings'
+import LoginRewardsSettings from './tabs/LoginRewardsSettings'
 
 // Tab labels and values
 const tabs = [
@@ -40,7 +41,8 @@ const tabs = [
   { label: 'Withdrawal', value: 'withdrawal' },
   { label: 'AI Chat', value: 'ai-chat' },
   { label: 'Appearance', value: 'appearance' },
-  { label: 'Avatar Studio', value: 'avatar-studio' }
+  { label: 'Avatar Studio', value: 'avatar-studio' },
+  { label: 'Login & Rewards', value: 'login-rewards' }
 ]
 
 const Settings = () => {
@@ -90,6 +92,8 @@ const Settings = () => {
         return <AppearanceSettings />
       case 'avatar-studio':
         return <AvatarStudioSettings />
+      case 'login-rewards':
+        return <LoginRewardsSettings />
       default:
         return <Typography>Select a tab</Typography>
     }
