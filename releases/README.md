@@ -5,13 +5,20 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.7.1-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
-| `bebu-1.7.1-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
+| `bebu-1.7.2-arm64-v8a.apk`       | Practically every phone from ~2017 on | 91 MB |
+| `bebu-1.7.2-armeabi-v7a.apk`     | Older 32-bit devices                  | 84 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.7.2` is the first build on bebu's own Firebase project (`neocat-ceae7`) and
+package name **`in.bebuapp.app`**: Google sign-in, phone OTP (with two free
+test numbers, `+91 99999 99999` / `+91 98888 88888`, code `123456`), guest
+login and push notifications all run against our own project. Because the
+package name changed this does **not** install over `1.7.1` — uninstall the
+old app first.
 
 `1.7.1` replaces the Random match radar with a photo-first card: a blurred
 reel of live hosts, live count with stacked avatars, an Audio / Video switch

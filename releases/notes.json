@@ -2,6 +2,11 @@
  "date": "2026-09-22",
  "items": [
   {
+   "type": "new",
+   "title": "Login now works: Google, phone OTP, guest",
+   "body": "The app moved to bebu's own Firebase project and the new package name in.bebuapp.app, so Continue with Google, phone codes and one-tap guest sign-in are live, and push notifications come from our own server. This is a fresh install: uninstall any older bebu build first."
+  },
+  {
    "type": "improved",
    "title": "Random match, redesigned again",
    "body": "The radar is gone. You now get one big card with a softly blurred reel of hosts who are live right now, how many are online, an Audio / Video switch that shows the coins per minute, and a single Start matching button with how many minutes your balance covers. While we search, the reel shuffles and you can cancel at any time."
