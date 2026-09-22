@@ -13,8 +13,7 @@ const Panel = styled('div')({
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
-  padding: '48px 56px',
+  padding: '48px 56px 72px',
   color: '#fff',
   background:
     'radial-gradient(120% 90% at 0% 0%, #5B2A86 0%, rgba(91,42,134,0) 55%), radial-gradient(90% 70% at 100% 100%, #FF4D6D 0%, rgba(255,77,109,0) 60%), linear-gradient(160deg, #1B0F2E 0%, #2A1443 50%, #3B0F2E 100%)',
@@ -42,7 +41,8 @@ const Wordmark = styled('div')({
 const Copy = styled('div')({
   position: 'relative',
   zIndex: 1,
-  maxWidth: 420,
+  maxWidth: 'min(440px, 62%)',
+  marginTop: 'clamp(40px, 9vh, 96px)',
   '& h1': {
     margin: 0,
     fontSize: 'clamp(30px, 3.2vw, 44px)',
@@ -71,18 +71,19 @@ const Chips = styled('div')({
 
 const Phones = styled('div')({
   position: 'absolute',
-  right: -40,
-  bottom: -60,
+  right: -24,
+  bottom: -110,
   display: 'flex',
   alignItems: 'flex-end',
-  gap: 24,
+  gap: 20,
   transform: 'rotate(-8deg)',
+  transformOrigin: 'bottom right',
   zIndex: 0,
-  '@media (max-width: 1100px)': { right: -120, transform: 'rotate(-8deg) scale(0.85)' }
+  '@media (max-width: 1280px)': { transform: 'rotate(-8deg) scale(0.8)' }
 })
 
 const Phone = styled('div', { shouldForwardProp: p => p !== 'tall' })(({ tall }) => ({
-  width: tall ? 250 : 220,
+  width: tall ? 210 : 180,
   aspectRatio: '780 / 1688',
   borderRadius: 40,
   padding: 10,
@@ -92,8 +93,14 @@ const Phone = styled('div', { shouldForwardProp: p => p !== 'tall' })(({ tall })
 }))
 
 const Foot = styled('div')({
-  position: 'relative',
-  zIndex: 1,
+  position: 'absolute',
+  left: 56,
+  bottom: 40,
+  zIndex: 2,
+  padding: '8px 14px',
+  borderRadius: 999,
+  background: 'rgba(20,10,35,0.55)',
+  backdropFilter: 'blur(8px)',
   display: 'flex',
   alignItems: 'center',
   gap: 10,
