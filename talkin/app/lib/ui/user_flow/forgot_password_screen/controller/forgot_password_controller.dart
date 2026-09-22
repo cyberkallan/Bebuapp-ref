@@ -102,8 +102,8 @@ class ForgotPasswordController extends GetxController {
           actionCodeSettings: ActionCodeSettings(
             url: 'https://example.com/finishSignUp?cartId=1234',
             handleCodeInApp: true,
-            iOSBundleId: 'com.incodes.tingle',
-            androidPackageName: 'com.incodes.tingle',
+            iOSBundleId: 'in.bebuapp.app',
+            androidPackageName: 'in.bebuapp.app',
             androidInstallApp: true,
             androidMinimumVersion: '10',
           ));

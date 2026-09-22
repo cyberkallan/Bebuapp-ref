@@ -17,7 +17,7 @@ class Utils {
   static const sandboxVerifyReceiptUrl = false;
 
   static RxBool isAppOpen = false.obs;
-  static String? playStoreId = "com.incodes.talkin";
+  static String? playStoreId = "in.bebuapp.app";
   static String? appStoreId = "6747668315";
 
   // /// =================== Toast =================== ///

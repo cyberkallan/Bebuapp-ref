@@ -1,4 +1,4 @@
-package com.incodes.talkin
+package `in`.bebuapp.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
