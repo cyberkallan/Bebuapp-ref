@@ -57,6 +57,7 @@ copy_common() { # $1 = destination root
      docs/avatar-studio.md docs/login-rewards.md "$dest/docs/"
   cp bebu/INSTALL.md "$dest/INSTALL.md"
   cp .github/workflows/ios-release.yml "$dest/bebu/.github-workflow-ios-release.yml"
+  cp codemagic.yaml "$dest/codemagic.yaml"
   cp releases/notes.json "$dest/docs/release-notes.json"
 }
 
@@ -252,11 +253,35 @@ for f in bebu/deploy/.env bebu/deploy/firebase-service-account.json bebu/app/and
 done
 echo "  clean"
 
+# ── Flutter app bundle (Android + iOS project, with our Firebase config) ─────
+say "Flutter app bundle"
+A="$WORK/bebu-app-flutter-$VERSION"
+mkdir -p "$A"
+rsync -a "${COMMON_EXCLUDES[@]}" --exclude /build --exclude /.dart_tool --exclude /android/.gradle --exclude /android/app/.cxx bebu/app/ "$A/app/"
+cp bebu/app/android/key.properties "$A/app/android/key.properties" 2>/dev/null || true
+cp docs/ios-release.md docs/play-store.md "$A/"
+cp codemagic.yaml "$A/codemagic.yaml"
+cat > "$A/README.md" <<EOF
+# bebu $VERSION — Flutter app (Android + iOS project)
+
+The complete mobile app source with our Firebase configuration
+(app/android/app/google-services.json, app/ios/Runner/GoogleService-Info.plist)
+and the Android upload keystore. PRIVATE.
+
+iOS: open app/ios/Runner.xcworkspace in Xcode after "flutter pub get && cd ios && pod install",
+or build without a Mac via Codemagic (codemagic.yaml) — step by step in ios-release.md.
+An .ipa can only be produced with an Apple Developer account (see ios-release.md).
+
+Android: "flutter build apk --release --split-per-abi" / "flutter build appbundle --release"
+(server URL and secret are the defaults in app/lib/utils/api.dart).
+EOF
+
 # ── zip ──────────────────────────────────────────────────────────────────────
 say "Zipping"
-rm -f "$DIST/bebu-production-$VERSION.zip" "$DIST/bebu-codecanyon-$VERSION.zip"
+rm -f "$DIST/bebu-production-$VERSION.zip" "$DIST/bebu-codecanyon-$VERSION.zip" "$DIST/bebu-app-flutter-$VERSION.zip"
 (cd "$WORK" && zip -qr -9 "$DIST/bebu-production-$VERSION.zip" "bebu-production-$VERSION")
 (cd "$WORK" && zip -qr -9 "$DIST/bebu-codecanyon-$VERSION.zip" "bebu-codecanyon-$VERSION")
+(cd "$WORK" && zip -qr -9 "$DIST/bebu-app-flutter-$VERSION.zip" "bebu-app-flutter-$VERSION")
 cp releases/bebu-"$VERSION"-*.apk releases/bebu-"$VERSION".aab "$DIST/"
 (cd "$DIST" && sha256sum *.zip *.apk *.aab > SHA256SUMS.txt)
 
@@ -271,6 +296,11 @@ cat > "$DIST/manifest.json" <<EOF
     "title": "bebu $VERSION — marketplace package (no keys)",
     "group": "Marketplace package",
     "description": "Same product with every credential removed, placeholder config files, guided install.sh and INSTALL.md. Safe to sell or hand to a developer."
+  },
+  "bebu-app-flutter-$VERSION.zip": {
+    "title": "Flutter app source $VERSION — Android + iOS project",
+    "group": "Source code",
+    "description": "The mobile app alone, with our Firebase config and keystore. Open app/ios/Runner.xcworkspace in Xcode, or build on Codemagic → TestFlight with the included codemagic.yaml (see ios-release.md). An .ipa needs an Apple Developer account first."
   },
   "bebu-$VERSION.aab": {
     "title": "Android App Bundle $VERSION",

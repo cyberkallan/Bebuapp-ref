@@ -1,0 +1,90 @@
+# Codemagic (codemagic.io) — builds the bebu iOS app on a hosted Mac and
+# uploads it to TestFlight. No Mac needed. Free tier: 500 build minutes/month.
+#
+# One-time setup in Codemagic:
+#   1. Add this repository (GitHub) → Codemagic finds this file automatically.
+#   2. Teams → Integrations → App Store Connect: upload an App Store Connect
+#      API key (Users and Access → Integrations → App Store Connect API → +)
+#      and name it "bebu_asc". Codemagic then creates and manages the Apple
+#      signing certificate and provisioning profile itself.
+#   3. Environment variables (group "bebu_app"):
+#        API_BASE_URL     https://bebu.145.223.79.74.sslip.io/   (your server, trailing slash)
+#        API_SECRET_KEY   <SECRET_KEY from bebu/deploy/.env>      (mark as secure)
+#   4. Start build → workflow "ios-testflight".
+#
+# Full walkthrough: docs/ios-release.md
+workflows:
+  ios-testflight:
+    name: bebu iOS → TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: bebu_asc
+    environment:
+      groups:
+        - bebu_app
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: in.bebuapp.app
+      vars:
+        APP_DIR: bebu/app
+    scripts:
+      - name: Flutter dependencies
+        script: |
+          cd $APP_DIR
+          flutter pub get
+      - name: Apply signing to the Xcode project
+        script: |
+          cd $APP_DIR
+          xcode-project use-profiles
+      - name: CocoaPods
+        script: |
+          cd $APP_DIR/ios
+          pod install
+      - name: Build signed IPA
+        script: |
+          cd $APP_DIR
+          flutter build ipa --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --dart-define=API_BASE_URL="$API_BASE_URL" \
+            --dart-define=API_SECRET_KEY="$API_SECRET_KEY" \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - bebu/app/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - bebu testers
+      email:
+        recipients:
+          - support@bebuapp.in
+        notify:
+          success: true
+          failure: true
+
+  # Unsigned build for a quick "does it compile" check — cannot be installed
+  # on a phone, but fails fast if a dependency breaks on iOS.
+  ios-compile-check:
+    name: bebu iOS compile check (unsigned)
+    max_build_duration: 45
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      vars:
+        APP_DIR: bebu/app
+    scripts:
+      - name: Build without signing
+        script: |
+          cd $APP_DIR
+          flutter pub get
+          flutter build ios --release --no-codesign
+    artifacts:
+      - bebu/app/build/ios/iphoneos/Runner.app
