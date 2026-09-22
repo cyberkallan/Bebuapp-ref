@@ -125,7 +125,8 @@ grep -q '"private_key"' "$SA_PATH" || die "$SA_PATH does not look like a Firebas
 SA_PROJECT="$(grep -oE '"project_id"\s*:\s*"[^"]+"' "$SA_PATH" | sed -E 's/.*"([^"]+)"$/\1/' || true)"
 [ "$SA_PROJECT" = "$FIREBASE_PROJECT_ID" ] || warn "Service account project ($SA_PROJECT) differs from projectId ($FIREBASE_PROJECT_ID). Both must be the same Firebase project."
 [ "$SA_PATH" = "firebase-service-account.json" ] || cp "$SA_PATH" firebase-service-account.json
-chmod 600 firebase-service-account.json
+# Readable by the container's unprivileged user; the deploy folder itself should stay root-only.
+chmod 644 firebase-service-account.json
 ok "Service account stored at deploy/firebase-service-account.json"
 
 # ── 3. calls ─────────────────────────────────────────────────────────────────
