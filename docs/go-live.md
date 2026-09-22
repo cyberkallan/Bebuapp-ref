@@ -87,6 +87,17 @@ Then **Authentication → Settings → Authorized domains → Add domain** →
 - Production OTP on Android uses Play Integrity. It works before the Play
   Store listing exists (falls back to a reCAPTCHA page) and becomes silent once
   the app is linked to Play Console (step 7).
+- **SMS region policy** (Authentication → Settings → SMS region policy). The
+  project was created in *Allowlist* mode with **no** countries, which makes
+  every OTP fail with `operation-not-allowed` ("This sign-in method is not
+  enabled yet" in the app) even though Phone is enabled. It is now set to
+  *Allow only* **India**; add more countries there when you launch elsewhere.
+  Keep it an allowlist, not "allow all": SMS toll fraud is real and you pay per
+  message.
+- Order of failures you will see from the API while setting this up, and what
+  each means: `OPERATION_NOT_ALLOWED … region` → fix the region policy;
+  `BILLING_NOT_ENABLED` → upgrade to Blaze (test numbers still work without it);
+  `QUOTA_EXCEEDED` → the daily SMS cap for the plan is used up.
 
 ### 2.5 Service account (lets the server send push notifications and verify logins)
 
