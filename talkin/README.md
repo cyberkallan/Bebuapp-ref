@@ -198,6 +198,16 @@ keeping the original controllers, APIs and call/chat entry points untouched:
   *Settings → Appearance* tab with a live phone preview. See
   `docs/appearance.md`.
 
+### New logo (`1.6.3`)
+
+The supplied bebu mark (pink B with a face profile and heart) replaces the
+placeholder phone glyph everywhere: `assets/images/app_logo.png` (full-bleed
+launcher icon), `app_logo_foreground.png` + `app_logo_bg.png` (adaptive icon,
+regenerated with `dart run flutter_launcher_icons`), `logo_mark.png` (bare
+mark, used on the splash screen), `splash_logo.png` (mark + wordmark), the
+Android `ic_notification` silhouettes, the admin `talkin-logo.png` / favicon,
+and the landing site brand, favicons and social card.
+
 ### Random match radar, host preview, presence badge (`1.6.2`)
 
 - `random_call_screen/view/random_call_view.dart` — rebuilt around a

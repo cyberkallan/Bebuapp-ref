@@ -327,17 +327,9 @@ p {
   font-size: 21px;
 }
 .brand__mark {
-  display: grid;
-  place-items: center;
   width: 28px;
   height: 28px;
-  border-radius: 9px;
-  background: var(--accent-grad);
-  color: #fff;
-}
-.brand__mark svg {
-  width: 15px;
-  height: 15px;
+  object-fit: contain;
 }
 .nav__links {
   display: flex;

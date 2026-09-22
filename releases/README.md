@@ -5,13 +5,19 @@ this repository.
 
 | File                             | Devices                               | Size  |
 | -------------------------------- | ------------------------------------- | ----- |
-| `bebu-1.6.2-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
-| `bebu-1.6.2-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
+| `bebu-1.6.3-arm64-v8a.apk`       | Practically every phone from ~2017 on | 93 MB |
+| `bebu-1.6.3-armeabi-v7a.apk`     | Older 32-bit devices                  | 86 MB |
 
 Checksums are in `SHA256SUMS.txt`; release notes shown on the website come from
 `notes.json`.
 
 ## What this build is
+
+`1.6.3` ships the new bebu logo: the pink B with a face profile and heart is the
+launcher icon (adaptive icon on a deep-plum plate, iOS icon set regenerated),
+the splash mark, the monochrome notification icon and the brand on the
+website, download page and admin panel. No functional changes. Installs over
+`1.6.2`.
 
 `1.6.2` redesigns Random match: a layered proximity radar over a faint city
 map with hosts drifting on the rings, a tappable black/white core that starts

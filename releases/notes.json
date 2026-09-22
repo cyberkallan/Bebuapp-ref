@@ -1,6 +1,11 @@
 {
-  "date": "2026-09-21",
+  "date": "2026-09-22",
   "items": [
+    {
+      "type": "new",
+      "title": "New bebu logo",
+      "body": "The B-with-a-face mark is now the launcher icon (adaptive on Android 8+, iOS set included), the splash logo, the notification icon and the website brand."
+    },
     {
       "type": "improved",
       "title": "Random match, redesigned",

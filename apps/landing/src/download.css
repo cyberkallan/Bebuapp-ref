@@ -514,11 +514,6 @@
 .dl-step__app .brand__mark {
   width: 34px;
   height: 34px;
-  border-radius: 11px;
-}
-.dl-step__app .brand__mark svg {
-  width: 18px;
-  height: 18px;
 }
 .dl-callout {
   margin-top: 20px;

@@ -147,6 +147,9 @@ class AppAsset {
   static const imagePlaceHolder = "${getImagesPath}image_place_holder.png";
   static const randomBg = "${getImagesPath}random_bg.png";
   static const appLogo = "${getImagesPath}app_logo.png";
+
+  /// The B mark alone on a transparent background (no icon plate).
+  static const logoMark = "${getImagesPath}logo_mark.png";
   static const appStoreImage = "${getImagesPath}apple_icon.png";
 
   /////////////////////// audio ringtone ////////////////////////

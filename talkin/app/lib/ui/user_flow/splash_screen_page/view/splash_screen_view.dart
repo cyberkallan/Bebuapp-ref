@@ -77,13 +77,15 @@ class _SplashBodyState extends State<_SplashBody> with TickerProviderStateMixin 
                       child: Opacity(
                         opacity: logoIn.value.clamp(0, 1),
                         child: Container(
-                          width: 116,
-                          height: 116,
+                          width: 124,
+                          height: 124,
+                          padding: const EdgeInsets.all(6),
+                          // A soft pink halo behind the bare mark; the Container itself stays transparent.
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            boxShadow: [BoxShadow(color: BebuTheme.violet.withValues(alpha: 0.55), blurRadius: 48, offset: const Offset(0, 16))],
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: BebuTheme.pink.withValues(alpha: 0.45), blurRadius: 56, spreadRadius: -8, offset: const Offset(0, 14))],
                           ),
-                          child: ClipRRect(borderRadius: BorderRadius.circular(32), child: Image.asset(AppAsset.appLogo, fit: BoxFit.cover)),
+                          child: Image.asset(AppAsset.logoMark, fit: BoxFit.contain, filterQuality: FilterQuality.high),
                         ),
                       ),
                     ),
