@@ -4,6 +4,8 @@ import 'package:talk_in/custom/dialog/exit_app_dialog.dart';
 import 'package:talk_in/custom/listeners/listener_photo_card.dart';
 import 'package:talk_in/custom/motion/coin_pill.dart';
 import 'package:talk_in/routes/app_routes.dart';
+import 'package:talk_in/ui/user_flow/daily_reward/controller/daily_reward_controller.dart';
+import 'package:talk_in/ui/user_flow/daily_reward/view/gift_badge.dart';
 import 'package:talk_in/ui/user_flow/edit_profile_screen/controller/edit_profile_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/controller/home_screen_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/widget/listener_deck.dart';
@@ -143,14 +145,27 @@ class _CoinPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<HomeScreenController>(
-      id: Constant.idCoinUpdate,
-      builder: (controller) => CoinPill(
-        coins: int.tryParse(Database.userCoin) ?? 0,
-        loading: controller.isCoinLoading,
-        height: _HomeHeader.controlHeight,
-        onTap: () => Get.toNamed(AppRoutes.myWalletScreen),
-      ),
+    final rewards = DailyRewardController.to;
+    return GetBuilder<DailyRewardController>(
+      id: DailyRewardController.idBadge,
+      builder: (_) {
+        final gift = rewards.canClaim;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            GetBuilder<HomeScreenController>(
+              id: Constant.idCoinUpdate,
+              builder: (controller) => CoinPill(
+                coins: int.tryParse(Database.userCoin) ?? 0,
+                loading: controller.isCoinLoading,
+                height: _HomeHeader.controlHeight,
+                onTap: () => gift ? rewards.open(context) : Get.toNamed(AppRoutes.myWalletScreen),
+              ),
+            ),
+            if (gift) const Positioned(top: -9, left: -8, child: GiftBadge()),
+          ],
+        );
+      },
     );
   }
 }

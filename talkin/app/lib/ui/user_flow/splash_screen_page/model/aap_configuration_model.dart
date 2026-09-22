@@ -35,19 +35,35 @@ class AppConfigurationModel {
 class Data {
   String? userPrivacyPolicyUrl;
   bool? isApplicationLive;
+  Map<String, dynamic>? login;
+  Map<String, dynamic>? appearance;
+  int? welcomeCoins;
+  Map<String, dynamic>? dailyReward;
 
   Data({
     this.userPrivacyPolicyUrl,
     this.isApplicationLive,
+    this.login,
+    this.appearance,
+    this.welcomeCoins,
+    this.dailyReward,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         userPrivacyPolicyUrl: json["userPrivacyPolicyUrl"],
         isApplicationLive: json["isApplicationLive"],
+        login: json["login"] is Map ? Map<String, dynamic>.from(json["login"]) : null,
+        appearance: json["appearance"] is Map ? Map<String, dynamic>.from(json["appearance"]) : null,
+        welcomeCoins: (json["welcomeCoins"] as num?)?.toInt(),
+        dailyReward: json["dailyReward"] is Map ? Map<String, dynamic>.from(json["dailyReward"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
         "userPrivacyPolicyUrl": userPrivacyPolicyUrl,
         "isApplicationLive": isApplicationLive,
+        "login": login,
+        "appearance": appearance,
+        "welcomeCoins": welcomeCoins,
+        "dailyReward": dailyReward,
       };
 }

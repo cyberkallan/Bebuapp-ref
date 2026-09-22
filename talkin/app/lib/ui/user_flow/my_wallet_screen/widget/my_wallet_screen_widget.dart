@@ -341,15 +341,16 @@ class WalletActivityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final type = item.type ?? 0;
-    final income = item.isIncome ?? (type == 1 || type == 2);
+    final income = item.isIncome ?? (type == 1 || type == 2 || type == 9);
     final (icon, color, title) = switch (type) {
-      1 => (Icons.card_giftcard_rounded, BebuTheme.violet, 'Daily login bonus'),
+      1 => (Icons.card_giftcard_rounded, BebuTheme.violet, 'Welcome bonus'),
       2 => (Icons.add_card_rounded, BebuTheme.amber, 'Coins purchased'),
       3 => (Icons.call_rounded, BebuTheme.green, 'Voice call'),
       4 => (Icons.videocam_rounded, BebuTheme.pink, 'Video call'),
       5 => (Icons.shuffle_rounded, BebuTheme.green, 'Random voice call'),
       6 => (Icons.shuffle_rounded, BebuTheme.pink, 'Random video call'),
       8 => (Icons.auto_awesome_rounded, BebuTheme.violet, 'Avatar item unlocked'),
+      9 => (Icons.redeem_rounded, BebuTheme.amber, 'Daily streak gift'),
       _ => (Icons.swap_horiz_rounded, BebuTheme.blue, 'Coins'),
     };
     final who = (type >= 3 && (item.receiverName ?? '').isNotEmpty) ? ' · ${item.receiverName}' : '';

@@ -16,6 +16,7 @@ import 'package:talk_in/ui/user_flow/splash_screen_page/model/ip_api_response_mo
 import 'package:talk_in/ui/user_flow/splash_screen_page/model/setting_api_model.dart';
 import 'package:talk_in/utils/app_color.dart';
 import 'package:talk_in/utils/appearance.dart';
+import 'package:talk_in/utils/login_config.dart';
 import 'package:talk_in/utils/database.dart';
 import 'package:talk_in/utils/firebse_access_token.dart';
 import 'package:talk_in/utils/utils.dart';
@@ -40,6 +41,14 @@ class SplashScreenController extends GetxController {
     /// for privacy policy link and app live key
     appConfigurationModel = await AppConfigurationApi.callApi();
     Database.appConfigurationModel = appConfigurationModel;
+    // Sign-in methods, reward teaser and the admin theme are public, so the
+    // sign-in screen is already branded and configured before any login.
+    final cfg = appConfigurationModel?.data;
+    if (cfg != null) {
+      LoginConfig.remember(cfg.login);
+      RewardTeaser.remember(cfg.toJson());
+      if (cfg.appearance != null) Appearance.applyServer(cfg.appearance);
+    }
     final token = await FirebaseAccessToken.onGet();
 
     fetchLoginUserProfileModel = await FetchLoginUserProfileApi.callApi(loginUserId: Database.loginUserFirebaseId, token: token ?? '');

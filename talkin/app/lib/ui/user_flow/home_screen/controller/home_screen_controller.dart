@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:talk_in/ui/user_flow/daily_reward/controller/daily_reward_controller.dart';
 import 'package:talk_in/ui/user_flow/home_screen/api/top_listeners_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/api/user_coin_api.dart';
 import 'package:talk_in/ui/user_flow/home_screen/model/top_listeners_model.dart';
@@ -40,6 +41,9 @@ class HomeScreenController extends GetxController {
     Database.onSetUserCoin(userCoinModel?.coin.toString() ?? "0");
     isCoinLoading = false;
     update([Constant.idCoinUpdate]);
+
+    // Daily streak gift: badge the coin pill and, once per day, open the sheet.
+    DailyRewardController.to.checkAndMaybeOpen();
 
     log("Enter In Home screen Controller");
     scrollController.addListener(onTopListenersPagination);
