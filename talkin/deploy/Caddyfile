@@ -13,7 +13,9 @@
 	# Some admin code joins URLs with a double slash; collapse before routing.
 	uri path_regexp /{2,} /
 
-	@backend path /api/* /storage/* /socket.io/* /avatar-studio/*
+	# /gifts/* are the bundled gift renders served by the backend; the bare
+	# /gifts path (no trailing slash) is the admin's Gifts page and stays here.
+	@backend path /api/* /storage/* /socket.io/* /avatar-studio/* /gifts/*
 	handle @backend {
 		reverse_proxy talkin-backend:5000
 	}
